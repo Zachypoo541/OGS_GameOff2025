@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: Triangle_Waveform
   m_EditorClassIdentifier: 
   waveformName: Triangle
-  waveformColor: {r: 1, g: 1, b: 0, a: 0}
+  waveformColor: {r: 1, g: 1, b: 0, a: 1}
   unlockLevel: 1
   baseDamage: 10
   energyCost: 15
   projectileSpeed: 35
   projectilePrefab: {fileID: 8115411382015281130, guid: ecbb56278298ef843a561305a9da9e31, type: 3}
   knockbackForce: 0
-  trailMaterial: {fileID: 0}
+  trailMaterial: {fileID: 2100000, guid: 242fd2afca459354b94c6d9c2b5e3510, type: 2}
   trailWidth: 0.5
   trailLifetime: 0.5
   usesHealthWhenEnergyEmpty: 0
