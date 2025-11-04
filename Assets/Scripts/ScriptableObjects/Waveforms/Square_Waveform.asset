@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: Square_Waveform
   m_EditorClassIdentifier: 
   waveformName: Square
-  waveformColor: {r: 0, g: 0, b: 1, a: 0}
+  waveformColor: {r: 0, g: 0, b: 1, a: 1}
   unlockLevel: 1
   baseDamage: 10
   energyCost: 15
   projectileSpeed: 20
   projectilePrefab: {fileID: 8115411382015281130, guid: 85ad334654d63a44490ffb4dc0fefac4, type: 3}
   knockbackForce: 0
-  trailMaterial: {fileID: 0}
+  trailMaterial: {fileID: 2100000, guid: 5ad21149e0ac29a4bbe3d52c554d3c18, type: 2}
   trailWidth: 0.5
   trailLifetime: 0.5
   usesHealthWhenEnergyEmpty: 0

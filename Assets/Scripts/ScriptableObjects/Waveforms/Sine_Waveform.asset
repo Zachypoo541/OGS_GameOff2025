@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: Sine_Waveform
   m_EditorClassIdentifier: 
   waveformName: Sine
-  waveformColor: {r: 0, g: 1, b: 0, a: 0}
+  waveformColor: {r: 0, g: 1, b: 0, a: 1}
   unlockLevel: 1
   baseDamage: 10
   energyCost: 15
   projectileSpeed: 20
   projectilePrefab: {fileID: 8115411382015281130, guid: a8fe23f536355134984809fef988e81d, type: 3}
   knockbackForce: 0
-  trailMaterial: {fileID: 0}
+  trailMaterial: {fileID: 2100000, guid: b78e839b2e94b9a4a9bf74b15c6f091d, type: 2}
   trailWidth: 0.5
   trailLifetime: 0.5
   usesHealthWhenEnergyEmpty: 0
