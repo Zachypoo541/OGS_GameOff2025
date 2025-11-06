@@ -41,11 +41,27 @@ public class Player : MonoBehaviour
             Rotation = playerCamera.transform.rotation,
             Move = input.Move.ReadValue<Vector2>(),
             Jump = input.Jump.WasPressedThisFrame(),
+            JumpSustain = input.Jump.IsPressed(),
             Crouch = input.Crouch.WasPressedThisFrame()
                 ? CrouchInput.Toggle
                 : CrouchInput.None
         };
         playerCharacter.UpdateInput(characterInput);
         playerCharacter.UpdateBody(deltaTime);
+
+#if UNITY_EDTIOR
+        if (keyboard.current.tKey.wasPressedThisFrame)
+        {
+            var ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+            {
+                Teleport(hit.point);
+            }
+        }
+#endif
+    }
+
+    public void Teleport(Vector3 position)
+    {
+        playerCharacter.SetPosition(position);
     }
 }

@@ -264,14 +264,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   motor: {fileID: 83750162}
-  root: {fileID: 1870160345}
+  root: {fileID: 1897027700}
   cameraTarget: {fileID: 65480438}
   walkSpeed: 20
   crouchSpeed: 7
   walkResponse: 25
   crouchResponse: 20
+  airSpeed: 15
+  airAcceleration: 70
   jumpSpeed: 20
+  jumpSustainGravity: 0.4
   gravity: -90
+  slideStartSpeed: 25
+  slideEndSpeed: 15
+  slideFriction: 0.8
+  slideSteerAcceleration: 5
+  slideGravity: 90
   standHeight: 2
   crouchHeight: 1
   crouchHeightResponse: 15
@@ -1488,7 +1496,7 @@ Transform:
   m_GameObject: {fileID: 1460169299}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9.403077, y: 11.246481, z: -18.085253}
+  m_LocalPosition: {x: -9.403077, y: 16.24, z: -35.09}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1980,7 +1988,7 @@ Transform:
   m_GameObject: {fileID: 1897027699}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9.222535, y: 1.41, z: -18.22239}
+  m_LocalPosition: {x: 1.59, y: 1.41, z: -28.77}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2211,7 +2219,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3667757875513446318, guid: 6b5fb19d297f4fb4eb34edfe8e4f16ff, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -11.271481
+      value: -14.9
       objectReference: {fileID: 0}
     - target: {fileID: 3667757875513446318, guid: 6b5fb19d297f4fb4eb34edfe8e4f16ff, type: 3}
       propertyPath: m_LocalPosition.z
