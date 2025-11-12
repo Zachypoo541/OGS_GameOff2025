@@ -2,11 +2,28 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] private PlayerCharacter playerCharacter;
+    public static Player Instance { get; private set; }
 
+    [SerializeField] private PlayerCharacter playerCharacter;
     [SerializeField] private PlayerCamera playerCamera;
 
+    [Header("Debug")]
+    [SerializeField] private bool debugInput = false;
+
     private PlayerInputActions _inputActions;
+
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Debug.LogWarning("Multiple Player instances detected! Destroying duplicate.");
+            Destroy(gameObject);
+        }
+    }
 
     void Start()
     {
@@ -15,13 +32,17 @@ public class Player : MonoBehaviour
         _inputActions = new PlayerInputActions();
         _inputActions.Enable();
 
-        playerCharacter.Initialize();
+        playerCharacter.Initialize(playerCamera.transform);
         playerCamera.Initialize(playerCharacter.GetCameraTarget());
     }
 
     void OnDestroy()
     {
-        _inputActions.Dispose();
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+        _inputActions?.Dispose();
     }
 
     void Update()
@@ -29,13 +50,28 @@ public class Player : MonoBehaviour
         var input = _inputActions.Gameplay;
         var deltaTime = Time.deltaTime;
 
-        // Get camera input and update its rotation and position.
+        // Debug input (enable in inspector to troubleshoot)
+        if (debugInput)
+        {
+            if (input.Fire.WasPressedThisFrame() ||
+                input.NextWaveform.WasPressedThisFrame() ||
+                input.PrevWaveform.WasPressedThisFrame() ||
+                input.SelfModifier.WasPressedThisFrame())
+            {
+                Debug.Log($"Combat Input - Fire: {input.Fire.WasPressedThisFrame()}, " +
+                         $"Next: {input.NextWaveform.WasPressedThisFrame()}, " +
+                         $"Prev: {input.PrevWaveform.WasPressedThisFrame()}, " +
+                         $"Modifier: {input.SelfModifier.WasPressedThisFrame()}");
+            }
+        }
+
+        // Get camera input and update its rotation and position
         var cameraInput = new CameraInput { Look = input.Look.ReadValue<Vector2>() };
 
         playerCamera.UpdatePosition(playerCharacter.GetCameraTarget());
         playerCamera.UpdateRotation(cameraInput);
 
-        // Get character input and update it.
+        // Get character movement input and update it
         var characterInput = new CharacterInput
         {
             Rotation = playerCamera.transform.rotation,
@@ -47,12 +83,24 @@ public class Player : MonoBehaviour
                 : CrouchInput.None
         };
         playerCharacter.UpdateInput(characterInput);
+
+        // Get combat input and update it
+        var combatInput = new CombatInput
+        {
+            Fire = input.Fire.WasPressedThisFrame(),
+            SelfModifier = input.SelfModifier.WasPressedThisFrame(),
+            NextWaveform = input.NextWaveform.WasPressedThisFrame(),
+            PrevWaveform = input.PrevWaveform.WasPressedThisFrame()
+        };
+        playerCharacter.UpdateCombatInput(combatInput);
+
         playerCharacter.UpdateBody(deltaTime);
 
-#if UNITY_EDTIOR
-        if (keyboard.current.tKey.wasPressedThisFrame)
+#if UNITY_EDITOR
+        if (UnityEngine.InputSystem.Keyboard.current.tKey.wasPressedThisFrame)
         {
             var ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+            if (Physics.Raycast(ray, out RaycastHit hit))
             {
                 Teleport(hit.point);
             }
@@ -63,5 +111,11 @@ public class Player : MonoBehaviour
     public void Teleport(Vector3 position)
     {
         playerCharacter.SetPosition(position);
+    }
+
+    // Public method for enemies to get the correct player transform
+    public Transform GetPlayerTransform()
+    {
+        return playerCharacter.GetMotorTransform();
     }
 }

@@ -127,6 +127,42 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Fire"",
+                    ""type"": ""Button"",
+                    ""id"": ""43e33627-aa02-4a37-96a9-49e2611f97ff"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SelfModifier"",
+                    ""type"": ""Button"",
+                    ""id"": ""9372e64b-dfc6-4de2-8aee-c40a0cb5f6cf"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""NextWaveform"",
+                    ""type"": ""Button"",
+                    ""id"": ""772ec41a-0bac-4fd5-a5dc-5e588c40da6c"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PrevWaveform"",
+                    ""type"": ""Button"",
+                    ""id"": ""7d29481d-d7e6-4882-ab66-73975ab8f8f2"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -217,6 +253,50 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Crouch"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4017e7cc-8f6e-4df2-ac77-a1def288a0e5"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Fire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e2a9f13d-74ac-49c1-98de-cf9b9bdfd117"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SelfModifier"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0ff6fd7a-787e-4c8b-80e6-486aed477279"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""NextWaveform"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e2a00da9-fe19-4d7f-89d1-e4443d109cfd"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PrevWaveform"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -229,6 +309,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Gameplay_Move = m_Gameplay.FindAction("Move", throwIfNotFound: true);
         m_Gameplay_Jump = m_Gameplay.FindAction("Jump", throwIfNotFound: true);
         m_Gameplay_Crouch = m_Gameplay.FindAction("Crouch", throwIfNotFound: true);
+        m_Gameplay_Fire = m_Gameplay.FindAction("Fire", throwIfNotFound: true);
+        m_Gameplay_SelfModifier = m_Gameplay.FindAction("SelfModifier", throwIfNotFound: true);
+        m_Gameplay_NextWaveform = m_Gameplay.FindAction("NextWaveform", throwIfNotFound: true);
+        m_Gameplay_PrevWaveform = m_Gameplay.FindAction("PrevWaveform", throwIfNotFound: true);
     }
 
     ~@PlayerInputActions()
@@ -313,6 +397,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_Move;
     private readonly InputAction m_Gameplay_Jump;
     private readonly InputAction m_Gameplay_Crouch;
+    private readonly InputAction m_Gameplay_Fire;
+    private readonly InputAction m_Gameplay_SelfModifier;
+    private readonly InputAction m_Gameplay_NextWaveform;
+    private readonly InputAction m_Gameplay_PrevWaveform;
     /// <summary>
     /// Provides access to input actions defined in input action map "Gameplay".
     /// </summary>
@@ -340,6 +428,22 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Gameplay/Crouch".
         /// </summary>
         public InputAction @Crouch => m_Wrapper.m_Gameplay_Crouch;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/Fire".
+        /// </summary>
+        public InputAction @Fire => m_Wrapper.m_Gameplay_Fire;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/SelfModifier".
+        /// </summary>
+        public InputAction @SelfModifier => m_Wrapper.m_Gameplay_SelfModifier;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/NextWaveform".
+        /// </summary>
+        public InputAction @NextWaveform => m_Wrapper.m_Gameplay_NextWaveform;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/PrevWaveform".
+        /// </summary>
+        public InputAction @PrevWaveform => m_Wrapper.m_Gameplay_PrevWaveform;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -378,6 +482,18 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Crouch.started += instance.OnCrouch;
             @Crouch.performed += instance.OnCrouch;
             @Crouch.canceled += instance.OnCrouch;
+            @Fire.started += instance.OnFire;
+            @Fire.performed += instance.OnFire;
+            @Fire.canceled += instance.OnFire;
+            @SelfModifier.started += instance.OnSelfModifier;
+            @SelfModifier.performed += instance.OnSelfModifier;
+            @SelfModifier.canceled += instance.OnSelfModifier;
+            @NextWaveform.started += instance.OnNextWaveform;
+            @NextWaveform.performed += instance.OnNextWaveform;
+            @NextWaveform.canceled += instance.OnNextWaveform;
+            @PrevWaveform.started += instance.OnPrevWaveform;
+            @PrevWaveform.performed += instance.OnPrevWaveform;
+            @PrevWaveform.canceled += instance.OnPrevWaveform;
         }
 
         /// <summary>
@@ -401,6 +517,18 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Crouch.started -= instance.OnCrouch;
             @Crouch.performed -= instance.OnCrouch;
             @Crouch.canceled -= instance.OnCrouch;
+            @Fire.started -= instance.OnFire;
+            @Fire.performed -= instance.OnFire;
+            @Fire.canceled -= instance.OnFire;
+            @SelfModifier.started -= instance.OnSelfModifier;
+            @SelfModifier.performed -= instance.OnSelfModifier;
+            @SelfModifier.canceled -= instance.OnSelfModifier;
+            @NextWaveform.started -= instance.OnNextWaveform;
+            @NextWaveform.performed -= instance.OnNextWaveform;
+            @NextWaveform.canceled -= instance.OnNextWaveform;
+            @PrevWaveform.started -= instance.OnPrevWaveform;
+            @PrevWaveform.performed -= instance.OnPrevWaveform;
+            @PrevWaveform.canceled -= instance.OnPrevWaveform;
         }
 
         /// <summary>
@@ -469,5 +597,33 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnCrouch(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Fire" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnFire(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SelfModifier" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSelfModifier(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "NextWaveform" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnNextWaveform(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "PrevWaveform" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnPrevWaveform(InputAction.CallbackContext context);
     }
 }
