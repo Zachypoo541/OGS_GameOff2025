@@ -17,7 +17,45 @@ public abstract class EnemyAI : CombatEntity
     protected override void Start()
     {
         base.Start();
-        player = GameObject.FindGameObjectWithTag("Player")?.transform;
+
+        // FIXED: Use Player.Instance singleton to get the correct moving transform
+        if (Player.Instance != null)
+        {
+            player = Player.Instance.GetPlayerTransform();
+        }
+        else
+        {
+            // Fallback to tag-based finding (less reliable)
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
+            {
+                // Try to get the Player component
+                Player playerComponent = playerObj.GetComponent<Player>();
+                if (playerComponent != null)
+                {
+                    player = playerComponent.GetPlayerTransform();
+                }
+                else
+                {
+                    // Last resort: try to find PlayerCharacter in children
+                    PlayerCharacter character = playerObj.GetComponentInChildren<PlayerCharacter>();
+                    if (character != null)
+                    {
+                        player = character.GetMotorTransform();
+                    }
+                    else
+                    {
+                        // Absolute fallback
+                        player = playerObj.transform;
+                        Debug.LogWarning($"{gameObject.name}: Could not find proper player transform. AI may not work correctly.");
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogError($"{gameObject.name}: Could not find player! Make sure player has 'Player' tag or Player.Instance is set.");
+            }
+        }
 
         // Enemy is immune to its own waveform type
         if (equippedWaveform != null)
@@ -63,4 +101,23 @@ public abstract class EnemyAI : CombatEntity
     // Override these in child classes for custom behavior
     protected virtual void OnEnemyStart() { }
     protected virtual void OnEnemyDeath() { }
+
+    // Optional: Add this for debugging in the Scene view
+    protected virtual void OnDrawGizmosSelected()
+    {
+        // Draw detection range
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, detectionRange);
+
+        // Draw attack range
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+
+        // Draw line to player if detected
+        if (player != null && isPlayerDetected)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(transform.position, player.position);
+        }
+    }
 }
