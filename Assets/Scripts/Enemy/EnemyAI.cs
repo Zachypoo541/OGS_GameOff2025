@@ -98,6 +98,27 @@ public abstract class EnemyAI : CombatEntity
         Destroy(gameObject);
     }
 
+    // Public getters for EnemyOutlineController
+    public Transform GetPlayerTransform()
+    {
+        return player;
+    }
+
+    public float GetAttackRange()
+    {
+        return attackRange;
+    }
+
+    public float GetDetectionRange()
+    {
+        return detectionRange;
+    }
+
+    public bool IsPlayerDetected()
+    {
+        return isPlayerDetected;
+    }
+
     // Override these in child classes for custom behavior
     protected virtual void OnEnemyStart() { }
     protected virtual void OnEnemyDeath() { }

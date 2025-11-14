@@ -9,14 +9,16 @@ public class WaveformProjectile : MonoBehaviour
     private float speed;
     private Rigidbody rb;
     private TrailRenderer trailRenderer;
+    private Reticle reticle; // Reference to reticle (only for player projectiles)
 
-    public void Initialize(float damage, WaveformData waveformType, CombatEntity source, Vector3 direction)
+    public void Initialize(float damage, WaveformData waveformType, CombatEntity source, Vector3 direction, Reticle reticle = null)
     {
         this.damage = damage;
         this.waveformType = waveformType;
         this.source = source;
         this.direction = direction.normalized;
         this.speed = waveformType.projectileSpeed;
+        this.reticle = reticle; // Store reticle reference (null for enemy projectiles)
 
         rb = GetComponent<Rigidbody>();
         if (rb != null)
@@ -56,6 +58,12 @@ public class WaveformProjectile : MonoBehaviour
 
         if (target != null && target != source)
         {
+            // Trigger reticle hit effect (only if player shot this)
+            if (reticle != null)
+            {
+                reticle.OnHit();
+            }
+
             target.TakeDamage(damage, waveformType);
 
             // Apply knockback

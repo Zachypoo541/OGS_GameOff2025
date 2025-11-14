@@ -77,6 +77,42 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Wave1",
+                    "type": "Button",
+                    "id": "ce8691c1-6e2e-4c99-95a6-d124aa3c4806",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Wave2",
+                    "type": "Button",
+                    "id": "3a1e471d-f0d3-4728-a5d9-41fc90dd1151",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Wave3",
+                    "type": "Button",
+                    "id": "e9cf6d17-bf8c-47e9-b8e4-d776ac2ee0ac",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Wave4",
+                    "type": "Button",
+                    "id": "d908df9b-1a24-4198-9523-9e813fa3b50e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -209,6 +245,50 @@
                     "processors": "",
                     "groups": "",
                     "action": "PrevWaveform",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "330eb273-2967-44de-8be3-4d8dc8291d68",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Wave1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "458dbe46-67d5-45cb-8dbd-ded715bbb22a",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Wave2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f7b94ff1-4be3-46b3-ae52-4fa15e1db129",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Wave3",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "25f164cb-c6fb-4325-93d7-efd1901f6c35",
+                    "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Wave4",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
