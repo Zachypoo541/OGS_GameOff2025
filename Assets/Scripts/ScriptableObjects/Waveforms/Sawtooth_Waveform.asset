@@ -15,9 +15,9 @@ MonoBehaviour:
   waveformName: Sawtooth
   waveformColor: {r: 1, g: 0, b: 0, a: 1}
   unlockLevel: 2
-  baseDamage: 30
-  energyCost: 15
-  projectileSpeed: 50
+  baseDamage: 20
+  energyCost: 20
+  projectileSpeed: 120
   projectilePrefab: {fileID: 8115411382015281130, guid: d20a378a8b2c21d488d7d071442e4a28, type: 3}
   knockbackForce: 0
   trailMaterial: {fileID: 2100000, guid: fdd033f09f58f6c4795e5489dcdba1a4, type: 2}

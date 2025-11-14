@@ -163,6 +163,42 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Wave1"",
+                    ""type"": ""Button"",
+                    ""id"": ""ce8691c1-6e2e-4c99-95a6-d124aa3c4806"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Wave2"",
+                    ""type"": ""Button"",
+                    ""id"": ""3a1e471d-f0d3-4728-a5d9-41fc90dd1151"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Wave3"",
+                    ""type"": ""Button"",
+                    ""id"": ""e9cf6d17-bf8c-47e9-b8e4-d776ac2ee0ac"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Wave4"",
+                    ""type"": ""Button"",
+                    ""id"": ""d908df9b-1a24-4198-9523-9e813fa3b50e"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -297,6 +333,50 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""PrevWaveform"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""330eb273-2967-44de-8be3-4d8dc8291d68"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Wave1"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""458dbe46-67d5-45cb-8dbd-ded715bbb22a"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Wave2"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f7b94ff1-4be3-46b3-ae52-4fa15e1db129"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Wave3"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""25f164cb-c6fb-4325-93d7-efd1901f6c35"",
+                    ""path"": ""<Keyboard>/4"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Wave4"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -313,6 +393,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Gameplay_SelfModifier = m_Gameplay.FindAction("SelfModifier", throwIfNotFound: true);
         m_Gameplay_NextWaveform = m_Gameplay.FindAction("NextWaveform", throwIfNotFound: true);
         m_Gameplay_PrevWaveform = m_Gameplay.FindAction("PrevWaveform", throwIfNotFound: true);
+        m_Gameplay_Wave1 = m_Gameplay.FindAction("Wave1", throwIfNotFound: true);
+        m_Gameplay_Wave2 = m_Gameplay.FindAction("Wave2", throwIfNotFound: true);
+        m_Gameplay_Wave3 = m_Gameplay.FindAction("Wave3", throwIfNotFound: true);
+        m_Gameplay_Wave4 = m_Gameplay.FindAction("Wave4", throwIfNotFound: true);
     }
 
     ~@PlayerInputActions()
@@ -401,6 +485,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_SelfModifier;
     private readonly InputAction m_Gameplay_NextWaveform;
     private readonly InputAction m_Gameplay_PrevWaveform;
+    private readonly InputAction m_Gameplay_Wave1;
+    private readonly InputAction m_Gameplay_Wave2;
+    private readonly InputAction m_Gameplay_Wave3;
+    private readonly InputAction m_Gameplay_Wave4;
     /// <summary>
     /// Provides access to input actions defined in input action map "Gameplay".
     /// </summary>
@@ -444,6 +532,22 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Gameplay/PrevWaveform".
         /// </summary>
         public InputAction @PrevWaveform => m_Wrapper.m_Gameplay_PrevWaveform;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/Wave1".
+        /// </summary>
+        public InputAction @Wave1 => m_Wrapper.m_Gameplay_Wave1;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/Wave2".
+        /// </summary>
+        public InputAction @Wave2 => m_Wrapper.m_Gameplay_Wave2;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/Wave3".
+        /// </summary>
+        public InputAction @Wave3 => m_Wrapper.m_Gameplay_Wave3;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/Wave4".
+        /// </summary>
+        public InputAction @Wave4 => m_Wrapper.m_Gameplay_Wave4;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -494,6 +598,18 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @PrevWaveform.started += instance.OnPrevWaveform;
             @PrevWaveform.performed += instance.OnPrevWaveform;
             @PrevWaveform.canceled += instance.OnPrevWaveform;
+            @Wave1.started += instance.OnWave1;
+            @Wave1.performed += instance.OnWave1;
+            @Wave1.canceled += instance.OnWave1;
+            @Wave2.started += instance.OnWave2;
+            @Wave2.performed += instance.OnWave2;
+            @Wave2.canceled += instance.OnWave2;
+            @Wave3.started += instance.OnWave3;
+            @Wave3.performed += instance.OnWave3;
+            @Wave3.canceled += instance.OnWave3;
+            @Wave4.started += instance.OnWave4;
+            @Wave4.performed += instance.OnWave4;
+            @Wave4.canceled += instance.OnWave4;
         }
 
         /// <summary>
@@ -529,6 +645,18 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @PrevWaveform.started -= instance.OnPrevWaveform;
             @PrevWaveform.performed -= instance.OnPrevWaveform;
             @PrevWaveform.canceled -= instance.OnPrevWaveform;
+            @Wave1.started -= instance.OnWave1;
+            @Wave1.performed -= instance.OnWave1;
+            @Wave1.canceled -= instance.OnWave1;
+            @Wave2.started -= instance.OnWave2;
+            @Wave2.performed -= instance.OnWave2;
+            @Wave2.canceled -= instance.OnWave2;
+            @Wave3.started -= instance.OnWave3;
+            @Wave3.performed -= instance.OnWave3;
+            @Wave3.canceled -= instance.OnWave3;
+            @Wave4.started -= instance.OnWave4;
+            @Wave4.performed -= instance.OnWave4;
+            @Wave4.canceled -= instance.OnWave4;
         }
 
         /// <summary>
@@ -625,5 +753,33 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnPrevWaveform(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Wave1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnWave1(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Wave2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnWave2(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Wave3" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnWave3(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Wave4" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnWave4(InputAction.CallbackContext context);
     }
 }

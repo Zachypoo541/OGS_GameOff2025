@@ -103,13 +103,16 @@ public class PlayerCharacter : CombatEntity, ICharacterController
 
     // Camera reference
     private Transform _cameraTransform;
+    private Reticle _reticle;
 
     // Collider overlap detection
     private Collider[] _uncrouchOverlapResults;
 
-    public void Initialize(Transform cameraTransform)
+    public void Initialize(Transform cameraTransform, Reticle reticle = null)
     {
         _cameraTransform = cameraTransform;
+        _reticle = reticle; // Store reticle reference
+
         _state.Stance = Stance.Stand;
         _lastState = _state;
         _uncrouchOverlapResults = new Collider[8];
@@ -122,6 +125,12 @@ public class PlayerCharacter : CombatEntity, ICharacterController
         if (unlockedWaveforms.Count > 0)
         {
             EquipWaveform(0);
+        }
+
+        // Update reticle to match starting waveform
+        if (_reticle != null && equippedWaveform != null)
+        {
+            _reticle.UpdateReticleForWaveform(equippedWaveform);
         }
     }
 
@@ -439,9 +448,46 @@ public class PlayerCharacter : CombatEntity, ICharacterController
 
             immuneToWaveforms.Clear();
             immuneToWaveforms.Add(equippedWaveform);
+
+            // Update reticle to match new waveform
+            if (_reticle != null)
+            {
+                _reticle.UpdateReticleForWaveform(equippedWaveform);
+            }
         }
     }
 
+    public override void FireProjectile(Vector3 direction)
+    {
+        if (!CanUseAttack()) return;
+
+        // Calculate damage (with ramping if applicable)
+        float damage = CalculateDamage();
+
+        // Consume resources
+        ConsumeAttackResources();
+
+        // Spawn projectile
+        if (equippedWaveform.projectilePrefab != null && projectileSpawnPoint != null)
+        {
+            GameObject proj = Instantiate(equippedWaveform.projectilePrefab,
+                projectileSpawnPoint.position,
+                Quaternion.LookRotation(direction));
+
+            WaveformProjectile projectile = proj.GetComponent<WaveformProjectile>();
+            if (projectile != null)
+            {
+                // Pass reticle reference to projectile (only player has reticle)
+                projectile.Initialize(damage, equippedWaveform, this, direction, _reticle);
+
+                // Trigger fire animation on reticle (only if projectile was spawned)
+                if (_reticle != null)
+                {
+                    _reticle.OnFire();
+                }
+            }
+        }
+    }
     public void UnlockWaveform(WaveformData waveform)
     {
         if (!unlockedWaveforms.Contains(waveform))

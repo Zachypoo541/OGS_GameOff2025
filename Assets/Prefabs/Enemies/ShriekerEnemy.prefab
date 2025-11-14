@@ -77,8 +77,8 @@ MonoBehaviour:
   projectileSpawnPoint: {fileID: 7054419513934335895}
   immuneToWaveforms:
   - {fileID: 11400000, guid: 15a84da28a63faa4f8c4d8ad11630f2c, type: 2}
-  attackRange: 150
-  detectionRange: 500
+  attackRange: 300
+  detectionRange: 320
   energyPickupPrefab: {fileID: 0}
   dropChance: 0.7
   sniperRange: 200
@@ -192,13 +192,40 @@ PrefabInstance:
       propertyPath: m_Name
       value: saw enemy 2
       objectReference: {fileID: 0}
+    - target: {fileID: 7202271454713460447, guid: 19ca586a9c1c60649834d9c05ad05db0, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 5e7875187705a1d47948aee1133a5f8a, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 65702495048144492, guid: 19ca586a9c1c60649834d9c05ad05db0, type: 3}
     - {fileID: -8700617353114198275, guid: 19ca586a9c1c60649834d9c05ad05db0, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: -5568371526223589888, guid: 19ca586a9c1c60649834d9c05ad05db0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6872389826180956338}
   m_SourcePrefab: {fileID: 100100000, guid: 19ca586a9c1c60649834d9c05ad05db0, type: 3}
+--- !u!1 &6485109876209637863 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -5568371526223589888, guid: 19ca586a9c1c60649834d9c05ad05db0, type: 3}
+  m_PrefabInstance: {fileID: 7730031337776699367}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6872389826180956338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6485109876209637863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0ec75cf81c8ff940beacd29ab8a48c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyAI: {fileID: 4161494848504414893}
+  visualSettings: {fileID: 11400000, guid: 43b9f88ee56c1ed44acf99bc90582b27, type: 2}
+  showDebugInfo: 0
 --- !u!4 &7839693787779313676 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 19ca586a9c1c60649834d9c05ad05db0, type: 3}

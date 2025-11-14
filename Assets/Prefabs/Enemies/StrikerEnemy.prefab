@@ -104,13 +104,13 @@ MonoBehaviour:
   equippedWaveform: {fileID: 11400000, guid: 62b0960bb54103e4ca4a4acffa48187e, type: 2}
   projectileSpawnPoint: {fileID: 6604138230457622507}
   immuneToWaveforms: []
-  attackRange: 15
-  detectionRange: 30
+  attackRange: 200
+  detectionRange: 200
   energyPickupPrefab: {fileID: 0}
   dropChance: 0.7
   normalSpeed: 4
-  rushSpeed: 15
-  rushDistance: 10
+  rushSpeed: 20
+  rushDistance: 15
   rushCooldown: 2
   lungeDamage: 30
   lungeRange: 2
@@ -205,6 +205,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7601226680800833775, guid: 922b4e17721f23542a2c222f1bce50d0, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 5e7875187705a1d47948aee1133a5f8a, type: 2}
     - target: {fileID: 919132149155446097, guid: 922b4e17721f23542a2c222f1bce50d0, type: 3}
       propertyPath: m_Name
       value: saw enemy 1
@@ -226,10 +230,33 @@ PrefabInstance:
     - {fileID: -8700617353114198275, guid: 922b4e17721f23542a2c222f1bce50d0, type: 3}
     - {fileID: 65702495048144492, guid: 922b4e17721f23542a2c222f1bce50d0, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 9013638940889411661, guid: 922b4e17721f23542a2c222f1bce50d0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7160325133325139659}
   m_SourcePrefab: {fileID: 100100000, guid: 922b4e17721f23542a2c222f1bce50d0, type: 3}
 --- !u!4 &2390658145568249021 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 922b4e17721f23542a2c222f1bce50d0, type: 3}
   m_PrefabInstance: {fileID: 2785453931398968150}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6607074549141291803 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9013638940889411661, guid: 922b4e17721f23542a2c222f1bce50d0, type: 3}
+  m_PrefabInstance: {fileID: 2785453931398968150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7160325133325139659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6607074549141291803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0ec75cf81c8ff940beacd29ab8a48c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyAI: {fileID: 7281407759149947109}
+  visualSettings: {fileID: 11400000, guid: 58e82013f1f1ebc48a8e337e0c1bdef3, type: 2}
+  showDebugInfo: 0

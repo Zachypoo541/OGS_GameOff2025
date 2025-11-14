@@ -17,7 +17,7 @@ MonoBehaviour:
   unlockLevel: 1
   baseDamage: 10
   energyCost: 15
-  projectileSpeed: 20
+  projectileSpeed: 90
   projectilePrefab: {fileID: 8115411382015281130, guid: 85ad334654d63a44490ffb4dc0fefac4, type: 3}
   knockbackForce: 0
   trailMaterial: {fileID: 2100000, guid: 5ad21149e0ac29a4bbe3d52c554d3c18, type: 2}

@@ -7,6 +7,8 @@ public class Player : MonoBehaviour
     [SerializeField] private PlayerCharacter playerCharacter;
     [SerializeField] private PlayerCamera playerCamera;
 
+    [SerializeField] private Reticle reticle;
+
     [Header("Debug")]
     [SerializeField] private bool debugInput = false;
 
@@ -32,7 +34,14 @@ public class Player : MonoBehaviour
         _inputActions = new PlayerInputActions();
         _inputActions.Enable();
 
-        playerCharacter.Initialize(playerCamera.transform);
+        // Find reticle if not assigned
+        if (reticle == null)
+        {
+            reticle = FindFirstObjectByType<Reticle>();
+        }
+
+        // Pass reticle to PlayerCharacter (CHANGED)
+        playerCharacter.Initialize(playerCamera.transform, reticle);
         playerCamera.Initialize(playerCharacter.GetCameraTarget());
     }
 
