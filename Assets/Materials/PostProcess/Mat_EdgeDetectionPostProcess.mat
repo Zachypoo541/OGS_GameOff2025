@@ -94,9 +94,9 @@ Material:
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
     - _ChromaticDistance: 20
-    - _ChromaticFalloff: 6.935738
-    - _ChromaticIntensity: 1.790749
-    - _ChromaticSpread: 4.838508
+    - _ChromaticFalloff: 4.213044
+    - _ChromaticIntensity: 4.213044
+    - _ChromaticSpread: 6.8124223
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
