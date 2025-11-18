@@ -80,6 +80,10 @@ public class PlayerCharacter : CombatEntity, ICharacterController
     [SerializeField] private float dashDecayRate = 0.85f;
     [SerializeField] private float minDashSpeed = 0.5f;
 
+    [Header("Aiming Settings")]
+    [SerializeField] private float maxAimDistance = 1000f;
+    [SerializeField] private LayerMask aimRaycastMask = -1; // Set in inspector to exclude player layer
+
     // Locomotion state
     private CharacterState _state;
     private CharacterState _lastState;
@@ -111,7 +115,7 @@ public class PlayerCharacter : CombatEntity, ICharacterController
     public void Initialize(Transform cameraTransform, Reticle reticle = null)
     {
         _cameraTransform = cameraTransform;
-        _reticle = reticle; // Store reticle reference
+        _reticle = reticle;
 
         _state.Stance = Stance.Stand;
         _lastState = _state;
@@ -180,10 +184,10 @@ public class PlayerCharacter : CombatEntity, ICharacterController
             CycleWaveform(-1);
         }
 
-        // Fire projectile
+        // Fire projectile with raycast-based aiming
         if (input.Fire && _cameraTransform != null)
         {
-            Vector3 aimDir = _cameraTransform.forward;
+            Vector3 aimDir = GetAimDirection();
             FireProjectile(aimDir);
         }
 
@@ -192,6 +196,32 @@ public class PlayerCharacter : CombatEntity, ICharacterController
         {
             ApplySelfModifier();
         }
+    }
+
+    private Vector3 GetAimDirection()
+    {
+        // Raycast from screen center (where reticle is) through camera
+        Ray ray = new Ray(_cameraTransform.position, _cameraTransform.forward);
+
+        Vector3 targetPoint;
+
+        // Raycast to find what we're aiming at
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, maxAimDistance, aimRaycastMask))
+        {
+            // Hit something - aim at that point
+            targetPoint = hit.point;
+        }
+        else
+        {
+            // Didn't hit anything - aim at a point far away
+            targetPoint = ray.origin + ray.direction * maxAimDistance;
+        }
+
+        // Calculate direction from projectile spawn point to target point
+        Vector3 direction = (targetPoint - projectileSpawnPoint.position).normalized;
+
+        return direction;
     }
 
     public void UpdateRotation(ref Quaternion currentRotation, float deltaTime)
@@ -220,9 +250,6 @@ public class PlayerCharacter : CombatEntity, ICharacterController
             b: new Vector3(0f, cameraTargetHeight, 0f),
             t: 1f - Mathf.Exp(-crouchHeightResponse * deltaTime)
         );
-
-        // REMOVED: root.localScale scaling to fix KinematicCharacterMotor error
-        // Visual crouching is now handled purely by capsule height changes
     }
 
     public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime)
@@ -296,9 +323,8 @@ public class PlayerCharacter : CombatEntity, ICharacterController
             {
                 var planarVelocity = Vector3.ProjectOnPlane(currentVelocity, motor.CharacterUp);
 
-                // FIX: Use -CharacterUp (gravity direction) instead of +CharacterUp
                 var slopeAcceleration = Vector3.ProjectOnPlane(
-                    -motor.CharacterUp * slideGravity,  // Now points DOWN
+                    -motor.CharacterUp * slideGravity,
                     motor.GroundingStatus.GroundNormal
                 );
 
@@ -488,6 +514,7 @@ public class PlayerCharacter : CombatEntity, ICharacterController
             }
         }
     }
+
     public void UnlockWaveform(WaveformData waveform)
     {
         if (!unlockedWaveforms.Contains(waveform))
@@ -580,15 +607,3 @@ public class PlayerCharacter : CombatEntity, ICharacterController
 
     public void ProcessHitStabilityReport(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, Vector3 atCharacterPosition, Quaternion atCharacterRotation, ref HitStabilityReport hitStabilityReport) { }
 }
-
-
-
-
-
-
-
-
-
-
-
-

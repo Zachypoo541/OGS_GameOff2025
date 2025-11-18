@@ -9956,6 +9956,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 42153235219220865, guid: f627d112fabccf44494a533df15e7655, type: 3}
+      propertyPath: reticleSize
+      value: 35
+      objectReference: {fileID: 0}
+    - target: {fileID: 673960703524506951, guid: f627d112fabccf44494a533df15e7655, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 35
+      objectReference: {fileID: 0}
+    - target: {fileID: 673960703524506951, guid: f627d112fabccf44494a533df15e7655, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 35
+      objectReference: {fileID: 0}
     - target: {fileID: 753803032822078505, guid: f627d112fabccf44494a533df15e7655, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -29273,10 +29285,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2039163384}
-  - component: {fileID: 2039163386}
   - component: {fileID: 2039163385}
+  - component: {fileID: 2039163388}
+  - component: {fileID: 2039163387}
   m_Layer: 0
-  m_Name: MusicPlayer
+  m_Name: MusicManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29310,135 +29323,85 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   edgeController: {fileID: 2031877361}
-  audioSource: {fileID: 2039163386}
-  sampleSize: 8192
-  useVolumeReactivity: 0
-  volumeParameter: 0
-  minIntensity: 2
-  maxIntensity: 10
-  sensitivity: 10000
+  sampleSize: 1024
+  useBassReactivity: 1
+  bassParameter: 1
+  bassMinValue: 3
+  bassMaxValue: 25
+  bassSensitivity: 100
+  useMidReactivity: 1
+  midParameter: 0
+  midMinValue: 3
+  midMaxValue: 10
+  midSensitivity: 100
+  useHighReactivity: 1
+  highParameter: 2
+  highMinValue: 3
+  highMaxValue: 10
+  highSensitivity: 100
   smoothing: 0.5
   parameterSmoothing: 0.1
-  useFrequencyBands: 1
-  bassReaction:
-    enabled: 1
-    parameter: 1
-    minValue: 3
-    maxValue: 8
-    sensitivity: 150
-  midReaction:
-    enabled: 1
-    parameter: 2
-    minValue: 0
-    maxValue: 25
-    sensitivity: 250
-  highReaction:
-    enabled: 1
-    parameter: 0
-    minValue: 1.5
-    maxValue: 10
-    sensitivity: 250
   enableRainbowWithMusic: 0
   animateRainbowSamples: 0
   rainbowAnimationSpeed: 1
   showDebugInfo: 0
---- !u!82 &2039163386
-AudioSource:
+--- !u!114 &2039163387
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2039163383}
   m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: -941768749352520230, guid: 96a0d62f98c16cc4eb787a0e9048f805, type: 2}
-  m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: f9a755a74fcddbc4b873b615c6a66f1a, type: 3}
-  m_PlayOnAwake: 1
-  m_Volume: 0.5
-  m_Pitch: 1
-  Loop: 1
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc2812f2d47edd84cb493d500c808952, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  musicManager: {fileID: 2039163388}
+  sceneMappings:
+  - sceneName: MainMenu
+    trackIndex: 0
+    trackName: PHOTOSYNTH4
+  - sceneName: Arena 1_DarkOpen
+    trackIndex: -1
+    trackName: PHOTOSYNTH4
+  - sceneName: 
+    trackIndex: 0
+    trackName: 
+  useCrossfade: 1
+  crossfadeDuration: 2
+--- !u!114 &2039163388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2039163383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a75f898637210343a6ce7ebfe40e6c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  musicTracks:
+  - trackName: PHOTOSYNTH 3
+    fullMixClip: {fileID: 8300000, guid: f9a755a74fcddbc4b873b615c6a66f1a, type: 3}
+    bassStemClip: {fileID: 8300000, guid: 5225385e4fc3d2e4c9d0079af83cf2bd, type: 3}
+    midStemClip: {fileID: 8300000, guid: f9a755a74fcddbc4b873b615c6a66f1a, type: 3}
+    highStemClip: {fileID: 8300000, guid: f9a755a74fcddbc4b873b615c6a66f1a, type: 3}
+    volume: 1
+    loop: 1
+  - trackName: PHOTOSYNTH 4
+    fullMixClip: {fileID: 8300000, guid: 9222c7873d21b814eaae4b26e8a6312c, type: 3}
+    bassStemClip: {fileID: 8300000, guid: ffb8837c0ce584a40b4b440be8326d5f, type: 3}
+    midStemClip: {fileID: 8300000, guid: 9222c7873d21b814eaae4b26e8a6312c, type: 3}
+    highStemClip: {fileID: 8300000, guid: 9222c7873d21b814eaae4b26e8a6312c, type: 3}
+    volume: 1
+    loop: 1
+  musicMixerGroup: {fileID: -941768749352520230, guid: 96a0d62f98c16cc4eb787a0e9048f805, type: 2}
+  mutedAnalysisMixerGroup: {fileID: 24300002, guid: 3101c4b588cce00458dd98d8cefdddaf, type: 2}
+  currentTrackIndex: -1
+  autoPlay: 1
+  autoPlayTrackIndex: 1
 --- !u!4 &2053584359 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6370870962629965191, guid: 6130de9970006b546a50df7b87cfad96, type: 3}

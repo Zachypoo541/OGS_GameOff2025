@@ -1,10 +1,10 @@
 using UnityEngine;
 
 /// <summary>
-/// Makes the Edge Detection effect react to music by analyzing audio spectrum data.
-/// Attach this to a GameObject with an AudioSource component.
+/// Makes the Edge Detection effect react to music by analyzing separate audio stems.
+/// Works with MusicStemManager to analyze bass, mid, and high stems independently.
 /// </summary>
-[RequireComponent(typeof(AudioSource))]
+[RequireComponent(typeof(MusicStemManager))]
 public class AudioReactiveEdgeDetection : MonoBehaviour
 {
     [Header("References")]
@@ -12,73 +12,69 @@ public class AudioReactiveEdgeDetection : MonoBehaviour
     public EdgeDetectionController edgeController;
 
     [Header("Audio Settings")]
-    [Tooltip("The AudioSource component playing your music (must have volume > 0)")]
-    public AudioSource audioSource;
-
     [Range(64, 8192)]
     [Tooltip("Number of samples to analyze (higher = more precise, lower = better performance)")]
     public int sampleSize = 1024;
 
-    [Header("Volume Reactivity")]
-    [Tooltip("Enable overall volume reactivity (adjusts one main parameter)")]
-    public bool useVolumeReactivity = true;
+    [Header("Stem Reactivity")]
+    [Tooltip("Enable bass stem reactivity")]
+    public bool useBassReactivity = true;
 
-    [Tooltip("Which parameter should react to the overall music volume")]
-    public VolumeReactiveParameter volumeParameter = VolumeReactiveParameter.ChromaticIntensity;
-
-    [Range(0f, 100f)]
-    [Tooltip("Minimum value when audio is silent")]
-    public float minIntensity = 3f;
+    [Tooltip("Bass stem controls this parameter")]
+    public VolumeReactiveParameter bassParameter = VolumeReactiveParameter.ChromaticSpread;
 
     [Range(0f, 100f)]
-    [Tooltip("Maximum value when audio is at peak volume")]
-    public float maxIntensity = 10f;
+    public float bassMinValue = 3f;
+
+    [Range(0f, 100f)]
+    public float bassMaxValue = 6f;
 
     [Range(0f, 10000f)]
-    [Tooltip("Multiplier for audio sensitivity (higher = more reactive) - Start with 100-500")]
-    public float sensitivity = 200f;
+    [Tooltip("Sensitivity for bass stem (start with 50-200)")]
+    public float bassSensitivity = 100f;
 
+    [Header("Mid Stem Settings")]
+    [Tooltip("Enable mid stem reactivity")]
+    public bool useMidReactivity = true;
+
+    [Tooltip("Mid stem controls this parameter")]
+    public VolumeReactiveParameter midParameter = VolumeReactiveParameter.ChromaticIntensity;
+
+    [Range(0f, 100f)]
+    public float midMinValue = 3f;
+
+    [Range(0f, 100f)]
+    public float midMaxValue = 10f;
+
+    [Range(0f, 10000f)]
+    [Tooltip("Sensitivity for mid stem (start with 50-200)")]
+    public float midSensitivity = 100f;
+
+    [Header("High Stem Settings")]
+    [Tooltip("Enable high stem reactivity")]
+    public bool useHighReactivity = true;
+
+    [Tooltip("High stem controls this parameter")]
+    public VolumeReactiveParameter highParameter = VolumeReactiveParameter.ChromaticFalloff;
+
+    [Range(0f, 100f)]
+    public float highMinValue = 3f;
+
+    [Range(0f, 100f)]
+    public float highMaxValue = 10f;
+
+    [Range(0f, 10000f)]
+    [Tooltip("Sensitivity for high stem (start with 50-200)")]
+    public float highSensitivity = 100f;
+
+    [Header("Smoothing")]
     [Range(0f, 1f)]
-    [Tooltip("Smoothing factor (0 = instant, 1 = very smooth)")]
+    [Tooltip("Smoothing factor for audio data (0 = instant, 1 = very smooth)")]
     public float smoothing = 0.85f;
 
     [Range(0f, 1f)]
     [Tooltip("How quickly parameters interpolate to new values (0 = instant, 1 = very smooth)")]
     public float parameterSmoothing = 0.3f;
-
-    [Header("Frequency Band Reactivity")]
-    [Tooltip("Enable different parameters to react to different frequency bands")]
-    public bool useFrequencyBands = true;
-
-    [Tooltip("React to bass frequencies (0-250 Hz) - Drums, bass guitar")]
-    public FrequencyBandReaction bassReaction = new FrequencyBandReaction
-    {
-        enabled = true,
-        parameter = VolumeReactiveParameter.ChromaticSpread,
-        minValue = 3f,
-        maxValue = 6f,
-        sensitivity = 200f
-    };
-
-    [Tooltip("React to mid frequencies (250-2000 Hz) - Vocals, guitars")]
-    public FrequencyBandReaction midReaction = new FrequencyBandReaction
-    {
-        enabled = true,
-        parameter = VolumeReactiveParameter.ChromaticIntensity,
-        minValue = 3f,
-        maxValue = 10f,
-        sensitivity = 200f
-    };
-
-    [Tooltip("React to high frequencies (2000+ Hz) - Cymbals, high notes")]
-    public FrequencyBandReaction highReaction = new FrequencyBandReaction
-    {
-        enabled = true,
-        parameter = VolumeReactiveParameter.ChromaticFalloff,
-        minValue = 3f,
-        maxValue = 10f,
-        sensitivity = 200f
-    };
 
     [Header("Rainbow Mode")]
     [Tooltip("Auto-enable rainbow mode when music plays")]
@@ -95,13 +91,18 @@ public class AudioReactiveEdgeDetection : MonoBehaviour
     public bool showDebugInfo = false;
 
     // Private variables
-    private float[] spectrumData;
-    private float currentVolume = 0f;
-    private float smoothedVolume = 0f;
+    private MusicStemManager stemManager;
+    private float[] bassSpectrumData;
+    private float[] midSpectrumData;
+    private float[] highSpectrumData;
 
-    private float smoothedBass = 0f;
-    private float smoothedMid = 0f;
-    private float smoothedHigh = 0f;
+    private float currentBassVolume = 0f;
+    private float currentMidVolume = 0f;
+    private float currentHighVolume = 0f;
+
+    private float smoothedBassVolume = 0f;
+    private float smoothedMidVolume = 0f;
+    private float smoothedHighVolume = 0f;
 
     // Interpolated parameter values for smooth transitions
     private float currentChromaticIntensity = 3f;
@@ -121,27 +122,13 @@ public class AudioReactiveEdgeDetection : MonoBehaviour
         NormalSensitivity
     }
 
-    [System.Serializable]
-    public class FrequencyBandReaction
-    {
-        public bool enabled = false;
-        public VolumeReactiveParameter parameter = VolumeReactiveParameter.ChromaticSpread;
-        [Range(0f, 100f)] public float minValue = 3f;
-        [Range(0f, 100f)] public float maxValue = 10f;
-        [Range(0f, 10000f)] public float sensitivity = 200f;
-    }
-
     private void Start()
     {
-        // Get AudioSource if not assigned
-        if (audioSource == null)
+        // Get stem manager
+        stemManager = GetComponent<MusicStemManager>();
+        if (stemManager == null)
         {
-            audioSource = GetComponent<AudioSource>();
-        }
-
-        if (audioSource == null)
-        {
-            Debug.LogError("AudioReactiveEdgeDetection: No AudioSource found! Please add an AudioSource component.");
+            Debug.LogError("AudioReactiveEdgeDetection: No MusicStemManager found! Add MusicStemManager component to this GameObject.");
             enabled = false;
             return;
         }
@@ -153,52 +140,84 @@ public class AudioReactiveEdgeDetection : MonoBehaviour
             return;
         }
 
-        // Initialize spectrum data array
-        spectrumData = new float[sampleSize];
+        // Initialize spectrum data arrays
+        bassSpectrumData = new float[sampleSize];
+        midSpectrumData = new float[sampleSize];
+        highSpectrumData = new float[sampleSize];
 
-        // Enable rainbow mode if requested
-        if (enableRainbowWithMusic && audioSource.isPlaying)
-        {
-            edgeController.SetRainbowMode(true);
-        }
-
-        Debug.Log("AudioReactiveEdgeDetection: Initialized successfully");
-        Debug.Log("NOTE: AudioSource volume must be > 0 for spectrum analysis. Use an Audio Mixer to control playback volume separately.");
+        Debug.Log("AudioReactiveEdgeDetection: Initialized with stem-based audio analysis");
     }
 
     private void Update()
     {
-        if (audioSource == null || edgeController == null || !audioSource.isPlaying)
+        if (stemManager == null || edgeController == null || !stemManager.IsPlaying())
         {
             return;
         }
 
-        // Get spectrum data from audio source
-        audioSource.GetSpectrumData(spectrumData, 0, FFTWindow.BlackmanHarris);
+        // Get audio sources from stem manager
+        AudioSource bassSource = stemManager.GetBassAnalysisSource();
+        AudioSource midSource = stemManager.GetMidAnalysisSource();
+        AudioSource highSource = stemManager.GetHighAnalysisSource();
 
-        // Calculate overall volume
-        currentVolume = CalculateAverageVolume();
-
-        // Apply sensitivity and smooth the volume
-        float amplifiedVolume = currentVolume * sensitivity;
-        smoothedVolume = Mathf.Lerp(smoothedVolume, amplifiedVolume, 1f - smoothing);
-
-        // Debug output
-        if (showDebugInfo)
+        // Analyze bass stem
+        if (useBassReactivity && bassSource != null && bassSource.clip != null)
         {
-            Debug.Log($"Raw: {currentVolume:F6} | Amp: {amplifiedVolume:F2} | Smooth: {smoothedVolume:F2}");
+            bassSource.GetSpectrumData(bassSpectrumData, 0, FFTWindow.BlackmanHarris);
+            currentBassVolume = CalculateAverageVolume(bassSpectrumData);
+
+            float amplifiedBass = currentBassVolume * bassSensitivity;
+            smoothedBassVolume = Mathf.Lerp(smoothedBassVolume, amplifiedBass, 1f - smoothing);
+
+            float mappedBass = Mathf.Lerp(bassMinValue, bassMaxValue, Mathf.Clamp01(smoothedBassVolume));
+            ApplyParameterValue(bassParameter, mappedBass);
+
+            if (showDebugInfo)
+            {
+                Debug.Log($"<color=red>Bass: Raw={currentBassVolume:F6} Smooth={smoothedBassVolume:F2} [{bassParameter}]={mappedBass:F2}</color>");
+            }
         }
 
-        // Apply volume-based reactivity if enabled
-        if (useVolumeReactivity)
+        // Analyze mid stem
+        if (useMidReactivity && midSource != null && midSource.clip != null)
         {
-            ApplyVolumeReactivity(smoothedVolume);
+            midSource.GetSpectrumData(midSpectrumData, 0, FFTWindow.BlackmanHarris);
+            currentMidVolume = CalculateAverageVolume(midSpectrumData);
+
+            float amplifiedMid = currentMidVolume * midSensitivity;
+            smoothedMidVolume = Mathf.Lerp(smoothedMidVolume, amplifiedMid, 1f - smoothing);
+
+            float mappedMid = Mathf.Lerp(midMinValue, midMaxValue, Mathf.Clamp01(smoothedMidVolume));
+            ApplyParameterValue(midParameter, mappedMid);
+
+            if (showDebugInfo)
+            {
+                Debug.Log($"<color=green>Mid: Raw={currentMidVolume:F6} Smooth={smoothedMidVolume:F2} [{midParameter}]={mappedMid:F2}</color>");
+            }
         }
 
-        // Apply frequency band reactivity if enabled
-        if (useFrequencyBands)
+        // Analyze high stem
+        if (useHighReactivity && highSource != null && highSource.clip != null)
         {
-            ApplyFrequencyBandReactivity();
+            highSource.GetSpectrumData(highSpectrumData, 0, FFTWindow.BlackmanHarris);
+            currentHighVolume = CalculateAverageVolume(highSpectrumData);
+
+            float amplifiedHigh = currentHighVolume * highSensitivity;
+            smoothedHighVolume = Mathf.Lerp(smoothedHighVolume, amplifiedHigh, 1f - smoothing);
+
+            float mappedHigh = Mathf.Lerp(highMinValue, highMaxValue, Mathf.Clamp01(smoothedHighVolume));
+            ApplyParameterValue(highParameter, mappedHigh);
+
+            if (showDebugInfo)
+            {
+                Debug.Log($"<color=blue>High: Raw={currentHighVolume:F6} Smooth={smoothedHighVolume:F2} [{highParameter}]={mappedHigh:F2}</color>");
+            }
+        }
+
+        // Enable rainbow mode if requested
+        if (enableRainbowWithMusic && !edgeController.useRainbowGradient)
+        {
+            edgeController.SetRainbowMode(true);
         }
 
         // Animate rainbow samples if enabled
@@ -211,7 +230,7 @@ public class AudioReactiveEdgeDetection : MonoBehaviour
     /// <summary>
     /// Calculate average volume from spectrum data
     /// </summary>
-    private float CalculateAverageVolume()
+    private float CalculateAverageVolume(float[] spectrumData)
     {
         float sum = 0f;
         for (int i = 0; i < spectrumData.Length; i++)
@@ -219,100 +238,6 @@ public class AudioReactiveEdgeDetection : MonoBehaviour
             sum += spectrumData[i];
         }
         return sum / spectrumData.Length;
-    }
-
-    /// <summary>
-    /// Apply the main volume-based parameter change
-    /// </summary>
-    private void ApplyVolumeReactivity(float volume)
-    {
-        // Map the volume (0-1+ range after sensitivity) to min/max intensity
-        float clampedVolume = Mathf.Clamp01(volume);
-        float mappedValue = Mathf.Lerp(minIntensity, maxIntensity, clampedVolume);
-
-        if (showDebugInfo)
-        {
-            Debug.Log($"<color=cyan>Volume [{volumeParameter}]: {mappedValue:F2}</color>");
-        }
-
-        ApplyParameterValue(volumeParameter, mappedValue);
-    }
-
-    /// <summary>
-    /// Apply frequency band-specific reactivity for more complex audio visualization
-    /// </summary>
-    private void ApplyFrequencyBandReactivity()
-    {
-        // Calculate frequency bands
-        // Bass: 0-250 Hz (approximately first 1/32 of spectrum)
-        // Mid: 250-2000 Hz (approximately next 1/8 of spectrum)
-        // High: 2000+ Hz (remaining spectrum)
-        float bass = CalculateFrequencyBand(0, sampleSize / 32);
-        float mid = CalculateFrequencyBand(sampleSize / 32, sampleSize / 4);
-        float high = CalculateFrequencyBand(sampleSize / 4, sampleSize);
-
-        // Apply sensitivity and smooth the bands
-        float amplifiedBass = bass * bassReaction.sensitivity;
-        float amplifiedMid = mid * midReaction.sensitivity;
-        float amplifiedHigh = high * highReaction.sensitivity;
-
-        smoothedBass = Mathf.Lerp(smoothedBass, amplifiedBass, 1f - smoothing);
-        smoothedMid = Mathf.Lerp(smoothedMid, amplifiedMid, 1f - smoothing);
-        smoothedHigh = Mathf.Lerp(smoothedHigh, amplifiedHigh, 1f - smoothing);
-
-        if (showDebugInfo)
-        {
-            Debug.Log($"<color=yellow>Bass: {smoothedBass:F2} | Mid: {smoothedMid:F2} | High: {smoothedHigh:F2}</color>");
-        }
-
-        // Apply bass reaction
-        if (bassReaction.enabled)
-        {
-            float value = Mathf.Lerp(bassReaction.minValue, bassReaction.maxValue, Mathf.Clamp01(smoothedBass));
-            if (showDebugInfo)
-            {
-                Debug.Log($"<color=red>Bass [{bassReaction.parameter}]: {value:F2}</color>");
-            }
-            ApplyParameterValue(bassReaction.parameter, value);
-        }
-
-        // Apply mid reaction
-        if (midReaction.enabled)
-        {
-            float value = Mathf.Lerp(midReaction.minValue, midReaction.maxValue, Mathf.Clamp01(smoothedMid));
-            if (showDebugInfo)
-            {
-                Debug.Log($"<color=green>Mid [{midReaction.parameter}]: {value:F2}</color>");
-            }
-            ApplyParameterValue(midReaction.parameter, value);
-        }
-
-        // Apply high reaction
-        if (highReaction.enabled)
-        {
-            float value = Mathf.Lerp(highReaction.minValue, highReaction.maxValue, Mathf.Clamp01(smoothedHigh));
-            if (showDebugInfo)
-            {
-                Debug.Log($"<color=blue>High [{highReaction.parameter}]: {value:F2}</color>");
-            }
-            ApplyParameterValue(highReaction.parameter, value);
-        }
-    }
-
-    /// <summary>
-    /// Calculate average intensity for a specific frequency band
-    /// </summary>
-    private float CalculateFrequencyBand(int startIndex, int endIndex)
-    {
-        float sum = 0f;
-        int count = endIndex - startIndex;
-
-        for (int i = startIndex; i < endIndex && i < spectrumData.Length; i++)
-        {
-            sum += spectrumData[i];
-        }
-
-        return count > 0 ? sum / count : 0f;
     }
 
     /// <summary>
@@ -352,18 +277,10 @@ public class AudioReactiveEdgeDetection : MonoBehaviour
     }
 
     /// <summary>
-    /// Get current smoothed volume (useful for debugging)
+    /// Get current smoothed volumes (useful for debugging)
     /// </summary>
-    public float GetCurrentVolume()
+    public Vector3 GetStemVolumes()
     {
-        return smoothedVolume;
-    }
-
-    /// <summary>
-    /// Get frequency band values (useful for debugging)
-    /// </summary>
-    public Vector3 GetFrequencyBands()
-    {
-        return new Vector3(smoothedBass, smoothedMid, smoothedHigh);
+        return new Vector3(smoothedBassVolume, smoothedMidVolume, smoothedHighVolume);
     }
 }
