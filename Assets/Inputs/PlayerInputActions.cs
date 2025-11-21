@@ -199,6 +199,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Counter"",
+                    ""type"": ""Button"",
+                    ""id"": ""73c2e13b-3891-4f5b-beee-2d5997d0b72f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -377,6 +386,17 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Wave4"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7777b954-bb48-43d0-a413-7c5cb3a807af"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Counter"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -397,6 +417,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Gameplay_Wave2 = m_Gameplay.FindAction("Wave2", throwIfNotFound: true);
         m_Gameplay_Wave3 = m_Gameplay.FindAction("Wave3", throwIfNotFound: true);
         m_Gameplay_Wave4 = m_Gameplay.FindAction("Wave4", throwIfNotFound: true);
+        m_Gameplay_Counter = m_Gameplay.FindAction("Counter", throwIfNotFound: true);
     }
 
     ~@PlayerInputActions()
@@ -489,6 +510,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_Wave2;
     private readonly InputAction m_Gameplay_Wave3;
     private readonly InputAction m_Gameplay_Wave4;
+    private readonly InputAction m_Gameplay_Counter;
     /// <summary>
     /// Provides access to input actions defined in input action map "Gameplay".
     /// </summary>
@@ -548,6 +570,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Gameplay/Wave4".
         /// </summary>
         public InputAction @Wave4 => m_Wrapper.m_Gameplay_Wave4;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/Counter".
+        /// </summary>
+        public InputAction @Counter => m_Wrapper.m_Gameplay_Counter;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -610,6 +636,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Wave4.started += instance.OnWave4;
             @Wave4.performed += instance.OnWave4;
             @Wave4.canceled += instance.OnWave4;
+            @Counter.started += instance.OnCounter;
+            @Counter.performed += instance.OnCounter;
+            @Counter.canceled += instance.OnCounter;
         }
 
         /// <summary>
@@ -657,6 +686,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Wave4.started -= instance.OnWave4;
             @Wave4.performed -= instance.OnWave4;
             @Wave4.canceled -= instance.OnWave4;
+            @Counter.started -= instance.OnCounter;
+            @Counter.performed -= instance.OnCounter;
+            @Counter.canceled -= instance.OnCounter;
         }
 
         /// <summary>
@@ -781,5 +813,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnWave4(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Counter" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCounter(InputAction.CallbackContext context);
     }
 }

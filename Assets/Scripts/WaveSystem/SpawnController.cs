@@ -31,6 +31,9 @@ public class SpawnController : MonoBehaviour
     private List<GameObject> activeEnemies = new List<GameObject>();
     private bool isSpawning = false;
 
+    // Cache of spawn points by ID for fast lookup
+    private Dictionary<string, SpawnPoint> spawnPointCache = new Dictionary<string, SpawnPoint>();
+
     private void Start()
     {
         // Create enemy container if not assigned
@@ -41,10 +44,41 @@ public class SpawnController : MonoBehaviour
             enemyContainer = container.transform;
         }
 
+        // Cache all spawn points in the scene
+        CacheSpawnPoints();
+
         if (autoStartFirstWave && currentArena != null)
         {
             StartWave(0);
         }
+    }
+
+    /// <summary>
+    /// Find and cache all spawn points in the scene by their ID
+    /// </summary>
+    private void CacheSpawnPoints()
+    {
+        spawnPointCache.Clear();
+        SpawnPoint[] allSpawnPoints = FindObjectsByType<SpawnPoint>(FindObjectsSortMode.None);
+
+        foreach (SpawnPoint sp in allSpawnPoints)
+        {
+            if (string.IsNullOrEmpty(sp.spawnPointID))
+            {
+                Debug.LogWarning($"SpawnController: SpawnPoint on {sp.gameObject.name} has no ID assigned!");
+                continue;
+            }
+
+            if (spawnPointCache.ContainsKey(sp.spawnPointID))
+            {
+                Debug.LogWarning($"SpawnController: Duplicate spawn point ID '{sp.spawnPointID}' found! Using first occurrence.");
+                continue;
+            }
+
+            spawnPointCache[sp.spawnPointID] = sp;
+        }
+
+        Debug.Log($"SpawnController: Cached {spawnPointCache.Count} spawn points");
     }
 
     /// <summary>
@@ -133,9 +167,21 @@ public class SpawnController : MonoBehaviour
     {
         foreach (SpawnEntry entry in group.spawnEntries)
         {
-            if (entry.enemyPrefab == null || entry.spawnLocation == null)
+            if (entry.enemyPrefab == null)
             {
-                Debug.LogWarning("SpawnController: Spawn entry has missing prefab or location!");
+                Debug.LogWarning("SpawnController: Spawn entry has missing enemy prefab!");
+                continue;
+            }
+
+            if (string.IsNullOrEmpty(entry.spawnPointID))
+            {
+                Debug.LogWarning("SpawnController: Spawn entry has no spawn point ID assigned!");
+                continue;
+            }
+
+            if (!spawnPointCache.ContainsKey(entry.spawnPointID))
+            {
+                Debug.LogWarning($"SpawnController: Spawn point '{entry.spawnPointID}' not found in scene!");
                 continue;
             }
 
@@ -158,8 +204,21 @@ public class SpawnController : MonoBehaviour
     /// </summary>
     private void SpawnEnemy(SpawnEntry entry)
     {
-        Vector3 spawnPosition = entry.spawnLocation.transform.position;
-        Quaternion spawnRotation = entry.spawnLocation.transform.rotation;
+        // Find the spawn point by ID
+        if (!spawnPointCache.TryGetValue(entry.spawnPointID, out SpawnPoint spawnPoint))
+        {
+            Debug.LogError($"SpawnController: Could not find spawn point with ID '{entry.spawnPointID}'. Make sure it exists in the scene!");
+            return;
+        }
+
+        if (entry.enemyPrefab == null)
+        {
+            Debug.LogWarning($"SpawnController: Spawn entry for '{entry.spawnPointID}' has no enemy prefab assigned!");
+            return;
+        }
+
+        Vector3 spawnPosition = spawnPoint.transform.position;
+        Quaternion spawnRotation = spawnPoint.transform.rotation;
 
         // Apply random spread if enabled
         if (entry.useRandomSpread && entry.spreadRadius > 0)

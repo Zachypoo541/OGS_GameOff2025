@@ -34,6 +34,7 @@ public struct CombatInput
     public bool SelfModifier;
     public bool NextWaveform;
     public bool PrevWaveform;
+    public bool Counter;
 }
 
 public class PlayerCharacter : CombatEntity, ICharacterController
@@ -112,6 +113,9 @@ public class PlayerCharacter : CombatEntity, ICharacterController
     // Collider overlap detection
     private Collider[] _uncrouchOverlapResults;
 
+    // Counter system reference
+    private CounterSystem _counterSystem;
+
     public void Initialize(Transform cameraTransform, Reticle reticle = null)
     {
         _cameraTransform = cameraTransform;
@@ -121,6 +125,13 @@ public class PlayerCharacter : CombatEntity, ICharacterController
         _lastState = _state;
         _uncrouchOverlapResults = new Collider[8];
         motor.CharacterController = this;
+
+        // Get counter system component
+        _counterSystem = GetComponent<CounterSystem>();
+        if (_counterSystem == null)
+        {
+            Debug.LogWarning("CounterSystem component not found on PlayerCharacter. Counter mechanics will not work.");
+        }
 
         // Initialize combat system
         currentHealth = maxHealth;
@@ -142,6 +153,12 @@ public class PlayerCharacter : CombatEntity, ICharacterController
     {
         base.Update(); // Handles energy regen, status effects, ramp timers
         UpdateDashVelocity();
+
+        // Apply unlimited energy from counter system
+        if (_counterSystem != null && _counterSystem.HasUnlimitedEnergy())
+        {
+            currentEnergy = maxEnergy; // Keep energy at max
+        }
     }
 
     public void UpdateInput(CharacterInput input)
@@ -174,6 +191,12 @@ public class PlayerCharacter : CombatEntity, ICharacterController
 
     public void UpdateCombatInput(CombatInput input)
     {
+        // Handle counter input
+        if (input.Counter && _counterSystem != null)
+        {
+            _counterSystem.AttemptCounter();
+        }
+
         // Switch waveforms
         if (input.NextWaveform)
         {
@@ -256,6 +279,12 @@ public class PlayerCharacter : CombatEntity, ICharacterController
     {
         // Apply acceleration modifier from combat system
         float accelModifier = GetAccelerationMultiplier();
+
+        // Apply movement speed modifier from counter system
+        if (_counterSystem != null)
+        {
+            accelModifier *= _counterSystem.GetMovementSpeedMultiplier();
+        }
 
         // If on the ground...
         if (motor.GroundingStatus.IsStableOnGround)
@@ -472,8 +501,8 @@ public class PlayerCharacter : CombatEntity, ICharacterController
             equippedWaveform = unlockedWaveforms[index];
             currentWaveformIndex = index;
 
+            // Don't add to immunity list - counter system handles this
             immuneToWaveforms.Clear();
-            immuneToWaveforms.Add(equippedWaveform);
 
             // Update reticle to match new waveform
             if (_reticle != null)
@@ -490,6 +519,12 @@ public class PlayerCharacter : CombatEntity, ICharacterController
         // Calculate damage (with ramping if applicable)
         float damage = CalculateDamage();
 
+        // Apply damage multiplier from counter system
+        if (_counterSystem != null)
+        {
+            damage *= _counterSystem.GetDamageMultiplier();
+        }
+
         // Consume resources
         ConsumeAttackResources();
 
@@ -503,8 +538,18 @@ public class PlayerCharacter : CombatEntity, ICharacterController
             WaveformProjectile projectile = proj.GetComponent<WaveformProjectile>();
             if (projectile != null)
             {
+                // Check if we have chain attack buff
+                bool enableChain = _counterSystem != null && _counterSystem.HasChainAttack();
+                float chainRange = enableChain ? _counterSystem.GetChainRange() : 0f;
+
                 // Pass reticle reference to projectile (only player has reticle)
-                projectile.Initialize(damage, equippedWaveform, this, direction, _reticle);
+                projectile.Initialize(damage, equippedWaveform, this, direction, _reticle, enableChain, chainRange);
+
+                // If chain attack was used, consume it
+                if (enableChain)
+                {
+                    _counterSystem.ConsumeChainAttack();
+                }
 
                 // Trigger fire animation on reticle (only if projectile was spawned)
                 if (_reticle != null)
@@ -513,6 +558,67 @@ public class PlayerCharacter : CombatEntity, ICharacterController
                 }
             }
         }
+    }
+
+    public override void TakeDamage(float amount, WaveformData sourceWaveform, CombatEntity attacker = null)
+    {
+        // Apply damage resistance from counter system
+        if (_counterSystem != null)
+        {
+            float resistance = _counterSystem.GetDamageResistance();
+            amount *= (1f - resistance);
+
+            // Check for reflection
+            if (_counterSystem.IsReflecting() && attacker != null)
+            {
+                // Reflect damage back to attacker
+                attacker.TakeDamage(amount, this);
+                Debug.Log($"Reflected {amount} damage back to {attacker.name}!");
+                return; // Don't take damage ourselves
+            }
+
+            // Apply damage received multiplier (from Saw stacks)
+            amount *= _counterSystem.GetDamageReceivedMultiplier();
+        }
+
+        base.TakeDamage(amount, sourceWaveform, attacker);
+    }
+
+    public override void TakeDamage(float amount, CombatEntity attacker = null)
+    {
+        // Apply damage resistance from counter system
+        if (_counterSystem != null)
+        {
+            float resistance = _counterSystem.GetDamageResistance();
+            amount *= (1f - resistance);
+
+            // Check for reflection
+            if (_counterSystem.IsReflecting() && attacker != null)
+            {
+                // Reflect damage back to attacker
+                attacker.TakeDamage(amount, this);
+                Debug.Log($"Reflected {amount} damage back to {attacker.name}!");
+                return; // Don't take damage ourselves
+            }
+
+            // Apply damage received multiplier (from Saw stacks)
+            amount *= _counterSystem.GetDamageReceivedMultiplier();
+        }
+
+        base.TakeDamage(amount, attacker);
+    }
+
+    protected override float GetEnergyRegenRate()
+    {
+        float baseRegen = base.GetEnergyRegenRate();
+
+        // Apply energy regen multiplier from counter system
+        if (_counterSystem != null)
+        {
+            baseRegen *= _counterSystem.GetEnergyRegenMultiplier();
+        }
+
+        return baseRegen;
     }
 
     public void UnlockWaveform(WaveformData waveform)

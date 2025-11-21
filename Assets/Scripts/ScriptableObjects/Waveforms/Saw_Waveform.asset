@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5199e601a89e7964a8ec5c3b0b0014af, type: 3}
-  m_Name: Sawtooth_Waveform
+  m_Name: Saw_Waveform
   m_EditorClassIdentifier: 
   waveformName: Sawtooth
   waveformColor: {r: 1, g: 0, b: 0, a: 1}

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2057590850391088320}
   - component: {fileID: -6064935166247100015}
   - component: {fileID: 560599127775079150}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: TriangleProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
