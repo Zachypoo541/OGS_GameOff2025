@@ -15,8 +15,8 @@ public class SpawnEntry
     public int count = 1;
 
     [Header("Location")]
-    [Tooltip("The spawn point where this enemy will appear")]
-    public SpawnPoint spawnLocation;
+    [Tooltip("The ID of the spawn point where this enemy will appear (must match a SpawnPoint's spawnPointID in the scene)")]
+    public string spawnPointID;
 
     [Header("Spawn Behavior")]
     [Tooltip("Spread spawned enemies randomly around the spawn point")]

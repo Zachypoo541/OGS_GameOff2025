@@ -179,9 +179,9 @@ public class ArenaConfigurationEditor : Editor
                                         issueCount++;
                                     }
 
-                                    if (entry.spawnLocation == null)
+                                    if (string.IsNullOrEmpty(entry.spawnPointID))
                                     {
-                                        Debug.LogWarning($"Arena '{arena.arenaName}' Wave {i + 1} has spawn entry with no spawn location!");
+                                        Debug.LogWarning($"Arena '{arena.arenaName}' Wave {i + 1} has spawn entry with no spawn point ID!");
                                         issueCount++;
                                     }
                                 }

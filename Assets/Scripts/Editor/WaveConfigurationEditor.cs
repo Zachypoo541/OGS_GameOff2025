@@ -105,9 +105,9 @@ public class WaveConfigurationEditor : Editor
                             hasWarnings = true;
                         }
 
-                        if (entry.spawnLocation == null)
+                        if (string.IsNullOrEmpty(entry.spawnPointID))
                         {
-                            EditorGUILayout.HelpBox($"Spawn Group {i + 1} has an entry with no spawn location.", MessageType.Warning);
+                            EditorGUILayout.HelpBox($"Spawn Group {i + 1} has an entry with no spawn point ID.", MessageType.Warning);
                             hasWarnings = true;
                         }
                     }

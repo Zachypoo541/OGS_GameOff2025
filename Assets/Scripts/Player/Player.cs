@@ -6,8 +6,8 @@ public class Player : MonoBehaviour
 
     [SerializeField] private PlayerCharacter playerCharacter;
     [SerializeField] private PlayerCamera playerCamera;
-
     [SerializeField] private Reticle reticle;
+    [SerializeField] private CounterSystem counterSystem;
 
     [Header("Debug")]
     [SerializeField] private bool debugInput = false;
@@ -34,13 +34,22 @@ public class Player : MonoBehaviour
         _inputActions = new PlayerInputActions();
         _inputActions.Enable();
 
-        // Find reticle if not assigned
+        // Find components if not assigned
         if (reticle == null)
         {
             reticle = FindFirstObjectByType<Reticle>();
         }
 
-        // Pass reticle to PlayerCharacter (CHANGED)
+        if (counterSystem == null)
+        {
+            counterSystem = playerCharacter.GetComponent<CounterSystem>();
+            if (counterSystem == null)
+            {
+                Debug.LogError("CounterSystem not found on PlayerCharacter! Please add the CounterSystem component.");
+            }
+        }
+
+        // Pass reticle to PlayerCharacter
         playerCharacter.Initialize(playerCamera.transform, reticle);
         playerCamera.Initialize(playerCharacter.GetCameraTarget());
     }
@@ -65,12 +74,14 @@ public class Player : MonoBehaviour
             if (input.Fire.WasPressedThisFrame() ||
                 input.NextWaveform.WasPressedThisFrame() ||
                 input.PrevWaveform.WasPressedThisFrame() ||
-                input.SelfModifier.WasPressedThisFrame())
+                input.SelfModifier.WasPressedThisFrame() ||
+                input.Counter.WasPressedThisFrame())
             {
                 Debug.Log($"Combat Input - Fire: {input.Fire.WasPressedThisFrame()}, " +
                          $"Next: {input.NextWaveform.WasPressedThisFrame()}, " +
                          $"Prev: {input.PrevWaveform.WasPressedThisFrame()}, " +
-                         $"Modifier: {input.SelfModifier.WasPressedThisFrame()}");
+                         $"Modifier: {input.SelfModifier.WasPressedThisFrame()}, " +
+                         $"Counter: {input.Counter.WasPressedThisFrame()}");
             }
         }
 
@@ -99,7 +110,8 @@ public class Player : MonoBehaviour
             Fire = input.Fire.WasPressedThisFrame(),
             SelfModifier = input.SelfModifier.WasPressedThisFrame(),
             NextWaveform = input.NextWaveform.WasPressedThisFrame(),
-            PrevWaveform = input.PrevWaveform.WasPressedThisFrame()
+            PrevWaveform = input.PrevWaveform.WasPressedThisFrame(),
+            Counter = input.Counter.WasPressedThisFrame()
         };
         playerCharacter.UpdateCombatInput(combatInput);
 

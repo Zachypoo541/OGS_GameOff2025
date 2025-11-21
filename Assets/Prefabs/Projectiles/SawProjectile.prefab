@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2057590850391088320}
   - component: {fileID: -6945794210071980360}
   - component: {fileID: 2016585727552766633}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: SawProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
