@@ -94,25 +94,25 @@ Material:
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
     - _ChromaticDistance: 20
-    - _ChromaticFalloff: 3.5174346
-    - _ChromaticIntensity: 3.5174346
-    - _ChromaticSpread: 3.0001101
+    - _ChromaticFalloff: 11.900304
+    - _ChromaticIntensity: 11.811575
+    - _ChromaticSpread: 23.48899
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
-    - _DepthSensitivity: 10
+    - _DepthSensitivity: 32.33368
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
-    - _EdgeThickness: 1
+    - _EdgeThickness: 1.990666
     - _EnvironmentReflections: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
-    - _NormalSensitivity: 1
+    - _NormalSensitivity: 37.836674
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0

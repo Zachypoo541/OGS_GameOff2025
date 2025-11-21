@@ -10,14 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d1b551a655616324db5252729ba65ca9, type: 3}
-  m_Name: TestArena_1
+  m_Name: Arena1
   m_EditorClassIdentifier: 
   arenaNumber: 1
   arenaName: Arena 1
   arenaDescription: 
   waves:
-  - {fileID: 11400000, guid: b03f49a85001cf44b851a43592e90f17, type: 2}
-  - {fileID: 11400000, guid: 0786cb92fde7d014394b60574a40f5e6, type: 2}
+  - {fileID: 11400000, guid: 9e81cc550c6ad594da3cd22e46947a95, type: 2}
   arenaSceneName: 
   spawnPointGroupTag: ArenaSpawns
   nextArena: {fileID: 0}

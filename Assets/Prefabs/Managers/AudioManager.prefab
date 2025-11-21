@@ -1,0 +1,160 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2659780690056636809
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8582724772773038801}
+  - component: {fileID: 5300882454854513819}
+  - component: {fileID: 5598775634969956387}
+  - component: {fileID: 1046577022544043494}
+  m_Layer: 0
+  m_Name: MusicManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8582724772773038801
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2659780690056636809}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4578038118924877098}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5300882454854513819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2659780690056636809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9991460ab7829044faf75f3698cd8581, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  edgeController: {fileID: 0}
+  sampleSize: 1024
+  useBassReactivity: 1
+  bassParameter: 1
+  bassMinValue: 3
+  bassMaxValue: 75
+  bassSensitivity: 100
+  useMidReactivity: 1
+  midParameter: 0
+  midMinValue: 3
+  midMaxValue: 25
+  midSensitivity: 100
+  useHighReactivity: 1
+  highParameter: 2
+  highMinValue: 3
+  highMaxValue: 25
+  highSensitivity: 100
+  smoothing: 0.5
+  parameterSmoothing: 0.1
+  enableRainbowWithMusic: 0
+  animateRainbowSamples: 0
+  rainbowAnimationSpeed: 1
+  showDebugInfo: 0
+--- !u!114 &5598775634969956387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2659780690056636809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a75f898637210343a6ce7ebfe40e6c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  musicTracks:
+  - trackName: PHOTOSYNTH 3
+    fullMixClip: {fileID: 8300000, guid: f9a755a74fcddbc4b873b615c6a66f1a, type: 3}
+    bassStemClip: {fileID: 8300000, guid: 5225385e4fc3d2e4c9d0079af83cf2bd, type: 3}
+    midStemClip: {fileID: 8300000, guid: f9a755a74fcddbc4b873b615c6a66f1a, type: 3}
+    highStemClip: {fileID: 8300000, guid: f9a755a74fcddbc4b873b615c6a66f1a, type: 3}
+    volume: 1
+    loop: 1
+  - trackName: PHOTOSYNTH 4
+    fullMixClip: {fileID: 8300000, guid: 9222c7873d21b814eaae4b26e8a6312c, type: 3}
+    bassStemClip: {fileID: 8300000, guid: ffb8837c0ce584a40b4b440be8326d5f, type: 3}
+    midStemClip: {fileID: 8300000, guid: 9222c7873d21b814eaae4b26e8a6312c, type: 3}
+    highStemClip: {fileID: 8300000, guid: 9222c7873d21b814eaae4b26e8a6312c, type: 3}
+    volume: 1
+    loop: 1
+  musicMixerGroup: {fileID: -941768749352520230, guid: 96a0d62f98c16cc4eb787a0e9048f805, type: 2}
+  mutedAnalysisMixerGroup: {fileID: 24300002, guid: 3101c4b588cce00458dd98d8cefdddaf, type: 2}
+  currentTrackIndex: -1
+  autoPlay: 0
+  autoPlayTrackIndex: 1
+--- !u!114 &1046577022544043494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2659780690056636809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc2812f2d47edd84cb493d500c808952, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  musicManager: {fileID: 5598775634969956387}
+  sceneMappings:
+  - sceneName: MainMenu
+    trackIndex: 0
+    trackName: PHOTOSYNTH4
+  - sceneName: Arena 1_DarkOpen
+    trackIndex: -1
+    trackName: PHOTOSYNTH 3
+  - sceneName: 
+    trackIndex: 0
+    trackName: 
+  useCrossfade: 1
+  crossfadeDuration: 2
+--- !u!1 &3386034028350916585
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4578038118924877098}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4578038118924877098
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3386034028350916585}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8582724772773038801}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

@@ -81,6 +81,7 @@ MonoBehaviour:
   playerCharacter: {fileID: 1613163692601214880}
   playerCamera: {fileID: 3954979626034672877}
   reticle: {fileID: 0}
+  counterSystem: {fileID: 102822914455170260}
   debugInput: 0
 --- !u!1 &3648927763264482542
 GameObject:
@@ -128,6 +129,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sensitivity: 0.1
+  verticalPositionDampening: 10
 --- !u!1 &3765348483398454242
 GameObject:
   m_ObjectHideFlags: 0
@@ -426,6 +428,7 @@ GameObject:
   - component: {fileID: 2750045865101113472}
   - component: {fileID: 7939782411666013399}
   - component: {fileID: 1613163692601214880}
+  - component: {fileID: 102822914455170260}
   m_Layer: 0
   m_Name: Character
   m_TagString: Untagged
@@ -571,6 +574,42 @@ MonoBehaviour:
   aimRaycastMask:
     serializedVersion: 2
     m_Bits: 23
+--- !u!114 &102822914455170260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8518445882225064906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d6b9e5c9886ec8499d5c9ec2f264d2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  counterWindowDuration: 1
+  counterCooldown: 1
+  counterRadius: 2
+  projectileLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  sineBaseHealing: 20
+  sineHealingPerStack: 5
+  sineRegenRate: 10
+  sineRegenDuration: 5
+  squareBaseDamageReduction: 0.3
+  squareReductionPerStack: 0.1
+  squareBuffDuration: 3
+  squareReflectionDuration: 5
+  sawBaseDamageBonus: 1.5
+  sawDamagePerStack: 0.2
+  sawDamageReceivedMultiplier: 1.3
+  sawChainRange: 15
+  triangleBaseEnergyRegen: 1.5
+  triangleRegenPerStack: 0.3
+  triangleBuffDuration: 4
+  triangleMovementSpeedBonus: 1.5
+  triangleUnlimitedEnergyDuration: 6
+  maxStacksForChromaticEffect: 5
 --- !u!1001 &8826533804309455961
 PrefabInstance:
   m_ObjectHideFlags: 0

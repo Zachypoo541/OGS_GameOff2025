@@ -59,10 +59,15 @@ public class CombatEntity : MonoBehaviour
     {
         if (currentEnergy < maxEnergy)
         {
-            float regenRate = baseEnergyRegenRate * GetEnergyRegenMultiplier();
+            float regenRate = GetEnergyRegenRate();
             currentEnergy = Mathf.Min(currentEnergy + regenRate * Time.deltaTime, maxEnergy);
             OnEnergyChanged?.Invoke(currentEnergy, maxEnergy);
         }
+    }
+
+    protected virtual float GetEnergyRegenRate()
+    {
+        return baseEnergyRegenRate * GetEnergyRegenMultiplier();
     }
 
     public void RestoreEnergy(float amount)
@@ -71,7 +76,7 @@ public class CombatEntity : MonoBehaviour
         OnEnergyChanged?.Invoke(currentEnergy, maxEnergy);
     }
 
-    public virtual void TakeDamage(float damage, WaveformData sourceWaveform)
+    public virtual void TakeDamage(float damage, WaveformData sourceWaveform, CombatEntity attacker = null)
     {
         // Check immunity
         if (IsImmuneTo(sourceWaveform))
@@ -80,6 +85,22 @@ public class CombatEntity : MonoBehaviour
             return;
         }
 
+        // Apply damage resistance
+        float damageResist = GetDamageResistance();
+        float finalDamage = damage * (1f - damageResist);
+
+        currentHealth = Mathf.Max(currentHealth - finalDamage, 0);
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    // Overload for Counter system (allows passing attacker without waveform)
+    public virtual void TakeDamage(float damage, CombatEntity attacker = null)
+    {
         // Apply damage resistance
         float damageResist = GetDamageResistance();
         float finalDamage = damage * (1f - damageResist);
