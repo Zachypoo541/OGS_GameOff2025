@@ -6,19 +6,16 @@ public class ShriekerEnemy : EnemyAI
     public float sniperRange = 25f;
     public float sniperCooldown = 3f;
     public float chargeTime = 1f;
-    public GameObject chargingEffectPrefab;
 
     private float nextShotTime;
     private bool isCharging;
     private float chargeTimer;
-    private GameObject chargingEffect;
 
     protected override void OnEnemyStart()
     {
         // Shrieker uses Sawtooth (Red) waveform
         // Stationary sniper
         // Immune to red, weak to repeated yellow attacks
-
         attackRange = sniperRange;
     }
 
@@ -40,7 +37,6 @@ public class ShriekerEnemy : EnemyAI
         if (isCharging)
         {
             chargeTimer -= Time.deltaTime;
-
             if (chargeTimer <= 0)
             {
                 // Fire high-damage sniper shot
@@ -48,11 +44,6 @@ public class ShriekerEnemy : EnemyAI
                 FireProjectile(direction);
 
                 isCharging = false;
-                if (chargingEffect != null)
-                {
-                    Destroy(chargingEffect);
-                }
-
                 nextShotTime = Time.time + sniperCooldown;
             }
         }
@@ -62,19 +53,13 @@ public class ShriekerEnemy : EnemyAI
             isCharging = true;
             chargeTimer = chargeTime;
 
-            // Spawn charging effect
-            if (chargingEffectPrefab != null && projectileSpawnPoint != null)
-            {
-                chargingEffect = Instantiate(chargingEffectPrefab, projectileSpawnPoint.position, Quaternion.identity, projectileSpawnPoint);
-            }
+            // Show attack indicator instead of old charging effect
+            ShowAttackIndicator(chargeTime - 0.3f); // Subtract fade-in time
         }
     }
 
     protected override void OnEnemyDeath()
     {
-        if (chargingEffect != null)
-        {
-            Destroy(chargingEffect);
-        }
+        // Indicator is automatically cleaned up in base Die() method
     }
 }

@@ -41,7 +41,7 @@ MonoBehaviour:
       spawnInterval: 0
     - enemyPrefab: {fileID: 3417624422039667496, guid: 61ff65c41de9e9646899eba2b73a3213, type: 3}
       count: 1
-      spawnPointID: SP_4
+      spawnPointID: SP_0
       useRandomSpread: 0
       spreadRadius: 0
       spawnInterval: 0
