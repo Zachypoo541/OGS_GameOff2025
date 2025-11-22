@@ -425,6 +425,83 @@ public class CounterSystem : MonoBehaviour
         _hasChainAttack = false;
     }
 
+    // Check if a hitscan attack should be countered (called before damage is applied)
+    public bool TryCounterHitscan(WaveformData waveformType, CombatEntity attacker, out bool applyEffect)
+    {
+        applyEffect = false;
+
+        if (!_isCounterActive)
+            return false;
+
+        // Check if player has matching waveform equipped
+        if (_playerCharacter.equippedWaveform != waveformType)
+        {
+            Debug.Log($"Cannot counter hitscan: Equipped {_playerCharacter.equippedWaveform?.name ?? "null"} but attack is {waveformType?.name ?? "null"}");
+            return false;
+        }
+
+        // Don't counter own attacks
+        if (attacker == _playerCharacter)
+        {
+            Debug.Log("Cannot counter: Own attack");
+            return false;
+        }
+
+        // Successfully countered
+        applyEffect = true;
+
+        // Update stack count
+        if (!_stackCounts.ContainsKey(waveformType))
+            _stackCounts[waveformType] = 0;
+
+        // Check if switching waveform types (reset other stacks)
+        if (_currentEffect != null && _currentEffect.waveformType != waveformType)
+        {
+            ClearActiveEffects();
+            var keysToReset = new List<WaveformData>(_stackCounts.Keys);
+            foreach (var key in keysToReset)
+            {
+                if (key != waveformType)
+                    _stackCounts[key] = 0;
+            }
+        }
+
+        _stackCounts[waveformType]++;
+        int currentStacks = _stackCounts[waveformType];
+
+        // Cap at max stacks
+        if (currentStacks > maxStacksForChromaticEffect)
+        {
+            currentStacks = maxStacksForChromaticEffect;
+            _stackCounts[waveformType] = maxStacksForChromaticEffect;
+        }
+
+        // Update current effect
+        _currentEffect = new CounterEffect
+        {
+            waveformType = waveformType,
+            activationTime = Time.time,
+            stackCount = currentStacks
+        };
+
+        // Apply counter effect
+        ApplyCounterEffect(waveformType, currentStacks);
+
+        // Reset stacks after Chromatic
+        if (currentStacks >= maxStacksForChromaticEffect)
+        {
+            _stackCounts[waveformType] = 0;
+            Debug.Log($"Stack count reset to 0 after Chromatic activation");
+        }
+
+        // Successful counter, no cooldown
+        EndCounterWindow(true);
+
+        Debug.Log($"Countered {waveformType.name} hitscan attack! Stack count: {currentStacks}");
+
+        return true;
+    }
+
     // For debugging
     private void OnDrawGizmosSelected()
     {

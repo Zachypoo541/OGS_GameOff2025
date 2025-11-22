@@ -9,6 +9,8 @@ public class WaveformData : ScriptableObject
     public int unlockLevel = 1;
 
     [Header("Projectile Attack")]
+    public bool isHitscan = false;
+    public float hitscanRange = 100f;
     public float baseDamage = 10f;
     public float energyCost = 15f;
     public float projectileSpeed = 20f;

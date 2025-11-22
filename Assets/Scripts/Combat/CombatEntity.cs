@@ -162,10 +162,22 @@ public class CombatEntity : MonoBehaviour
                 projectileSpawnPoint.position,
                 Quaternion.LookRotation(direction));
 
-            WaveformProjectile projectile = proj.GetComponent<WaveformProjectile>();
-            if (projectile != null)
+            // Check if hitscan or regular projectile
+            if (equippedWaveform.isHitscan)
             {
-                projectile.Initialize(damage, equippedWaveform, this, direction);
+                HitscanProjectile hitscan = proj.GetComponent<HitscanProjectile>();
+                if (hitscan != null)
+                {
+                    hitscan.Initialize(damage, equippedWaveform, this, direction, equippedWaveform.hitscanRange);
+                }
+            }
+            else
+            {
+                WaveformProjectile projectile = proj.GetComponent<WaveformProjectile>();
+                if (projectile != null)
+                {
+                    projectile.Initialize(damage, equippedWaveform, this, direction);
+                }
             }
         }
     }

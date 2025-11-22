@@ -562,22 +562,47 @@ public class PlayerCharacter : CombatEntity, ICharacterController
 
     public override void TakeDamage(float amount, WaveformData sourceWaveform, CombatEntity attacker = null)
     {
+        // Check for hitscan counter first
+        if (_counterSystem != null && sourceWaveform != null)
+        {
+            bool shouldApplyEffect;
+            if (_counterSystem.TryCounterHitscan(sourceWaveform, attacker, out shouldApplyEffect))
+            {
+                Debug.Log("Countered hitscan attack!");
+                return; // Don't take damage
+            }
+        }
+
+        // Check for reflection (for regular projectiles)
+        if (_counterSystem != null && _counterSystem.IsReflecting() && attacker != null)
+        {
+            Vector3 directionToAttacker = (attacker.transform.position - transform.position).normalized;
+
+            if (sourceWaveform != null && sourceWaveform.projectilePrefab != null && projectileSpawnPoint != null)
+            {
+                GameObject reflectedProj = Instantiate(
+                    sourceWaveform.projectilePrefab,
+                    projectileSpawnPoint.position,
+                    Quaternion.LookRotation(directionToAttacker)
+                );
+
+                WaveformProjectile projectile = reflectedProj.GetComponent<WaveformProjectile>();
+                if (projectile != null)
+                {
+                    projectile.Initialize(amount, sourceWaveform, this, directionToAttacker, _reticle);
+                }
+
+                Debug.Log($"Reflected {sourceWaveform.name} projectile back to {attacker.name}!");
+            }
+
+            return; // Don't take damage
+        }
+
         // Apply damage resistance from counter system
         if (_counterSystem != null)
         {
             float resistance = _counterSystem.GetDamageResistance();
             amount *= (1f - resistance);
-
-            // Check for reflection
-            if (_counterSystem.IsReflecting() && attacker != null)
-            {
-                // Reflect damage back to attacker
-                attacker.TakeDamage(amount, this);
-                Debug.Log($"Reflected {amount} damage back to {attacker.name}!");
-                return; // Don't take damage ourselves
-            }
-
-            // Apply damage received multiplier (from Saw stacks)
             amount *= _counterSystem.GetDamageReceivedMultiplier();
         }
 
@@ -586,20 +611,18 @@ public class PlayerCharacter : CombatEntity, ICharacterController
 
     public override void TakeDamage(float amount, CombatEntity attacker = null)
     {
+        // Check for reflection first (can't reflect without waveform data, so just reduce to 0)
+        if (_counterSystem != null && _counterSystem.IsReflecting())
+        {
+            Debug.Log("Reflecting damage (no projectile - direct damage source)");
+            return; // Don't take damage
+        }
+
         // Apply damage resistance from counter system
         if (_counterSystem != null)
         {
             float resistance = _counterSystem.GetDamageResistance();
             amount *= (1f - resistance);
-
-            // Check for reflection
-            if (_counterSystem.IsReflecting() && attacker != null)
-            {
-                // Reflect damage back to attacker
-                attacker.TakeDamage(amount, this);
-                Debug.Log($"Reflected {amount} damage back to {attacker.name}!");
-                return; // Don't take damage ourselves
-            }
 
             // Apply damage received multiplier (from Saw stacks)
             amount *= _counterSystem.GetDamageReceivedMultiplier();

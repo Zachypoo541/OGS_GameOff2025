@@ -11,8 +11,15 @@ public abstract class EnemyAI : CombatEntity
     [Range(0f, 1f)]
     public float dropChance = 0.7f;
 
+    [Header("Attack Indicator")]
+    public GameObject attackIndicatorPrefab;
+    [SerializeField] private Sprite attackIndicatorSprite;
+    public Color attackIndicatorColor = Color.red;
+    public Vector3 indicatorOffset = Vector3.up * 2f;
+
     protected Transform player;
     protected bool isPlayerDetected;
+    protected GameObject currentIndicator;
 
     protected override void Start()
     {
@@ -84,9 +91,56 @@ public abstract class EnemyAI : CombatEntity
 
     protected abstract void UpdateBehavior(float distanceToPlayer);
 
+    /// <summary>
+    /// Spawns an attack indicator at the enemy's position.
+    /// Call this when the enemy begins charging/preparing an attack.
+    /// </summary>
+    /// <param name="attackDuration">How long until the attack fires (duration of the indicator effect)</param>
+    protected void ShowAttackIndicator(float attackDuration)
+    {
+        // Clean up existing indicator
+        if (currentIndicator != null)
+        {
+            Destroy(currentIndicator);
+        }
+
+        // Create new indicator
+        if (attackIndicatorPrefab != null)
+        {
+            Vector3 spawnPos = transform.position + indicatorOffset;
+            currentIndicator = Instantiate(attackIndicatorPrefab, spawnPos, Quaternion.identity, transform);
+
+            AttackIndicator indicator = currentIndicator.GetComponent<AttackIndicator>();
+            if (indicator != null && attackIndicatorSprite != null)
+            {
+                indicator.StartIndicator(attackDuration, attackIndicatorSprite, attackIndicatorColor);
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"{gameObject.name}: No attack indicator prefab assigned!");
+        }
+    }
+
+    /// <summary>
+    /// Manually destroys the current attack indicator.
+    /// Useful if an attack is cancelled or interrupted.
+    /// </summary>
+    protected void ClearAttackIndicator()
+    {
+        if (currentIndicator != null)
+        {
+            Destroy(currentIndicator);
+            currentIndicator = null;
+        }
+    }
+
     protected override void Die()
     {
         base.Die();
+
+        // Clean up indicator on death
+        ClearAttackIndicator();
 
         // Drop energy pickup based on chance
         if (energyPickupPrefab != null && Random.value <= dropChance)
@@ -140,5 +194,9 @@ public abstract class EnemyAI : CombatEntity
             Gizmos.color = Color.red;
             Gizmos.DrawLine(transform.position, player.position);
         }
+
+        // Draw indicator position
+        Gizmos.color = attackIndicatorColor;
+        Gizmos.DrawWireSphere(transform.position + indicatorOffset, 0.5f);
     }
 }
