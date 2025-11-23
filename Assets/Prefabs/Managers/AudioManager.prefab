@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8582724772773038801}
   - component: {fileID: 5300882454854513819}
+  - component: {fileID: 1690559604842529345}
   - component: {fileID: 5598775634969956387}
   - component: {fileID: 1046577022544043494}
   m_Layer: 0
@@ -68,6 +69,35 @@ MonoBehaviour:
   enableRainbowWithMusic: 0
   animateRainbowSamples: 0
   rainbowAnimationSpeed: 1
+  showDebugInfo: 0
+--- !u!114 &1690559604842529345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2659780690056636809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32fa6c82577f9384494310f7713a743a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  handVideoImage: {fileID: 0}
+  sampleSize: 1024
+  useBassReactivity: 1
+  bassMinSpread: 1
+  bassMaxSpread: 3
+  bassSensitivity: 100
+  useMidReactivity: 1
+  midMinIntensity: 0.8
+  midMaxIntensity: 1.5
+  midSensitivity: 100
+  useHighReactivity: 1
+  highMinSharpness: 1
+  highMaxSharpness: 3
+  highSensitivity: 100
+  smoothing: 0.85
+  parameterSmoothing: 0.3
   showDebugInfo: 0
 --- !u!114 &5598775634969956387
 MonoBehaviour:
