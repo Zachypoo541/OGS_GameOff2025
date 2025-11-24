@@ -40,3 +40,7 @@ MonoBehaviour:
   counterEffectType: 0
   counterEffectStrength: 1
   counterEffectDuration: 3
+  decalSprite: {fileID: 21300000, guid: 1a0eb7306f286bc458457d9558565422, type: 3}
+  decalColor: {r: 1, g: 0, b: 0, a: 1}
+  decalSize: 0.5
+  decalLifetime: 1.5

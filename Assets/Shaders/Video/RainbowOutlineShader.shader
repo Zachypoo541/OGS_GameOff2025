@@ -7,8 +7,8 @@ Shader "Custom/RainbowOutlineVideo"
         _SilhouetteColor ("Silhouette Color", Color) = (0,0,0,1)
         _WhiteOutlineColor ("White Outline Color", Color) = (1,1,1,1)
         _RainbowSamples ("Rainbow Samples", Range(3, 12)) = 7
-        _RainbowSpread ("Rainbow Spread", Range(0.5, 5.0)) = 2.0
-        _RainbowIntensity ("Rainbow Intensity", Range(0.5, 2.0)) = 1.0
+        _RainbowSpread ("Rainbow Spread", Range(0.5, 50.0)) = 2.0
+        _RainbowIntensity ("Rainbow Intensity", Range(0.5, 10.0)) = 1.0
         _EdgeSensitivity ("Edge Sensitivity", Range(0.01, 1.0)) = 0.2
         _LineSharpness ("Line Sharpness", Range(0.1, 5.0)) = 2.0
         

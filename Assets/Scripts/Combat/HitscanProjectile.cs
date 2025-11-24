@@ -11,9 +11,15 @@ public class HitscanProjectile : MonoBehaviour
     private Reticle reticle;
     private TrailRenderer trailRenderer;
 
-    private float visualSpeed = 100f; // Speed the visual trail travels
+    private float visualSpeed = 100f;
     private float distanceTraveled = 0f;
     private bool hasHit = false;
+
+    private void Awake()
+    {
+        // Ensure projectile is on the Projectile layer
+        gameObject.layer = LayerMask.NameToLayer("Projectile");
+    }
 
     public void Initialize(float damage, WaveformData waveformType, CombatEntity source, Vector3 direction, float maxRange = 100f, Reticle reticle = null)
     {
@@ -29,12 +35,26 @@ public class HitscanProjectile : MonoBehaviour
             visualSpeed = waveformType.projectileSpeed;
         }
 
+        // Create layer mask that ignores Projectile and UI layers
+        int layerMask = ~((1 << LayerMask.NameToLayer("Projectile")) | (1 << LayerMask.NameToLayer("UI")));
+
         // Perform instant raycast
         RaycastHit hit;
-        if (Physics.Raycast(startPosition, direction, out hit, maxRange))
+        if (Physics.Raycast(startPosition, direction, out hit, maxRange, layerMask))
         {
             endPosition = hit.point;
             travelDistance = hit.distance;
+
+            // Spawn decal at impact point (but pass hitObject for layer checking)
+            ProjectileDecal.SpawnDecal(
+                hit.point,
+                hit.normal,
+                hit.collider.gameObject,
+                waveformType.decalSprite,
+                waveformType.decalColor,
+                waveformType.decalSize,
+                waveformType.decalLifetime
+            );
 
             // Check if we hit a valid target
             CombatEntity target = hit.collider.GetComponent<CombatEntity>();

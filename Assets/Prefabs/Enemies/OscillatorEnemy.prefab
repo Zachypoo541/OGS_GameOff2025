@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4297808456800004116}
   - component: {fileID: 949566148304067951}
   - component: {fileID: 2039624497482826617}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: OscillatorEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -80,6 +80,10 @@ MonoBehaviour:
   detectionRange: 80
   energyPickupPrefab: {fileID: 0}
   dropChance: 0.7
+  attackIndicatorPrefab: {fileID: 0}
+  attackIndicatorSprite: {fileID: 0}
+  attackIndicatorColor: {r: 1, g: 0, b: 0, a: 1}
+  indicatorOffset: {x: 0, y: 2, z: 0}
   useUnpredictableMovement: 1
   changeDirectionInterval: 2
   moveSpeed: 3
@@ -98,7 +102,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3576081988137954073}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ProjectileSpawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -168,6 +172,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8391222552659086748, guid: d8e9f0d73bac58a4498710a862179ed6, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: -5477749408508380018, guid: d8e9f0d73bac58a4498710a862179ed6, type: 3}
       propertyPath: m_LocalScale.x
       value: 85
@@ -215,6 +223,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: d8e9f0d73bac58a4498710a862179ed6, type: 3}
       propertyPath: m_Name
       value: triangle enemy 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: d8e9f0d73bac58a4498710a862179ed6, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
