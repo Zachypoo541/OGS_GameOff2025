@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1186898252154548172}
   - component: {fileID: 1670277426049763263}
   - component: {fileID: 7281407759149947109}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: StrikerEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -108,6 +108,10 @@ MonoBehaviour:
   detectionRange: 200
   energyPickupPrefab: {fileID: 0}
   dropChance: 0.7
+  attackIndicatorPrefab: {fileID: 0}
+  attackIndicatorSprite: {fileID: 0}
+  attackIndicatorColor: {r: 1, g: 0, b: 0, a: 1}
+  indicatorOffset: {x: 0, y: 2, z: 0}
   normalSpeed: 4
   rushSpeed: 20
   rushDistance: 15
@@ -123,7 +127,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6604138230457622507}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ProjectileSpawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -213,6 +217,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: saw enemy 1
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 922b4e17721f23542a2c222f1bce50d0, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 1300264252759386080, guid: 922b4e17721f23542a2c222f1bce50d0, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
@@ -224,6 +232,10 @@ PrefabInstance:
     - target: {fileID: 1300264252759386080, guid: 922b4e17721f23542a2c222f1bce50d0, type: 3}
       propertyPath: m_LocalScale.z
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9013638940889411661, guid: 922b4e17721f23542a2c222f1bce50d0, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:

@@ -15,6 +15,8 @@ MonoBehaviour:
   waveformName: Triangle
   waveformColor: {r: 1, g: 1, b: 0, a: 1}
   unlockLevel: 1
+  isHitscan: 0
+  hitscanRange: 100
   baseDamage: 10
   energyCost: 15
   projectileSpeed: 120
@@ -38,3 +40,7 @@ MonoBehaviour:
   counterEffectType: 0
   counterEffectStrength: 1
   counterEffectDuration: 3
+  decalSprite: {fileID: 21300000, guid: bd051c41641b7e449aad4b68e065ef2d, type: 3}
+  decalColor: {r: 1, g: 1, b: 0, a: 1}
+  decalSize: 0.5
+  decalLifetime: 1.5

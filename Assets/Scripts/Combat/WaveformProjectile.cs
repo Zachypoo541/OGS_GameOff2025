@@ -9,14 +9,26 @@ public class WaveformProjectile : MonoBehaviour
     private float speed;
     private Rigidbody rb;
     private TrailRenderer trailRenderer;
-    private Reticle reticle; // Reference to reticle (only for player projectiles)
+    private Reticle reticle;
 
     // Chain attack support
     private bool hasChainAttack;
     private float chainRange;
 
-    public WaveformData Waveform => waveformType; // Public getter for CounterSystem
-    public CombatEntity Owner => source; // Public getter for CounterSystem
+    // Homing support
+    private bool hasHoming;
+    private float homingStrength;
+    private float homingRange;
+    private CombatEntity homingTarget;
+
+    public WaveformData Waveform => waveformType;
+    public CombatEntity Owner => source;
+
+    private void Awake()
+    {
+        // Ensure projectile is on the Projectile layer
+        gameObject.layer = LayerMask.NameToLayer("Projectile");
+    }
 
     public void Initialize(float damage, WaveformData waveformType, CombatEntity source, Vector3 direction, Reticle reticle = null, bool enableChain = false, float chainRange = 0f)
     {
@@ -25,14 +37,42 @@ public class WaveformProjectile : MonoBehaviour
         this.source = source;
         this.direction = direction.normalized;
         this.speed = waveformType.projectileSpeed;
-        this.reticle = reticle; // Store reticle reference (null for enemy projectiles)
+        this.reticle = reticle;
         this.hasChainAttack = enableChain;
         this.chainRange = chainRange;
+
+        // Setup homing if waveform supports it
+        this.hasHoming = waveformType.enableHoming;
+        this.homingStrength = waveformType.homingStrength;
+        this.homingRange = waveformType.homingRange;
 
         rb = GetComponent<Rigidbody>();
         if (rb != null)
         {
+            // Set collision detection to Continuous for fast projectiles
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
             rb.linearVelocity = direction * speed;
+        }
+
+        // Ignore collision with the source entity
+        if (source != null)
+        {
+            Collider[] projectileColliders = GetComponents<Collider>();
+            Collider[] sourceColliders = source.GetComponentsInChildren<Collider>();
+
+            foreach (Collider projCol in projectileColliders)
+            {
+                foreach (Collider sourceCol in sourceColliders)
+                {
+                    Physics.IgnoreCollision(projCol, sourceCol);
+                }
+            }
+        }
+
+        // Find initial homing target if homing is enabled
+        if (hasHoming)
+        {
+            FindHomingTarget();
         }
 
         // Set color for projectile head
@@ -61,8 +101,100 @@ public class WaveformProjectile : MonoBehaviour
         Destroy(gameObject, 5f);
     }
 
+    private void FixedUpdate()
+    {
+        if (hasHoming && rb != null)
+        {
+            ApplyHoming();
+        }
+    }
+
+    private void FindHomingTarget()
+    {
+        Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, homingRange);
+        CombatEntity closestEnemy = null;
+        float closestDistance = float.MaxValue;
+
+        foreach (Collider col in nearbyColliders)
+        {
+            CombatEntity entity = col.GetComponent<CombatEntity>();
+
+            if (entity == null || entity == source)
+                continue;
+
+            // Determine if valid target based on source type
+            bool isValidTarget = false;
+            if (source is PlayerCharacter)
+            {
+                // Player projectile homes to non-players (enemies)
+                isValidTarget = !(entity is PlayerCharacter);
+            }
+            else
+            {
+                // Enemy projectile homes to player
+                isValidTarget = entity is PlayerCharacter;
+            }
+
+            if (!isValidTarget)
+                continue;
+
+            float distance = Vector3.Distance(transform.position, entity.transform.position);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestEnemy = entity;
+            }
+        }
+
+        homingTarget = closestEnemy;
+    }
+
+    private void ApplyHoming()
+    {
+        // Check if target still exists and is in range
+        if (homingTarget == null || homingTarget.gameObject == null)
+        {
+            FindHomingTarget(); // Try to find a new target
+            return;
+        }
+
+        float distanceToTarget = Vector3.Distance(transform.position, homingTarget.transform.position);
+        if (distanceToTarget > homingRange)
+        {
+            FindHomingTarget(); // Target out of range, find new one
+            return;
+        }
+
+        // Calculate direction to target
+        Vector3 directionToTarget = (homingTarget.transform.position - transform.position).normalized;
+
+        // Smoothly rotate velocity towards target
+        Vector3 newVelocity = Vector3.RotateTowards(
+            rb.linearVelocity,
+            directionToTarget * speed,
+            homingStrength * Time.fixedDeltaTime,
+            0f
+        );
+
+        rb.linearVelocity = newVelocity.normalized * speed;
+
+        // Update visual rotation to match velocity
+        if (rb.linearVelocity != Vector3.zero)
+        {
+            transform.rotation = Quaternion.LookRotation(rb.linearVelocity);
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
+        // Ignore UI layer
+        if (other.gameObject.layer == LayerMask.NameToLayer("UI"))
+            return;
+
+        // Ignore other projectiles
+        if (other.gameObject.layer == LayerMask.NameToLayer("Projectile"))
+            return;
+
         CombatEntity target = other.GetComponent<CombatEntity>();
 
         if (target != null && target != source)
@@ -73,7 +205,16 @@ public class WaveformProjectile : MonoBehaviour
                 reticle.OnHit();
             }
 
-            target.TakeDamage(damage, waveformType, source);
+            // Apply damage with ramping if this waveform supports it
+            float finalDamage = damage;
+            if (waveformType.enableDamageRamp)
+            {
+                finalDamage = target.ApplyDamageRamp(damage, waveformType, source);
+            }
+            else
+            {
+                target.TakeDamage(finalDamage, waveformType, source);
+            }
 
             // Apply knockback
             if (waveformType.knockbackForce > 0)
@@ -91,6 +232,53 @@ public class WaveformProjectile : MonoBehaviour
                 TriggerChainAttack(target, transform.position);
             }
 
+            Destroy(gameObject);
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        // Ignore UI layer
+        if (collision.gameObject.layer == LayerMask.NameToLayer("UI"))
+            return;
+
+        // Ignore other projectiles
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Projectile"))
+            return;
+
+        // Double-check we're not hitting our source
+        if (source != null && collision.gameObject == source.gameObject)
+        {
+            return;
+        }
+
+        // Check if this is a blocking surface (not a CombatEntity)
+        CombatEntity entity = collision.gameObject.GetComponent<CombatEntity>();
+
+        if (entity == null)
+        {
+            // Hit a non-entity object (wall, floor, obstacle, etc.)
+            // Spawn decal at impact point
+            if (collision.contacts.Length > 0)
+            {
+                ContactPoint contact = collision.contacts[0];
+                ProjectileDecal.SpawnDecal(
+                    contact.point,
+                    contact.normal,
+                    collision.gameObject,
+                    waveformType.decalSprite,
+                    waveformType.decalColor,
+                    waveformType.decalSize,
+                    waveformType.decalLifetime
+                );
+            }
+
+            Destroy(gameObject);
+        }
+        else if (entity != source)
+        {
+            // Hit a different entity
+            // Don't spawn decal, just destroy (damage is handled by OnTriggerEnter)
             Destroy(gameObject);
         }
     }
@@ -158,6 +346,18 @@ public class WaveformProjectile : MonoBehaviour
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, chainRange);
+        }
+
+        if (hasHoming)
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireSphere(transform.position, homingRange);
+
+            if (homingTarget != null)
+            {
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawLine(transform.position, homingTarget.transform.position);
+            }
         }
     }
 }

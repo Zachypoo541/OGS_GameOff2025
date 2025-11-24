@@ -42,4 +42,26 @@ public class WaveformData : ScriptableObject
     public StatusEffectType counterEffectType;
     public float counterEffectStrength = 1f;
     public float counterEffectDuration = 3f;
+
+    [Header("Decal Settings")]
+    public Sprite decalSprite; // The sprite to use for impact decals
+    public Color decalColor = Color.white; // Color tint for the decal
+    public float decalSize = 0.5f; // Size of the decal
+    public float decalLifetime = 10f; // How long the decal lasts before fading
+
+    [Header("Homing Settings")]
+    public bool enableHoming = false;
+    [Tooltip("How strongly the projectile turns towards target (radians per second)")]
+    public float homingStrength = 3f;
+    [Tooltip("Max range to detect and home towards targets")]
+    public float homingRange = 20f;
+
+    [Header("Damage Ramp Settings")]
+    public bool enableDamageRamp = false;
+    [Tooltip("Base damage increase per consecutive hit")]
+    public float damageRampPerHit = 2f;
+    [Tooltip("Maximum damage ramp multiplier")]
+    public float maxDamageRampMultiplier = 3f;
+    [Tooltip("Time before damage ramp resets (seconds)")]
+    public float damageRampResetTime = 3f;
 }
