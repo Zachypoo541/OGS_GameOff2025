@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3667757875513446318}
   - component: {fileID: 4533455389107496042}
   - component: {fileID: 4161494848504414893}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ShriekerEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -98,7 +98,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7054419513934335895}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ProjectileSpawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -171,6 +171,10 @@ PrefabInstance:
     - target: {fileID: 610336537932092410, guid: 940f7320a75e2af4b895689ec09fbc42, type: 3}
       propertyPath: m_Name
       value: AttackIndicator
+      objectReference: {fileID: 0}
+    - target: {fileID: 610336537932092410, guid: 940f7320a75e2af4b895689ec09fbc42, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -247,6 +251,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -5568371526223589888, guid: 19ca586a9c1c60649834d9c05ad05db0, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: -2577548232221058511, guid: 19ca586a9c1c60649834d9c05ad05db0, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
@@ -262,6 +270,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 19ca586a9c1c60649834d9c05ad05db0, type: 3}
       propertyPath: m_Name
       value: saw enemy 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 19ca586a9c1c60649834d9c05ad05db0, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 7202271454713460447, guid: 19ca586a9c1c60649834d9c05ad05db0, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'

@@ -182,7 +182,7 @@ public class CombatEntity : MonoBehaviour
         }
     }
 
-    protected float CalculateDamage()
+    public float CalculateDamage()
     {
         float damage = equippedWaveform.baseDamage;
 
@@ -207,7 +207,7 @@ public class CombatEntity : MonoBehaviour
         return damage;
     }
 
-    protected void ConsumeAttackResources()
+    public void ConsumeAttackResources()
     {
         float energyCost = equippedWaveform.energyCost;
 
@@ -374,4 +374,47 @@ public class CombatEntity : MonoBehaviour
 
     public float GetGravityMultiplier() => currentGravityMod;
     public float GetAccelerationMultiplier() => currentAccelMod;
+
+    [System.Serializable]
+    public class DamageRampData
+    {
+        public int hitCount = 0;
+        public float lastHitTime = 0f;
+    }
+
+    private Dictionary<WaveformData, DamageRampData> damageRampTracking = new Dictionary<WaveformData, DamageRampData>();
+
+    public float ApplyDamageRamp(float baseDamage, WaveformData waveformType, CombatEntity source)
+    {
+        if (!damageRampTracking.ContainsKey(waveformType))
+        {
+            damageRampTracking[waveformType] = new DamageRampData();
+        }
+
+        DamageRampData rampData = damageRampTracking[waveformType];
+
+        // Check if ramp should reset due to timeout
+        if (Time.time - rampData.lastHitTime > waveformType.damageRampResetTime)
+        {
+            rampData.hitCount = 0;
+        }
+
+        // Increment hit count
+        rampData.hitCount++;
+        rampData.lastHitTime = Time.time;
+
+        // Calculate ramped damage
+        float damageIncrease = (rampData.hitCount - 1) * waveformType.damageRampPerHit;
+        float maxIncrease = baseDamage * (waveformType.maxDamageRampMultiplier - 1f);
+        damageIncrease = Mathf.Min(damageIncrease, maxIncrease);
+
+        float finalDamage = baseDamage + damageIncrease;
+
+        Debug.Log($"{gameObject.name} hit by {waveformType.name} (Hit #{rampData.hitCount}): {baseDamage} -> {finalDamage} damage");
+
+        // Apply the damage
+        TakeDamage(finalDamage, waveformType, source);
+
+        return finalDamage;
+    }
 }
