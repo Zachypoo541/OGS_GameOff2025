@@ -120,15 +120,25 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
+<<<<<<< HEAD
     - _LineSharpness: 2.469606
+=======
+    - _LineSharpness: 2.7491128
+>>>>>>> parent of 3286361 (finishing arboretum)
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _OutlineThickness: 0.005
     - _Parallax: 0.005
     - _QueueOffset: 0
+<<<<<<< HEAD
     - _RainbowIntensity: 3.2522824
     - _RainbowSamples: 7
     - _RainbowSpread: 3.7713645
+=======
+    - _RainbowIntensity: 3.9976342
+    - _RainbowSamples: 7
+    - _RainbowSpread: 7.7606845
+>>>>>>> parent of 3286361 (finishing arboretum)
     - _ReceiveShadows: 1
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0

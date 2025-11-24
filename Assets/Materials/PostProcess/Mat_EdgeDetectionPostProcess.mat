@@ -94,9 +94,15 @@ Material:
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
     - _ChromaticDistance: 20
+<<<<<<< HEAD
     - _ChromaticFalloff: 6.2390738
     - _ChromaticIntensity: 6.2390738
     - _ChromaticSpread: 7.2953205
+=======
+    - _ChromaticFalloff: 8.292113
+    - _ChromaticIntensity: 8.292113
+    - _ChromaticSpread: 16.898302
+>>>>>>> parent of 3286361 (finishing arboretum)
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2

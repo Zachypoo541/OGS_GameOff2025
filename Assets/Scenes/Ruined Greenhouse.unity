@@ -2738,6 +2738,7 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 748968476098026259, guid: 5dc8ba9dfdc9f0f438570fdb53ca643a, type: 3}
   m_PrefabInstance: {fileID: 352296194}
   m_PrefabAsset: {fileID: 0}
+<<<<<<< HEAD
 --- !u!1001 &366761710
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2795,6 +2796,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
+=======
+>>>>>>> parent of 3286361 (finishing arboretum)
 --- !u!4 &368800321 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2729256618828939920, guid: 3b1bf6689e7937042bc7b5ae3213332c, type: 3}
@@ -7909,6 +7912,7 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 748968476098026259, guid: 5dc8ba9dfdc9f0f438570fdb53ca643a, type: 3}
   m_PrefabInstance: {fileID: 894601969}
   m_PrefabAsset: {fileID: 0}
+<<<<<<< HEAD
 --- !u!1001 &909279799
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7970,6 +7974,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 02e0c192b1c42dc4dab95e423e71411a, type: 3}
+=======
+>>>>>>> parent of 3286361 (finishing arboretum)
 --- !u!1 &910653576
 GameObject:
   m_ObjectHideFlags: 0
