@@ -12,6 +12,9 @@ public class PulseEnemy : EnemyAI
     public int projectilesInSequence = 3;
     public float timeBetweenSequences = 2.5f;
 
+    [Header("Collision Settings")]
+    public LayerMask obstacleLayerMask = ~0; // Default to all layers
+
     private float floatOffset;
     private Vector3 driftDirection;
     private float nextSequenceTime;
@@ -29,28 +32,52 @@ public class PulseEnemy : EnemyAI
 
     protected override void UpdateBehavior(float distanceToPlayer)
     {
+        // Wait for spawn effect to complete before moving
+        if (enemyEffects != null && !enemyEffects.IsSpawningComplete)
+        {
+            return;
+        }
+
         HandleFloatyMovement(distanceToPlayer);
         HandleStaggeredAttack(distanceToPlayer);
     }
 
     private void HandleFloatyMovement(float distanceToPlayer)
     {
+        Vector3 targetPosition = transform.position;
+
         // Slow drift toward player
         if (distanceToPlayer > attackRange * 0.8f)
         {
             Vector3 toPlayer = (player.position - transform.position).normalized;
-            transform.position += toPlayer * driftSpeed * Time.deltaTime;
+            toPlayer.y = 0; // Keep movement horizontal
+            toPlayer.Normalize();
+            Vector3 movement = toPlayer * driftSpeed * Time.deltaTime;
+            if (CanMove(movement))
+            {
+                targetPosition += movement;
+            }
+        }
+
+        // Slow drift in random direction
+        Vector3 driftMovement = driftDirection * (driftSpeed * 0.3f) * Time.deltaTime;
+        if (CanMove(driftMovement))
+        {
+            targetPosition += driftMovement;
+        }
+        else
+        {
+            // Hit obstacle, change drift direction
+            driftDirection = new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f)).normalized;
         }
 
         // Add floating bobbing motion
         floatOffset += floatSpeed * Time.deltaTime;
         float yOffset = Mathf.Sin(floatOffset) * floatHeight;
-        Vector3 targetPos = transform.position;
-        targetPos.y = startPosition.y + yOffset;
-        transform.position = new Vector3(transform.position.x, targetPos.y, transform.position.z);
+        targetPosition.y = startPosition.y + yOffset;
 
-        // Slow drift in random direction
-        transform.position += driftDirection * (driftSpeed * 0.3f) * Time.deltaTime;
+        // Apply position
+        transform.position = targetPosition;
 
         // Occasionally change drift direction
         if (Random.value < 0.01f)
@@ -90,5 +117,27 @@ public class PulseEnemy : EnemyAI
                 nextSequenceTime = Time.time + timeBetweenSequences;
             }
         }
+    }
+
+    private bool CanMove(Vector3 movement)
+    {
+        Collider col = GetComponent<Collider>();
+        if (col == null) return true;
+
+        // Get collision radius
+        float radius = 0.5f;
+        if (col is SphereCollider sphere)
+            radius = sphere.radius * transform.localScale.x;
+        else if (col is CapsuleCollider capsule)
+            radius = capsule.radius * transform.localScale.x;
+        else if (col is BoxCollider box)
+            radius = Mathf.Max(box.size.x, box.size.z) * 0.5f * transform.localScale.x;
+
+        // Check if path is clear (use slightly smaller radius to avoid getting stuck)
+        float checkRadius = radius * 0.8f;
+        float checkDistance = movement.magnitude + (radius * 0.2f);
+
+        return !Physics.SphereCast(transform.position, checkRadius, movement.normalized,
+                                   out RaycastHit hit, checkDistance, obstacleLayerMask);
     }
 }

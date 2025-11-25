@@ -21,6 +21,13 @@ public class PlayerCharacter : CombatEntity, ICharacterController
     [Range(0f, 1f)]
     [SerializeField] private float crouchCameraTargetHeight = 0.7f;
 
+    [Header("Camera Shake")]
+    [SerializeField] private float damageShakeIntensity = 0.3f;
+    [SerializeField] private float damageShakeScaling = 0.01f;
+
+    [Header("Hand Animations")]
+    [SerializeField] private HandAnimationController handAnimationController;
+
     // Component references
     private PlayerInput _playerInput;
     private PlayerCombat _playerCombat;
@@ -52,8 +59,14 @@ public class PlayerCharacter : CombatEntity, ICharacterController
             Debug.LogWarning("CounterSystem component not found on PlayerCharacter. Counter mechanics will not work.");
         }
 
+        // Warn if HandAnimationController is not assigned
+        if (handAnimationController == null)
+        {
+            Debug.LogWarning("HandAnimationController not assigned in Inspector. Hand animations will not play.");
+        }
+
         // Initialize components
-        _playerCombat.Initialize(cameraTransform, reticle, _counterSystem, this, projectileSpawnPoint);
+        _playerCombat.Initialize(cameraTransform, reticle, _counterSystem, this, projectileSpawnPoint, handAnimationController);
         _playerLocomotion.Initialize(motor, cameraTransform, this, _counterSystem, _playerInput);
 
         // Initialize state
@@ -141,6 +154,25 @@ public class PlayerCharacter : CombatEntity, ICharacterController
 
     public override void TakeDamage(float amount, WaveformData sourceWaveform, CombatEntity attacker = null)
     {
+        // Check for projectile counter FIRST (before any other counter logic)
+        if (_counterSystem != null && sourceWaveform != null && attacker != null)
+        {
+            // Try to find the projectile component on the attacker
+            WaveformProjectile projectile = attacker.GetComponentInChildren<WaveformProjectile>();
+            if (projectile == null)
+            {
+                // The attacker might BE the projectile in some collision scenarios
+                projectile = (attacker as MonoBehaviour)?.GetComponent<WaveformProjectile>();
+            }
+
+            if (projectile != null && _counterSystem.TryCounterProjectile(projectile))
+            {
+                Debug.Log("Projectile countered!");
+                return; // Exit early, don't take damage
+            }
+        }
+
+        // Now check hitscan counter
         if (_counterSystem != null && sourceWaveform != null)
         {
             bool shouldApplyEffect;
@@ -151,6 +183,7 @@ public class PlayerCharacter : CombatEntity, ICharacterController
             }
         }
 
+        // Rest of your existing TakeDamage code...
         if (_counterSystem != null && _counterSystem.IsReflecting() && attacker != null)
         {
             Vector3 directionToAttacker = (attacker.transform.position - transform.position).normalized;
@@ -182,6 +215,13 @@ public class PlayerCharacter : CombatEntity, ICharacterController
             amount *= _counterSystem.GetDamageReceivedMultiplier();
         }
 
+        // Trigger camera shake based on damage amount
+        float shakeAmount = damageShakeIntensity + (amount * damageShakeScaling);
+        if (Player.Instance != null)
+        {
+            Player.Instance.TriggerCameraShake(shakeAmount);
+        }
+
         base.TakeDamage(amount, sourceWaveform, attacker);
     }
 
@@ -198,6 +238,13 @@ public class PlayerCharacter : CombatEntity, ICharacterController
             float resistance = _counterSystem.GetDamageResistance();
             amount *= (1f - resistance);
             amount *= _counterSystem.GetDamageReceivedMultiplier();
+        }
+
+        // Trigger camera shake based on damage amount
+        float shakeAmount = damageShakeIntensity + (amount * damageShakeScaling);
+        if (Player.Instance != null)
+        {
+            Player.Instance.TriggerCameraShake(shakeAmount);
         }
 
         base.TakeDamage(amount, attacker);
@@ -300,4 +347,16 @@ public class PlayerCharacter : CombatEntity, ICharacterController
     }
 
     public void ProcessHitStabilityReport(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, Vector3 atCharacterPosition, Quaternion atCharacterRotation, ref HitStabilityReport hitStabilityReport) { }
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        // Check setup
+        if (motor != null && motor.Capsule != null)
+        {
+            Debug.Log($"PlayerCharacter collider layer: {LayerMask.LayerToName(motor.Capsule.gameObject.layer)}");
+            Debug.Log($"PlayerCharacter collider is trigger: {motor.Capsule.isTrigger}");
+        }
+    }
+#endif
 }

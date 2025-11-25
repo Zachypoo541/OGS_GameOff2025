@@ -19,7 +19,7 @@ MonoBehaviour:
   hitscanRange: 100
   baseDamage: 10
   energyCost: 15
-  projectileSpeed: 120
+  projectileSpeed: 90
   projectilePrefab: {fileID: 8115411382015281130, guid: ecbb56278298ef843a561305a9da9e31, type: 3}
   knockbackForce: 0
   trailMaterial: {fileID: 2100000, guid: 242fd2afca459354b94c6d9c2b5e3510, type: 2}
@@ -37,10 +37,22 @@ MonoBehaviour:
   usesDash: 0
   dashForce: 20
   dashDecayRate: 0.9
-  counterEffectType: 0
+  counterEffectType: 4
   counterEffectStrength: 1
   counterEffectDuration: 3
   decalSprite: {fileID: 21300000, guid: bd051c41641b7e449aad4b68e065ef2d, type: 3}
   decalColor: {r: 1, g: 1, b: 0, a: 1}
   decalSize: 0.5
   decalLifetime: 1.5
+  enableHoming: 1
+  homingStrength: 2
+  homingRange: 50
+  enableDamageRamp: 1
+  damageRampPerHit: 2
+  maxDamageRampMultiplier: 3
+  damageRampResetTime: 2
+  handAnimations:
+    enter: {fileID: 32900000, guid: 9161bc4fc508c914796a3d78afad098a, type: 3}
+    idle: {fileID: 32900000, guid: 3171f07bab9c0b741acc393333fcd436, type: 3}
+    fire: {fileID: 32900000, guid: 382b419d6fb56284f8d4280aff5ebb9a, type: 3}
+    exit: {fileID: 32900000, guid: de01cf2673d1b0241930486b3bb94374, type: 3}

@@ -31,12 +31,12 @@ Shader "Fullscreen/EdgeDetection"
             ZWrite Off
             Cull Off
             
-            Stencil
-            {
-            Ref 1
-            Comp NotEqual
-            ReadMask 1
-            }
+Stencil
+{
+    Ref 1
+    Comp NotEqual
+    ReadMask 1
+}
 
             HLSLPROGRAM
             #pragma vertex Vert

@@ -42,6 +42,7 @@ GameObject:
   - component: {fileID: 7246700864745825256}
   - component: {fileID: 5387700145548018359}
   - component: {fileID: 6145619446478309187}
+  - component: {fileID: -3395418390963053329}
   m_Layer: 7
   m_Name: PulseEnemy
   m_TagString: Untagged
@@ -82,7 +83,7 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -116,12 +117,81 @@ MonoBehaviour:
   attackIndicatorSprite: {fileID: 21300000, guid: 53369bbc6f722c543be0097e9d0b928b, type: 3}
   attackIndicatorColor: {r: 0, g: 1, b: 0, a: 1}
   indicatorOffset: {x: 0, y: 1.2, z: 0}
-  floatSpeed: 2
+  floatSpeed: 3
   floatHeight: 0.5
   driftSpeed: 1
   staggerDelay: 0.3
   projectilesInSequence: 3
   timeBetweenSequences: 2.5
+  obstacleLayerMask:
+    serializedVersion: 2
+    m_Bits: 449
+--- !u!114 &-3395418390963053329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7327358941035645116}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2743dbf49b06677418f7cc7a1a36db22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnParticlePrefab: {fileID: 8695996345421108049, guid: 865f5fff7cd2eb443aab3d96109ed8c9, type: 3}
+  spawnParticleSprite: {fileID: 21300000, guid: 53369bbc6f722c543be0097e9d0b928b, type: 3}
+  spawnParticleColor: {r: 0, g: 1, b: 0, a: 1}
+  spawnDuration: 1.5
+  spawnParticleCount: 30
+  spawnRadius: 3
+  particleSpeed: 2
+  spawnParticleDestructionRadius: 0.01
+  hitFlashDuration: 0.4
+  hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  hitFlashCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: -0.010989079
+      outSlope: -0.010989079
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.45279142
+    - serializedVersion: 3
+      time: 0.47851318
+      value: 0.9863086
+      inSlope: -0.09589845
+      outSlope: -0.09589845
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.4430468
+      outWeight: 0.38964868
+    - serializedVersion: 3
+      time: 1.0041666
+      value: 0
+      inSlope: -3.01299
+      outSlope: -3.01299
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.045643114
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  deathParticlePrefab: {fileID: 2536141653585090296, guid: c4d53cd33773b114486d2e23b037fe3a, type: 3}
+  deathParticleSprite: {fileID: 21300000, guid: 53369bbc6f722c543be0097e9d0b928b, type: 3}
+  deathParticleColor: {r: 0, g: 1, b: 0, a: 1}
+  deathDuration: 0.8
+  deathParticleCount: 30
+  deathRadius: 4
+  deathParticleSpeed: 2
+  deathParticleStartRadius: 0.1
+  whiteFlashSpeed: 0.15
+  deathGlowIntensity: 5
+  enemyRenderer: {fileID: 2671733558653933323}
 --- !u!1001 &486145632658595885
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -237,6 +307,11 @@ MonoBehaviour:
   enemyAI: {fileID: 6145619446478309187}
   visualSettings: {fileID: 11400000, guid: e2a6bee25e2fd6f4dbad3805867addd3, type: 2}
   showDebugInfo: 0
+--- !u!23 &2671733558653933323 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -6652725513331149018, guid: 5f4ae483e3cd4944aa6b014a2343d6ff, type: 3}
+  m_PrefabInstance: {fileID: 486145632658595885}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7993552287249692171
 PrefabInstance:
   m_ObjectHideFlags: 0

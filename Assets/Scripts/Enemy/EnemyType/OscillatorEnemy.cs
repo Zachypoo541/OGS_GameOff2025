@@ -17,6 +17,9 @@ public class OscillatorEnemy : EnemyAI
     public float timeBetweenShots = 0.4f;
     public float sequenceCooldown = 3f;
 
+    [Header("Collision Settings")]
+    public LayerMask obstacleLayerMask = ~0; // Default to all layers
+
     private Vector3 moveDirection;
     private float nextDirectionChangeTime;
     private float nextTeleportTime;
@@ -36,6 +39,12 @@ public class OscillatorEnemy : EnemyAI
 
     protected override void UpdateBehavior(float distanceToPlayer)
     {
+        // Wait for spawn effect to complete before moving
+        if (enemyEffects != null && !enemyEffects.IsSpawningComplete)
+        {
+            return;
+        }
+
         if (useUnpredictableMovement)
         {
             HandleUnpredictableMovement(distanceToPlayer);
@@ -68,8 +77,20 @@ public class OscillatorEnemy : EnemyAI
             nextDirectionChangeTime = Time.time + changeDirectionInterval;
         }
 
-        // Move in current direction
-        transform.position += moveDirection * moveSpeed * Time.deltaTime;
+        // Check for obstacles before moving
+        Vector3 movement = moveDirection * moveSpeed * Time.deltaTime;
+        if (CanMove(movement))
+        {
+            transform.position += movement;
+        }
+        else
+        {
+            // Hit obstacle, pick new random direction
+            moveDirection = Random.onUnitSphere;
+            moveDirection.y = 0;
+            moveDirection.Normalize();
+            nextDirectionChangeTime = Time.time; // Change direction immediately
+        }
 
         // Face player
         Vector3 lookPos = player.position;
@@ -106,7 +127,7 @@ public class OscillatorEnemy : EnemyAI
 
         // Make sure new position is valid
         RaycastHit hit;
-        if (Physics.Raycast(newPosition + Vector3.up * 5f, Vector3.down, out hit, 10f))
+        if (Physics.Raycast(newPosition + Vector3.up * 5f, Vector3.down, out hit, 10f, obstacleLayerMask))
         {
             transform.position = hit.point + Vector3.up * 0.5f;
         }
@@ -144,5 +165,27 @@ public class OscillatorEnemy : EnemyAI
                 nextSequenceTime = Time.time + sequenceCooldown;
             }
         }
+    }
+
+    private bool CanMove(Vector3 movement)
+    {
+        Collider col = GetComponent<Collider>();
+        if (col == null) return true;
+
+        // Get collision radius
+        float radius = 0.5f;
+        if (col is SphereCollider sphere)
+            radius = sphere.radius * transform.localScale.x;
+        else if (col is CapsuleCollider capsule)
+            radius = capsule.radius * transform.localScale.x;
+        else if (col is BoxCollider box)
+            radius = Mathf.Max(box.size.x, box.size.z) * 0.5f * transform.localScale.x;
+
+        // Check if path is clear (use slightly smaller radius to avoid getting stuck)
+        float checkRadius = radius * 0.8f;
+        float checkDistance = movement.magnitude + (radius * 0.2f);
+
+        return !Physics.SphereCast(transform.position, checkRadius, movement.normalized,
+                                   out RaycastHit hit, checkDistance, obstacleLayerMask);
     }
 }

@@ -139,4 +139,10 @@ public class Player : MonoBehaviour
     {
         return playerCharacter.GetMotorTransform();
     }
+
+    // Public method for triggering camera shake
+    public void TriggerCameraShake(float intensity)
+    {
+        playerCamera.AddCameraShake(intensity);
+    }
 }

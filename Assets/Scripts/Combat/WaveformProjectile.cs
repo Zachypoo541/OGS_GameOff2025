@@ -20,6 +20,7 @@ public class WaveformProjectile : MonoBehaviour
     private float homingStrength;
     private float homingRange;
     private CombatEntity homingTarget;
+    private Vector3 initialDirection;
 
     public WaveformData Waveform => waveformType;
     public CombatEntity Owner => source;
@@ -36,6 +37,7 @@ public class WaveformProjectile : MonoBehaviour
         this.waveformType = waveformType;
         this.source = source;
         this.direction = direction.normalized;
+        this.initialDirection = direction.normalized;
         this.speed = waveformType.projectileSpeed;
         this.reticle = reticle;
         this.hasChainAttack = enableChain;
@@ -111,9 +113,21 @@ public class WaveformProjectile : MonoBehaviour
 
     private void FindHomingTarget()
     {
-        Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, homingRange);
-        CombatEntity closestEnemy = null;
-        float closestDistance = float.MaxValue;
+        // Create layer mask for valid targets
+        int targetLayerMask;
+        if (source is PlayerCharacter)
+        {
+            targetLayerMask = 1 << LayerMask.NameToLayer("Enemy");
+        }
+        else
+        {
+            targetLayerMask = 1 << LayerMask.NameToLayer("Player");
+        }
+
+        Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, homingRange, targetLayerMask);
+        CombatEntity bestTarget = null;
+        float bestScore = float.MaxValue;
+        Vector3 aimDirection = initialDirection;
 
         foreach (Collider col in nearbyColliders)
         {
@@ -122,31 +136,23 @@ public class WaveformProjectile : MonoBehaviour
             if (entity == null || entity == source)
                 continue;
 
-            // Determine if valid target based on source type
-            bool isValidTarget = false;
-            if (source is PlayerCharacter)
-            {
-                // Player projectile homes to non-players (enemies)
-                isValidTarget = !(entity is PlayerCharacter);
-            }
-            else
-            {
-                // Enemy projectile homes to player
-                isValidTarget = entity is PlayerCharacter;
-            }
+            // Use collider bounds center instead of transform position for better targeting
+            Vector3 targetCenter = col.bounds.center;
+            Vector3 directionToTarget = (targetCenter - transform.position).normalized;
+            float distance = Vector3.Distance(transform.position, targetCenter);
+            float angle = Vector3.Angle(aimDirection, directionToTarget);
+            float angleWeight = 2f;
+            float score = (angle * angleWeight) + distance;
+            float maxAngle = 60f;
 
-            if (!isValidTarget)
-                continue;
-
-            float distance = Vector3.Distance(transform.position, entity.transform.position);
-            if (distance < closestDistance)
+            if (angle <= maxAngle && score < bestScore)
             {
-                closestDistance = distance;
-                closestEnemy = entity;
+                bestScore = score;
+                bestTarget = entity;
             }
         }
 
-        homingTarget = closestEnemy;
+        homingTarget = bestTarget;
     }
 
     private void ApplyHoming()
@@ -154,19 +160,42 @@ public class WaveformProjectile : MonoBehaviour
         // Check if target still exists and is in range
         if (homingTarget == null || homingTarget.gameObject == null)
         {
-            FindHomingTarget(); // Try to find a new target
             return;
         }
 
-        float distanceToTarget = Vector3.Distance(transform.position, homingTarget.transform.position);
+        // Get the target's collider center
+        Collider targetCollider = homingTarget.GetComponent<Collider>();
+        Vector3 targetPosition;
+
+        if (targetCollider != null)
+        {
+            // Aim for the center of the collider bounds
+            targetPosition = targetCollider.bounds.center;
+        }
+        else
+        {
+            // Fallback to transform position if no collider
+            targetPosition = homingTarget.transform.position;
+        }
+
+        float distanceToTarget = Vector3.Distance(transform.position, targetPosition);
         if (distanceToTarget > homingRange)
         {
-            FindHomingTarget(); // Target out of range, find new one
+            homingTarget = null;
             return;
         }
 
-        // Calculate direction to target
-        Vector3 directionToTarget = (homingTarget.transform.position - transform.position).normalized;
+        // Check if target is still in front of us
+        Vector3 directionToTarget = (targetPosition - transform.position).normalized;
+        Vector3 currentDirection = rb.linearVelocity.normalized;
+        float angleToTarget = Vector3.Angle(currentDirection, directionToTarget);
+
+        // If target is too far off to the side or behind us, stop homing to it
+        if (angleToTarget > 90f)
+        {
+            homingTarget = null;
+            return;
+        }
 
         // Smoothly rotate velocity towards target
         Vector3 newVelocity = Vector3.RotateTowards(
@@ -187,6 +216,8 @@ public class WaveformProjectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log($"Projectile hit: {other.gameObject.name} on layer: {LayerMask.LayerToName(other.gameObject.layer)}");
+
         // Ignore UI layer
         if (other.gameObject.layer == LayerMask.NameToLayer("UI"))
             return;
@@ -206,14 +237,14 @@ public class WaveformProjectile : MonoBehaviour
             }
 
             // Apply damage with ramping if this waveform supports it
-            float finalDamage = damage;
             if (waveformType.enableDamageRamp)
             {
-                finalDamage = target.ApplyDamageRamp(damage, waveformType, source);
+                target.ApplyDamageRamp(damage, waveformType, source);
             }
             else
             {
-                target.TakeDamage(finalDamage, waveformType, source);
+                target.TakeDamage(damage, waveformType, source);
+                Debug.Log($"{target.name} hit by {waveformType.name} for {damage} damage");
             }
 
             // Apply knockback
@@ -335,29 +366,54 @@ public class WaveformProjectile : MonoBehaviour
                 // Initialize chain projectile without further chaining (prevents infinite loops)
                 chainProjectile.Initialize(damage, waveformType, source, chainDirection, null, false, 0f);
             }
-
-            Debug.Log($"Chain attack! {waveformType.name} projectile chaining to {closestEnemy.name}");
         }
     }
 
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
-        if (hasChainAttack)
+        if (!hasHoming || !Application.isPlaying) return;
+
+        // Draw homing range sphere
+        Gizmos.color = new Color(0, 1, 1, 0.2f);
+        Gizmos.DrawWireSphere(transform.position, homingRange);
+
+        // Draw initial direction ray (blue)
+        Gizmos.color = Color.blue;
+        Gizmos.DrawRay(transform.position, initialDirection * 5f);
+
+        // Draw current velocity direction (red)
+        if (rb != null && rb.linearVelocity != Vector3.zero)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, chainRange);
+            Gizmos.DrawRay(transform.position, rb.linearVelocity.normalized * 5f);
         }
 
-        if (hasHoming)
-        {
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawWireSphere(transform.position, homingRange);
+        // Draw cone
+        float maxAngle = 60f;
+        int numRays = 12;
+        Gizmos.color = Color.yellow;
 
-            if (homingTarget != null)
-            {
-                Gizmos.color = Color.yellow;
-                Gizmos.DrawLine(transform.position, homingTarget.transform.position);
-            }
+        for (int i = 0; i < numRays; i++)
+        {
+            float angle = (i / (float)numRays) * 360f;
+
+            Vector3 perpendicular = Vector3.Cross(initialDirection, Vector3.up);
+            if (perpendicular.magnitude < 0.001f)
+                perpendicular = Vector3.Cross(initialDirection, Vector3.right);
+            perpendicular.Normalize();
+
+            Vector3 rotated = Quaternion.AngleAxis(angle, initialDirection) * perpendicular;
+            Vector3 coneDir = Quaternion.AngleAxis(maxAngle, rotated) * initialDirection;
+
+            Gizmos.DrawRay(transform.position, coneDir * homingRange);
+        }
+
+        // Draw line to target (green)
+        if (homingTarget != null)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(transform.position, homingTarget.transform.position);
+            Gizmos.DrawWireSphere(homingTarget.transform.position, 1f);
         }
     }
 }

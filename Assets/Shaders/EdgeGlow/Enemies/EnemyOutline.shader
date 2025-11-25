@@ -6,16 +6,22 @@ Shader "Custom/EnemyOutline"
         _Color ("Base Color", Color) = (1,1,1,1)
         _TintColor ("Tint Color", Color) = (1,1,1,1)
         _TintStrength ("Tint Strength", Range(0, 1)) = 0.0
+        [HDR] _EmissionColor ("Emission Color", Color) = (0,0,0,0)
+        _EmissionStrength ("Emission Strength", Range(0, 5)) = 0.0
     }
     
     SubShader
     {
-        Tags { "RenderType"="Opaque" "Queue"="Geometry" "RenderPipeline" = "UniversalPipeline" }
+        Tags { "RenderType"="Transparent" "Queue"="Transparent" "RenderPipeline" = "UniversalPipeline" }
         
         Pass
         {
             Name "ForwardLit"
             Tags { "LightMode" = "UniversalForward" }
+            
+            Blend SrcAlpha OneMinusSrcAlpha
+            ZWrite Off
+            ZTest LEqual
             
             Stencil
             {
@@ -60,6 +66,8 @@ Shader "Custom/EnemyOutline"
                 half4 _Color;
                 half4 _TintColor;
                 float _TintStrength;
+                half4 _EmissionColor;
+                float _EmissionStrength;
             CBUFFER_END
             
             Varyings vert(Attributes input)
@@ -96,7 +104,7 @@ Shader "Custom/EnemyOutline"
                 // Simple, robust lighting that always shows something
                 float3 normalWS = normalize(input.normalWS);
                 
-                // Get main light - with fallback
+                // Get main light with fallback
                 Light mainLight = GetMainLight();
                 float3 lightDir = mainLight.direction;
                 float3 lightColor = mainLight.color;
@@ -123,6 +131,13 @@ Shader "Custom/EnemyOutline"
                 
                 // Safety clamp to ensure we never go completely black
                 color.rgb = max(color.rgb, float3(0.1, 0.1, 0.1) * _Color.rgb);
+                
+                // Add emission for glow effect
+                color.rgb += _EmissionColor.rgb * _EmissionStrength;
+                
+                // IMPORTANT: Preserve alpha from _Color for transparency
+                // This allows the EnemyEffects script to control opacity
+                color.a = _Color.a;
                 
                 return color;
             }

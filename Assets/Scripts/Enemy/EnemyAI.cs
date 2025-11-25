@@ -20,10 +20,18 @@ public abstract class EnemyAI : CombatEntity
     protected Transform player;
     protected bool isPlayerDetected;
     protected GameObject currentIndicator;
+    protected EnemyEffects enemyEffects;
 
     protected override void Start()
     {
         base.Start();
+
+        // Get effects component
+        enemyEffects = GetComponent<EnemyEffects>();
+        if (enemyEffects == null)
+        {
+            Debug.LogWarning($"{gameObject.name}: No EnemyEffects component found. Visual effects will not play.");
+        }
 
         // FIXED: Use Player.Instance singleton to get the correct moving transform
         if (Player.Instance != null)
@@ -78,6 +86,12 @@ public abstract class EnemyAI : CombatEntity
     {
         base.Update();
 
+        // Stop all behavior if dying
+        if (enemyEffects != null && enemyEffects.IsDying)
+        {
+            return;
+        }
+
         if (player == null) return;
 
         float distToPlayer = Vector3.Distance(transform.position, player.position);
@@ -90,6 +104,27 @@ public abstract class EnemyAI : CombatEntity
     }
 
     protected abstract void UpdateBehavior(float distanceToPlayer);
+
+    /// <summary>
+    /// Override FireProjectile to prevent firing during spawn or death
+    /// </summary>
+    public override void FireProjectile(Vector3 direction)
+    {
+        // Don't fire if still spawning
+        if (enemyEffects != null && !enemyEffects.IsSpawningComplete)
+        {
+            return;
+        }
+
+        // Don't fire if dying
+        if (enemyEffects != null && enemyEffects.IsDying)
+        {
+            return;
+        }
+
+        // Call base implementation
+        base.FireProjectile(direction);
+    }
 
     /// <summary>
     /// Spawns an attack indicator at the enemy's position.
@@ -135,6 +170,28 @@ public abstract class EnemyAI : CombatEntity
         }
     }
 
+    public override void TakeDamage(float damage, WaveformData sourceWaveform, CombatEntity attacker = null)
+    {
+        // Play hit effect before processing damage
+        if (enemyEffects != null && currentHealth > 0)
+        {
+            enemyEffects.OnEnemyHit();
+        }
+
+        base.TakeDamage(damage, sourceWaveform, attacker);
+    }
+
+    public override void TakeDamage(float damage, CombatEntity attacker = null)
+    {
+        // Play hit effect before processing damage
+        if (enemyEffects != null && currentHealth > 0)
+        {
+            enemyEffects.OnEnemyHit();
+        }
+
+        base.TakeDamage(damage, attacker);
+    }
+
     protected override void Die()
     {
         base.Die();
@@ -149,7 +206,9 @@ public abstract class EnemyAI : CombatEntity
         }
 
         OnEnemyDeath();
-        Destroy(gameObject);
+
+        // Delay destruction to allow death effect to play
+        Destroy(gameObject, 1f);
     }
 
     // Public getters for EnemyOutlineController
