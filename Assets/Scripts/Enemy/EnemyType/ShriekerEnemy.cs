@@ -6,6 +6,7 @@ public class ShriekerEnemy : EnemyAI
     public float sniperRange = 25f;
     public float sniperCooldown = 3f;
     public float chargeTime = 1f;
+    public float aimHeightOffset = 1f; // Adjust this to aim lower/higher on the Character
 
     private float nextShotTime;
     private bool isCharging;
@@ -16,7 +17,6 @@ public class ShriekerEnemy : EnemyAI
         // Shrieker uses Sawtooth (Red) waveform
         // Stationary sniper
         // Immune to red, weak to repeated yellow attacks
-
         attackRange = sniperRange;
     }
 
@@ -38,11 +38,13 @@ public class ShriekerEnemy : EnemyAI
         if (isCharging)
         {
             chargeTimer -= Time.deltaTime;
-
             if (chargeTimer <= 0)
             {
-                // Fire high-damage sniper shot
-                Vector3 direction = (player.position - transform.position).normalized;
+                // Fire at the Character's adjusted position
+                Vector3 targetPos = player.position;
+                targetPos.y = player.position.y - aimHeightOffset;
+
+                Vector3 direction = (targetPos - transform.position).normalized;
                 FireProjectile(direction);
 
                 isCharging = false;
@@ -54,7 +56,6 @@ public class ShriekerEnemy : EnemyAI
         {
             isCharging = true;
             chargeTimer = chargeTime;
-
             // Show attack indicator
             ShowAttackIndicator(chargeTime - 0.3f); // Subtract fade-in time
         }

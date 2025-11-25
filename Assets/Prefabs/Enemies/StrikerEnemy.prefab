@@ -117,10 +117,10 @@ MonoBehaviour:
   rushSpeed: 15
   rushDistance: 15
   rushCooldown: 2
-  flyHeight: 1
+  flyHeight: 4
   heightAdjustSpeed: 5
   lungeDamage: 30
-  lungeRange: 2
+  lungeRange: 2.2
   obstacleLayerMask:
     serializedVersion: 2
     m_Bits: 449
