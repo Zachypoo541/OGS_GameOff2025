@@ -1040,7 +1040,7 @@ MonoBehaviour:
   stackInfoText: {fileID: 1091829821751245675}
   activeBuffsText: {fileID: 8235310916782066784}
   cooldownBar: {fileID: 8111925385621293018}
-  showDebugUI: 1
+  showDebugUI: 0
 --- !u!114 &1260021785529785123
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1058,6 +1058,7 @@ MonoBehaviour:
   leftHandGrab: {fileID: 0}
   leftHandButton: {fileID: 0}
   leftHandCounter: {fileID: 0}
+  enableDebugLogs: 0
 --- !u!1 &6710040237034145806
 GameObject:
   m_ObjectHideFlags: 0

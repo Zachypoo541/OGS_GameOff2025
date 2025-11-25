@@ -84,25 +84,31 @@ public class HandAnimationController : MonoBehaviour
         Debug.Log($"[HandAnimController] New Fire clip: {(newWaveform.fire != null ? newWaveform.fire.name : "NULL")}");
         Debug.Log($"[HandAnimController] New Exit clip: {(newWaveform.exit != null ? newWaveform.exit.name : "NULL")}");
 
+        // Store the old waveform for exit animation
+        WaveformHandAnimations oldWaveform = _currentWaveform;
+
+        // IMPORTANT: Update current waveform IMMEDIATELY so fire uses the correct animation
+        _currentWaveform = newWaveform;
+
         if (_rightHandCoroutine != null)
             StopCoroutine(_rightHandCoroutine);
 
-        _rightHandCoroutine = StartCoroutine(TransitionToNewWaveform(newWaveform));
+        _rightHandCoroutine = StartCoroutine(TransitionToNewWaveform(oldWaveform, newWaveform));
     }
 
-    private IEnumerator TransitionToNewWaveform(WaveformHandAnimations newWaveform)
+    private IEnumerator TransitionToNewWaveform(WaveformHandAnimations oldWaveform, WaveformHandAnimations newWaveform)
     {
         if (enableDebugLogs)
             Debug.Log("[HandAnimController] Starting transition to new waveform...");
 
-        // Play exit animation if we have a current waveform
-        if (_currentWaveform != null && _currentWaveform.exit != null)
+        // Play exit animation if we have an old waveform
+        if (oldWaveform != null && oldWaveform.exit != null)
         {
             if (enableDebugLogs)
-                Debug.Log($"[HandAnimController] Playing EXIT animation: {_currentWaveform.exit.name}");
+                Debug.Log($"[HandAnimController] Playing EXIT animation: {oldWaveform.exit.name}");
 
             _rightHandState = RightHandState.Exiting;
-            PlayRightHandClip(_currentWaveform.exit, false);
+            PlayRightHandClip(oldWaveform.exit, false);
 
             // Wait for video to be prepared and start playing
             float prepTimeout = 2f;
@@ -141,17 +147,14 @@ public class HandAnimationController : MonoBehaviour
             }
         }
 
-        // Switch to new waveform
-        _currentWaveform = newWaveform;
-
-        // Play enter animation
-        if (_currentWaveform.enter != null)
+        // Play enter animation (note: _currentWaveform is already set to newWaveform)
+        if (newWaveform.enter != null)
         {
             if (enableDebugLogs)
-                Debug.Log($"[HandAnimController] Playing ENTER animation: {_currentWaveform.enter.name}");
+                Debug.Log($"[HandAnimController] Playing ENTER animation: {newWaveform.enter.name}");
 
             _rightHandState = RightHandState.Entering;
-            PlayRightHandClip(_currentWaveform.enter, false);
+            PlayRightHandClip(newWaveform.enter, false);
 
             // Wait for video to be prepared and start playing
             float prepTimeout = 2f;
@@ -211,6 +214,7 @@ public class HandAnimationController : MonoBehaviour
         if (enableDebugLogs)
             Debug.Log($"[HandAnimController] PlayFireAnimation called for {_currentWaveform.fire.name}");
 
+        // IMPORTANT: Stop any ongoing transition to allow immediate firing
         if (_rightHandCoroutine != null)
             StopCoroutine(_rightHandCoroutine);
 
