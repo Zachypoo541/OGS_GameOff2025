@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Video;
 
 [CreateAssetMenu(fileName = "New Waveform", menuName = "Combat/Waveform")]
 public class WaveformData : ScriptableObject
@@ -64,4 +65,16 @@ public class WaveformData : ScriptableObject
     public float maxDamageRampMultiplier = 3f;
     [Tooltip("Time before damage ramp resets (seconds)")]
     public float damageRampResetTime = 3f;
+
+    public WaveformHandAnimations handAnimations;
+}
+
+[System.Serializable]
+public class WaveformHandAnimations
+{
+    [Header("Right Hand Waveform Animations")]
+    public VideoClip enter;
+    public VideoClip idle;
+    public VideoClip fire;
+    public VideoClip exit;
 }

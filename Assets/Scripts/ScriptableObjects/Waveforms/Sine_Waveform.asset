@@ -37,10 +37,22 @@ MonoBehaviour:
   usesDash: 0
   dashForce: 20
   dashDecayRate: 0.9
-  counterEffectType: 0
+  counterEffectType: 1
   counterEffectStrength: 1
   counterEffectDuration: 3
   decalSprite: {fileID: 21300000, guid: 53369bbc6f722c543be0097e9d0b928b, type: 3}
   decalColor: {r: 0, g: 1, b: 0, a: 1}
   decalSize: 0.5
   decalLifetime: 1.5
+  enableHoming: 0
+  homingStrength: 3
+  homingRange: 20
+  enableDamageRamp: 0
+  damageRampPerHit: 2
+  maxDamageRampMultiplier: 3
+  damageRampResetTime: 3
+  handAnimations:
+    enter: {fileID: 32900000, guid: 9a4e4e7b4ca0eca4aaf8149f61ee220f, type: 3}
+    idle: {fileID: 32900000, guid: ee88e14454337634db43b5c4a332628e, type: 3}
+    fire: {fileID: 32900000, guid: 4dc94eab2eaa4884ab535199835a6a3f, type: 3}
+    exit: {fileID: 32900000, guid: 905621d0fd92554458525f05fe8781a7, type: 3}

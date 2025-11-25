@@ -2,15 +2,19 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Makes the hand video rainbow effect react to music by analyzing separate audio stems.
+/// Makes hand video rainbow effects react to music by analyzing separate audio stems.
 /// Works with MusicStemManager to analyze bass, mid, and high stems independently.
+/// Can control multiple hand players (left and right).
 /// </summary>
 [RequireComponent(typeof(MusicStemManager))]
 public class AudioReactiveHandEffect : MonoBehaviour
 {
-    [Header("References")]
-    [Tooltip("Reference to the Raw Image component displaying the hand video")]
-    public RawImage handVideoImage;
+    [Header("Hand References")]
+    [Tooltip("Reference to the Raw Image component displaying the right hand video")]
+    public RawImage rightHandVideoImage;
+
+    [Tooltip("Reference to the Raw Image component displaying the left hand video")]
+    public RawImage leftHandVideoImage;
 
     [Header("Audio Settings")]
     [Range(64, 8192)]
@@ -74,7 +78,8 @@ public class AudioReactiveHandEffect : MonoBehaviour
 
     // Private variables
     private MusicStemManager stemManager;
-    private Material handMaterial;
+    private Material rightHandMaterial;
+    private Material leftHandMaterial;
 
     private float[] bassSpectrumData;
     private float[] midSpectrumData;
@@ -109,18 +114,45 @@ public class AudioReactiveHandEffect : MonoBehaviour
             return;
         }
 
-        if (handVideoImage == null)
+        // Check if at least one hand is assigned
+        if (rightHandVideoImage == null && leftHandVideoImage == null)
         {
-            Debug.LogError("AudioReactiveHandEffect: No RawImage assigned! Please assign your hand video RawImage in the Inspector.");
+            Debug.LogError("AudioReactiveHandEffect: No RawImage assigned! Please assign at least one hand video RawImage in the Inspector.");
             enabled = false;
             return;
         }
 
-        // Get the material from the Raw Image
-        handMaterial = handVideoImage.material;
-        if (handMaterial == null)
+        // Get materials from the Raw Images
+        if (rightHandVideoImage != null)
         {
-            Debug.LogError("AudioReactiveHandEffect: RawImage has no material assigned!");
+            rightHandMaterial = rightHandVideoImage.material;
+            if (rightHandMaterial == null)
+            {
+                Debug.LogWarning("AudioReactiveHandEffect: Right hand RawImage has no material assigned!");
+            }
+            else
+            {
+                Debug.Log("AudioReactiveHandEffect: Right hand material initialized");
+            }
+        }
+
+        if (leftHandVideoImage != null)
+        {
+            leftHandMaterial = leftHandVideoImage.material;
+            if (leftHandMaterial == null)
+            {
+                Debug.LogWarning("AudioReactiveHandEffect: Left hand RawImage has no material assigned!");
+            }
+            else
+            {
+                Debug.Log("AudioReactiveHandEffect: Left hand material initialized");
+            }
+        }
+
+        // If no valid materials, disable
+        if (rightHandMaterial == null && leftHandMaterial == null)
+        {
+            Debug.LogError("AudioReactiveHandEffect: No valid materials found on any hand!");
             enabled = false;
             return;
         }
@@ -135,20 +167,27 @@ public class AudioReactiveHandEffect : MonoBehaviour
         midSpectrumData = new float[sampleSize];
         highSpectrumData = new float[sampleSize];
 
-        // Initialize current values from material
-        if (handMaterial.HasProperty(spreadPropertyID))
-            currentSpread = handMaterial.GetFloat(spreadPropertyID);
-        if (handMaterial.HasProperty(intensityPropertyID))
-            currentIntensity = handMaterial.GetFloat(intensityPropertyID);
-        if (handMaterial.HasProperty(sharpnessPropertyID))
-            currentSharpness = handMaterial.GetFloat(sharpnessPropertyID);
+        // Initialize current values from first available material
+        Material referenceMaterial = rightHandMaterial != null ? rightHandMaterial : leftHandMaterial;
+        if (referenceMaterial.HasProperty(spreadPropertyID))
+            currentSpread = referenceMaterial.GetFloat(spreadPropertyID);
+        if (referenceMaterial.HasProperty(intensityPropertyID))
+            currentIntensity = referenceMaterial.GetFloat(intensityPropertyID);
+        if (referenceMaterial.HasProperty(sharpnessPropertyID))
+            currentSharpness = referenceMaterial.GetFloat(sharpnessPropertyID);
 
-        Debug.Log("AudioReactiveHandEffect: Initialized with stem-based audio analysis for hand video");
+        Debug.Log("AudioReactiveHandEffect: Initialized with stem-based audio analysis for hand videos");
     }
 
     private void Update()
     {
-        if (stemManager == null || handMaterial == null || !stemManager.IsPlaying())
+        if (stemManager == null || !stemManager.IsPlaying())
+        {
+            return;
+        }
+
+        // Check if we have any valid materials
+        if (rightHandMaterial == null && leftHandMaterial == null)
         {
             return;
         }
@@ -170,10 +209,8 @@ public class AudioReactiveHandEffect : MonoBehaviour
             float targetSpread = Mathf.Lerp(bassMinSpread, bassMaxSpread, Mathf.Clamp01(smoothedBassVolume));
             currentSpread = Mathf.Lerp(currentSpread, targetSpread, 1f - parameterSmoothing);
 
-            if (handMaterial.HasProperty(spreadPropertyID))
-            {
-                handMaterial.SetFloat(spreadPropertyID, currentSpread);
-            }
+            // Apply to both materials
+            SetPropertyOnBothMaterials(spreadPropertyID, currentSpread);
 
             if (showDebugInfo)
             {
@@ -193,10 +230,8 @@ public class AudioReactiveHandEffect : MonoBehaviour
             float targetIntensity = Mathf.Lerp(midMinIntensity, midMaxIntensity, Mathf.Clamp01(smoothedMidVolume));
             currentIntensity = Mathf.Lerp(currentIntensity, targetIntensity, 1f - parameterSmoothing);
 
-            if (handMaterial.HasProperty(intensityPropertyID))
-            {
-                handMaterial.SetFloat(intensityPropertyID, currentIntensity);
-            }
+            // Apply to both materials
+            SetPropertyOnBothMaterials(intensityPropertyID, currentIntensity);
 
             if (showDebugInfo)
             {
@@ -216,15 +251,29 @@ public class AudioReactiveHandEffect : MonoBehaviour
             float targetSharpness = Mathf.Lerp(highMinSharpness, highMaxSharpness, Mathf.Clamp01(smoothedHighVolume));
             currentSharpness = Mathf.Lerp(currentSharpness, targetSharpness, 1f - parameterSmoothing);
 
-            if (handMaterial.HasProperty(sharpnessPropertyID))
-            {
-                handMaterial.SetFloat(sharpnessPropertyID, currentSharpness);
-            }
+            // Apply to both materials
+            SetPropertyOnBothMaterials(sharpnessPropertyID, currentSharpness);
 
             if (showDebugInfo)
             {
                 Debug.Log($"<color=blue>High: Raw={currentHighVolume:F6} Smooth={smoothedHighVolume:F2} Sharpness={currentSharpness:F2}</color>");
             }
+        }
+    }
+
+    /// <summary>
+    /// Helper method to set a shader property on both hand materials
+    /// </summary>
+    private void SetPropertyOnBothMaterials(int propertyID, float value)
+    {
+        if (rightHandMaterial != null && rightHandMaterial.HasProperty(propertyID))
+        {
+            rightHandMaterial.SetFloat(propertyID, value);
+        }
+
+        if (leftHandMaterial != null && leftHandMaterial.HasProperty(propertyID))
+        {
+            leftHandMaterial.SetFloat(propertyID, value);
         }
     }
 
@@ -255,10 +304,7 @@ public class AudioReactiveHandEffect : MonoBehaviour
     public void SetSpread(float value)
     {
         currentSpread = value;
-        if (handMaterial != null && handMaterial.HasProperty(spreadPropertyID))
-        {
-            handMaterial.SetFloat(spreadPropertyID, value);
-        }
+        SetPropertyOnBothMaterials(spreadPropertyID, value);
     }
 
     /// <summary>
@@ -267,10 +313,7 @@ public class AudioReactiveHandEffect : MonoBehaviour
     public void SetIntensity(float value)
     {
         currentIntensity = value;
-        if (handMaterial != null && handMaterial.HasProperty(intensityPropertyID))
-        {
-            handMaterial.SetFloat(intensityPropertyID, value);
-        }
+        SetPropertyOnBothMaterials(intensityPropertyID, value);
     }
 
     /// <summary>
@@ -279,9 +322,6 @@ public class AudioReactiveHandEffect : MonoBehaviour
     public void SetSharpness(float value)
     {
         currentSharpness = value;
-        if (handMaterial != null && handMaterial.HasProperty(sharpnessPropertyID))
-        {
-            handMaterial.SetFloat(sharpnessPropertyID, value);
-        }
+        SetPropertyOnBothMaterials(sharpnessPropertyID, value);
     }
 }

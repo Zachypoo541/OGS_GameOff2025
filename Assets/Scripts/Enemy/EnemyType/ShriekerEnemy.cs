@@ -16,6 +16,7 @@ public class ShriekerEnemy : EnemyAI
         // Shrieker uses Sawtooth (Red) waveform
         // Stationary sniper
         // Immune to red, weak to repeated yellow attacks
+
         attackRange = sniperRange;
     }
 
@@ -37,6 +38,7 @@ public class ShriekerEnemy : EnemyAI
         if (isCharging)
         {
             chargeTimer -= Time.deltaTime;
+
             if (chargeTimer <= 0)
             {
                 // Fire high-damage sniper shot
@@ -53,7 +55,7 @@ public class ShriekerEnemy : EnemyAI
             isCharging = true;
             chargeTimer = chargeTime;
 
-            // Show attack indicator instead of old charging effect
+            // Show attack indicator
             ShowAttackIndicator(chargeTime - 0.3f); // Subtract fade-in time
         }
     }

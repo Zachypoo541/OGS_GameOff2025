@@ -16,15 +16,23 @@ public class PlayerCombat : MonoBehaviour
     private CounterSystem _counterSystem;
     private CombatEntity _combatEntity;
     private Transform _projectileSpawnPoint;
+    private HandAnimationController _handAnimationController;
 
-    public void Initialize(Transform cameraTransform, Reticle reticle, CounterSystem counterSystem, CombatEntity combatEntity, Transform projectileSpawnPoint)
+    public void Initialize(Transform cameraTransform, Reticle reticle, CounterSystem counterSystem, CombatEntity combatEntity, Transform projectileSpawnPoint, HandAnimationController handAnimationController)
     {
         _cameraTransform = cameraTransform;
         _reticle = reticle;
         _counterSystem = counterSystem;
         _combatEntity = combatEntity;
         _projectileSpawnPoint = projectileSpawnPoint;
+        _handAnimationController = handAnimationController;
 
+        if (_handAnimationController != null)
+        {
+            _handAnimationController.Initialize();
+        }
+
+        // Equip the first waveform (this will trigger the initial enter animation)
         if (unlockedWaveforms.Count > 0)
         {
             EquipWaveform(0);
@@ -43,6 +51,10 @@ public class PlayerCombat : MonoBehaviour
         if (input.Counter && _counterSystem != null)
         {
             _counterSystem.AttemptCounter();
+
+            // Play counter animation on left hand
+            if (_handAnimationController != null)
+                _handAnimationController.PlayCounterAction();
         }
 
         // Switch waveforms
@@ -91,6 +103,12 @@ public class PlayerCombat : MonoBehaviour
     public void FireProjectile(Vector3 direction)
     {
         if (!_combatEntity.CanUseAttack()) return;
+
+        // Play fire animation on right hand FIRST
+        if (_handAnimationController != null)
+        {
+            _handAnimationController.PlayFireAnimation();
+        }
 
         float damage = _combatEntity.CalculateDamage();
         if (_counterSystem != null)
@@ -147,7 +165,13 @@ public class PlayerCombat : MonoBehaviour
     {
         if (index >= 0 && index < unlockedWaveforms.Count)
         {
-            _combatEntity.equippedWaveform = unlockedWaveforms[index];
+            WaveformData newWaveform = unlockedWaveforms[index];
+            bool isInitial = (_combatEntity.equippedWaveform == null);
+
+            Debug.Log($"[PlayerCombat] EquipWaveform: {newWaveform.name}, IsInitial: {isInitial}");
+            Debug.Log($"[PlayerCombat] HandAnimations is null? {newWaveform.handAnimations == null}");
+
+            _combatEntity.equippedWaveform = newWaveform;
             currentWaveformIndex = index;
 
             _combatEntity.immuneToWaveforms.Clear();
@@ -155,6 +179,25 @@ public class PlayerCombat : MonoBehaviour
             if (_reticle != null)
             {
                 _reticle.UpdateReticleForWaveform(_combatEntity.equippedWaveform);
+            }
+
+            // Update right hand animations for the new waveform
+            if (_handAnimationController != null && newWaveform.handAnimations != null)
+            {
+                if (isInitial)
+                {
+                    Debug.Log($"[PlayerCombat] Calling SetInitialWaveform for {newWaveform.name}");
+                    _handAnimationController.SetInitialWaveform(newWaveform.handAnimations);
+                }
+                else
+                {
+                    Debug.Log($"[PlayerCombat] Calling SwitchWaveform to {newWaveform.name}");
+                    _handAnimationController.SwitchWaveform(newWaveform.handAnimations);
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"[PlayerCombat] Cannot update animations - HandAnimController: {_handAnimationController != null}, HandAnimations: {newWaveform.handAnimations != null}");
             }
         }
     }
