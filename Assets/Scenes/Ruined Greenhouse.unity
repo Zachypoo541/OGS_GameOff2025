@@ -6296,7 +6296,7 @@ PrefabInstance:
     - target: {fileID: 1690559604842529345, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
       propertyPath: handVideoImage
       value: 
-      objectReference: {fileID: 400053404}
+      objectReference: {fileID: 0}
     - target: {fileID: 1690559604842529345, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
       propertyPath: midMaxIntensity
       value: 10
@@ -8726,6 +8726,22 @@ PrefabInstance:
       propertyPath: reticleSize
       value: 35
       objectReference: {fileID: 0}
+    - target: {fileID: 42153235219220865, guid: f627d112fabccf44494a533df15e7655, type: 3}
+      propertyPath: shieldFadeInSpeed
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 42153235219220865, guid: f627d112fabccf44494a533df15e7655, type: 3}
+      propertyPath: shieldFadeOutSpeed
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 42153235219220865, guid: f627d112fabccf44494a533df15e7655, type: 3}
+      propertyPath: shieldSuccessFlashDuration
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 42153235219220865, guid: f627d112fabccf44494a533df15e7655, type: 3}
+      propertyPath: waveformReticles.Array.data[2].waveformName
+      value: Saw
+      objectReference: {fileID: 0}
     - target: {fileID: 143552867992509978, guid: f627d112fabccf44494a533df15e7655, type: 3}
       propertyPath: m_Layer
       value: 5
@@ -8907,7 +8923,8 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 5014603664451546999, guid: f627d112fabccf44494a533df15e7655, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f627d112fabccf44494a533df15e7655, type: 3}

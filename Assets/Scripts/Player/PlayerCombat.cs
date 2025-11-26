@@ -57,7 +57,25 @@ public class PlayerCombat : MonoBehaviour
                 _handAnimationController.PlayCounterAction();
         }
 
-        // Switch waveforms
+        // Direct waveform switching (1-4 keys)
+        if (input.Wave1)
+        {
+            EquipWaveformByName("Sine");
+        }
+        if (input.Wave2)
+        {
+            EquipWaveformByName("Square");
+        }
+        if (input.Wave3)
+        {
+            EquipWaveformByName("Saw");
+        }
+        if (input.Wave4)
+        {
+            EquipWaveformByName("Triangle");
+        }
+
+        // Cycle waveforms (Q/E keys)
         if (input.NextWaveform)
         {
             CycleWaveform(1);
@@ -72,12 +90,6 @@ public class PlayerCombat : MonoBehaviour
         {
             Vector3 aimDir = GetAimDirection();
             FireProjectile(aimDir);
-        }
-
-        // Self modifier (includes dash)
-        if (input.SelfModifier)
-        {
-            _combatEntity.ApplySelfModifier();
         }
     }
 
@@ -168,6 +180,13 @@ public class PlayerCombat : MonoBehaviour
             WaveformData newWaveform = unlockedWaveforms[index];
             bool isInitial = (_combatEntity.equippedWaveform == null);
 
+            // Check if this waveform is already equipped
+            if (_combatEntity.equippedWaveform == newWaveform && !isInitial)
+            {
+                Debug.Log($"[PlayerCombat] {newWaveform.name} is already equipped, skipping switch.");
+                return;
+            }
+
             Debug.Log($"[PlayerCombat] EquipWaveform: {newWaveform.name}, IsInitial: {isInitial}");
             Debug.Log($"[PlayerCombat] HandAnimations is null? {newWaveform.handAnimations == null}");
 
@@ -199,7 +218,27 @@ public class PlayerCombat : MonoBehaviour
             {
                 Debug.LogWarning($"[PlayerCombat] Cannot update animations - HandAnimController: {_handAnimationController != null}, HandAnimations: {newWaveform.handAnimations != null}");
             }
+
+            // Notify PlayerCharacter about waveform change for self-cast system
+            if (_combatEntity is PlayerCharacter playerCharacter)
+            {
+                playerCharacter.OnWaveformSwitched(newWaveform);
+            }
         }
+    }
+
+    public void EquipWaveformByName(string waveformName)
+    {
+        for (int i = 0; i < unlockedWaveforms.Count; i++)
+        {
+            if (unlockedWaveforms[i].waveformName.Equals(waveformName, System.StringComparison.OrdinalIgnoreCase))
+            {
+                EquipWaveform(i);
+                return;
+            }
+        }
+
+        Debug.LogWarning($"[PlayerCombat] Waveform '{waveformName}' not found or not unlocked.");
     }
 
     public void UnlockWaveform(WaveformData waveform)

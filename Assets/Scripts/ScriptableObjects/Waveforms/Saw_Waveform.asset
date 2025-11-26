@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5199e601a89e7964a8ec5c3b0b0014af, type: 3}
   m_Name: Saw_Waveform
   m_EditorClassIdentifier: 
-  waveformName: Sawtooth
+  waveformName: Saw
   waveformColor: {r: 1, g: 0, b: 0, a: 1}
   unlockLevel: 2
   isHitscan: 1
@@ -32,11 +32,16 @@ MonoBehaviour:
   rampStacks: 3
   gravityMultiplier: 1
   accelerationMultiplier: 1
-  usesConstantVelocity: 0
-  constantVelocitySpeed: 10
-  usesDash: 0
+  selfCastType: 3
+  selfCastEnergyCost: 20
+  selfCastCooldown: 5
+  usesDash: 1
   dashForce: 20
   dashDecayRate: 0.9
+  reducedGravityMultiplier: 0.3
+  reducedGravityDuration: 3
+  thrustForce: 15
+  grantsDoubleJump: 0
   counterEffectType: 3
   counterEffectStrength: 1
   counterEffectDuration: 3
@@ -56,3 +61,15 @@ MonoBehaviour:
     idle: {fileID: 32900000, guid: 9cf69cb1c43610749914187728f1ddf4, type: 3}
     fire: {fileID: 32900000, guid: 68eeb79ecad80e14a9d7a4eec8392825, type: 3}
     exit: {fileID: 32900000, guid: f99fbe2b86f142942ae62c39033ec09d, type: 3}
+  selfCastAnimations:
+  - clip: {fileID: 32900000, guid: 44b11409384830041a25cc3b896e09a3, type: 3}
+    playbackSpeed: 1.5
+  selfCastEnterAnimation:
+    clip: {fileID: 0}
+    playbackSpeed: 1
+  selfCastLoopAnimation:
+    clip: {fileID: 0}
+    playbackSpeed: 1
+  selfCastExitAnimation:
+    clip: {fileID: 0}
+    playbackSpeed: 1

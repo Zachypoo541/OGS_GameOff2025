@@ -2,71 +2,85 @@ using UnityEngine;
 
 public class PlayerInput : MonoBehaviour
 {
-    // Input tracking
-    private Quaternion _requestedRotation;
-    private Vector3 _requestedMovement;
-    private bool _requestedJump;
-    private bool _requestedSustainedJump;
-    private bool _requestedCrouch;
-    private bool _requestedCrouchInAir;
+    [Header("Movement Input")]
+    public Vector3 RequestedMovement { get; private set; }
+    public Quaternion RequestedRotation { get; private set; }
+    public bool RequestedJump { get; private set; }
+    public bool RequestedSustainedJump { get; private set; }
+    public bool RequestedCrouch { get; private set; }
+    public bool RequestedCrouchInAir { get; private set; }
 
-    // Jump timing
-    private float _timeSinceJumpRequest;
+    [Header("Self-Cast Input")]
+    public bool RequestedSelfCast { get; private set; }
 
-    // Public accessors
-    public Quaternion RequestedRotation => _requestedRotation;
-    public Vector3 RequestedMovement => _requestedMovement;
-    public bool RequestedJump => _requestedJump;
-    public bool RequestedSustainedJump => _requestedSustainedJump;
-    public bool RequestedCrouch => _requestedCrouch;
-    public bool RequestedCrouchInAir => _requestedCrouchInAir;
-    public float TimeSinceJumpRequest => _timeSinceJumpRequest;
+    [Header("Jump Timing")]
+    public float TimeSinceJumpRequest { get; private set; }
 
     public void UpdateInput(CharacterInput input)
     {
-        _requestedRotation = input.Rotation;
+        // Convert Vector2 move input to Vector3 movement
+        Vector3 forward = input.Rotation * Vector3.forward;
+        Vector3 right = input.Rotation * Vector3.right;
+        forward.y = 0f;
+        right.y = 0f;
+        forward.Normalize();
+        right.Normalize();
 
-        _requestedMovement = new Vector3(input.Move.x, 0f, input.Move.y);
-        _requestedMovement = Vector3.ClampMagnitude(_requestedMovement, 1f);
-        _requestedMovement = input.Rotation * _requestedMovement;
+        RequestedMovement = (forward * input.Move.y + right * input.Move.x);
+        RequestedRotation = input.Rotation;
 
-        var wasRequestingJump = _requestedJump;
-        _requestedJump = _requestedJump || input.Jump;
-        if (_requestedJump && !wasRequestingJump)
-            _timeSinceJumpRequest = 0f;
-
-        _requestedSustainedJump = input.JumpSustain;
-
-        var wasRequestingCrouch = _requestedCrouch;
-        _requestedCrouch = input.Crouch switch
+        // IMPORTANT: Set jump to true if input is pressed, but don't reset it to false here
+        // Only ConsumeJumpRequest() should set it to false
+        if (input.Jump)
         {
-            CrouchInput.Toggle => !_requestedCrouch,
-            CrouchInput.None => _requestedCrouch,
-            _ => _requestedCrouch,
-        };
-        if (_requestedCrouch && !wasRequestingCrouch)
-            _requestedCrouchInAir = input.Crouch != CrouchInput.None;
-        else if (!_requestedCrouch && wasRequestingCrouch)
-            _requestedCrouchInAir = false;
-    }
+            RequestedJump = true;
+            TimeSinceJumpRequest = 0f; // Reset timer when new jump is requested
+        }
 
-    public void SetRequestedCrouchInAir(bool value)
-    {
-        _requestedCrouchInAir = value;
+        RequestedSustainedJump = input.JumpSustain;
+
+        // Handle crouch toggle
+        if (input.Crouch == CrouchInput.Toggle)
+        {
+            RequestedCrouch = !RequestedCrouch;
+        }
+
+        // SelfCast comes from the SelfModifier input being held
+        RequestedSelfCast = input.SelfCast;
     }
 
     public void ConsumeJumpRequest()
     {
-        _requestedJump = false;
-    }
-
-    public void SetRequestedCrouch(bool value)
-    {
-        _requestedCrouch = value;
+        RequestedJump = false;
+        TimeSinceJumpRequest = 0f;
     }
 
     public void UpdateTimeSinceJumpRequest(float deltaTime)
     {
-        _timeSinceJumpRequest += deltaTime;
+        // Only update timer if we have an active jump request
+        if (RequestedJump)
+        {
+            TimeSinceJumpRequest += deltaTime;
+        }
+    }
+
+    public void SetRequestedCrouch(bool value)
+    {
+        RequestedCrouch = value;
+    }
+
+    public void SetRequestedCrouchInAir(bool value)
+    {
+        RequestedCrouchInAir = value;
+    }
+
+    public void SetRequestedSelfCast(bool value)
+    {
+        RequestedSelfCast = value;
+    }
+
+    public void ConsumeSelfCastRequest()
+    {
+        RequestedSelfCast = false;
     }
 }

@@ -100,7 +100,8 @@ public class Player : MonoBehaviour
             JumpSustain = input.Jump.IsPressed(),
             Crouch = input.Crouch.WasPressedThisFrame()
                 ? CrouchInput.Toggle
-                : CrouchInput.None
+                : CrouchInput.None,
+            SelfCast = input.SelfModifier.IsPressed() // NEW: Self-cast uses SelfModifier held down
         };
         playerCharacter.UpdateInput(characterInput);
 
@@ -111,7 +112,11 @@ public class Player : MonoBehaviour
             SelfModifier = input.SelfModifier.WasPressedThisFrame(),
             NextWaveform = input.NextWaveform.WasPressedThisFrame(),
             PrevWaveform = input.PrevWaveform.WasPressedThisFrame(),
-            Counter = input.Counter.WasPressedThisFrame()
+            Counter = input.Counter.WasPressedThisFrame(),
+            Wave1 = input.Wave1.WasPressedThisFrame(),
+            Wave2 = input.Wave2.WasPressedThisFrame(),
+            Wave3 = input.Wave3.WasPressedThisFrame(),
+            Wave4 = input.Wave4.WasPressedThisFrame() 
         };
         playerCharacter.UpdateCombatInput(combatInput);
 

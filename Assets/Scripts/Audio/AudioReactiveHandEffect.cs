@@ -132,7 +132,6 @@ public class AudioReactiveHandEffect : MonoBehaviour
             }
             else
             {
-                Debug.Log("AudioReactiveHandEffect: Right hand material initialized");
             }
         }
 
@@ -145,7 +144,6 @@ public class AudioReactiveHandEffect : MonoBehaviour
             }
             else
             {
-                Debug.Log("AudioReactiveHandEffect: Left hand material initialized");
             }
         }
 
@@ -175,8 +173,6 @@ public class AudioReactiveHandEffect : MonoBehaviour
             currentIntensity = referenceMaterial.GetFloat(intensityPropertyID);
         if (referenceMaterial.HasProperty(sharpnessPropertyID))
             currentSharpness = referenceMaterial.GetFloat(sharpnessPropertyID);
-
-        Debug.Log("AudioReactiveHandEffect: Initialized with stem-based audio analysis for hand videos");
     }
 
     private void Update()

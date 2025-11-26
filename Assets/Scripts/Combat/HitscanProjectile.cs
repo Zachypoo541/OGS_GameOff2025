@@ -60,6 +60,26 @@ public class HitscanProjectile : MonoBehaviour
             CombatEntity target = hit.collider.GetComponent<CombatEntity>();
             if (target != null && target != source)
             {
+                // CHECK FOR COUNTER FIRST (before dealing damage)
+                PlayerCharacter player = target as PlayerCharacter;
+                if (player != null)
+                {
+                    CounterSystem counterSystem = player.GetComponent<CounterSystem>();
+                    if (counterSystem != null)
+                    {
+                        bool shouldApplyEffect;
+                        if (counterSystem.TryCounterHitscan(waveformType, source, out shouldApplyEffect))
+                        {
+                            // Hitscan was countered, don't apply damage
+                            Debug.Log("Hitscan attack was countered!");
+                            hasHit = false;
+                            // Don't return here, we still want the visual trail to appear
+                            // Just skip the damage application
+                            goto SkipDamage;
+                        }
+                    }
+                }
+
                 // Apply damage immediately
                 target.TakeDamage(damage, waveformType, source);
 
@@ -81,6 +101,8 @@ public class HitscanProjectile : MonoBehaviour
 
                 hasHit = true;
             }
+
+        SkipDamage:;
         }
         else
         {

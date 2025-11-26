@@ -17,7 +17,7 @@ MonoBehaviour:
   spawnGroups:
   - delayBeforeSpawn: 1
     spawnEntries:
-    - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
+    - enemyPrefab: {fileID: 3417624422039667496, guid: 61ff65c41de9e9646899eba2b73a3213, type: 3}
       count: 1
       spawnPointID: SP_1
       useRandomSpread: 0
