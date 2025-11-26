@@ -28,6 +28,9 @@ public class PlayerCharacter : CombatEntity, ICharacterController
     [Header("Hand Animations")]
     [SerializeField] private HandAnimationController handAnimationController;
 
+    [Header("Self-Cast System")]
+    private SelfCastController _selfCastController;
+
     // Component references
     private PlayerInput _playerInput;
     private PlayerCombat _playerCombat;
@@ -58,6 +61,10 @@ public class PlayerCharacter : CombatEntity, ICharacterController
         {
             Debug.LogWarning("CounterSystem component not found on PlayerCharacter. Counter mechanics will not work.");
         }
+        if (_counterSystem != null)
+        {
+            _counterSystem.Initialize(reticle);
+        }
 
         // Warn if HandAnimationController is not assigned
         if (handAnimationController == null)
@@ -65,9 +72,14 @@ public class PlayerCharacter : CombatEntity, ICharacterController
             Debug.LogWarning("HandAnimationController not assigned in Inspector. Hand animations will not play.");
         }
 
-        // Initialize components
+        // Initialize SelfCastController
+        _selfCastController = gameObject.AddComponent<SelfCastController>();
+        _selfCastController.Initialize(this, _playerLocomotion, handAnimationController,
+                                       cameraTransform, _playerInput, motor);
+
+        // Initialize components (note: pass selfCastController to locomotion)
         _playerCombat.Initialize(cameraTransform, reticle, _counterSystem, this, projectileSpawnPoint, handAnimationController);
-        _playerLocomotion.Initialize(motor, cameraTransform, this, _counterSystem, _playerInput);
+        _playerLocomotion.Initialize(motor, cameraTransform, this, _counterSystem, _playerInput, _selfCastController);
 
         // Initialize state
         _state.Stance = Stance.Stand;
@@ -85,6 +97,12 @@ public class PlayerCharacter : CombatEntity, ICharacterController
         base.Update();
         _playerLocomotion.UpdateLocomotion(Time.deltaTime);
 
+        // Update self-cast system
+        if (_selfCastController != null)
+        {
+            _selfCastController.UpdateSelfCast(Time.deltaTime);
+        }
+
         if (_counterSystem != null && _counterSystem.HasUnlimitedEnergy())
         {
             currentEnergy = maxEnergy;
@@ -99,6 +117,13 @@ public class PlayerCharacter : CombatEntity, ICharacterController
     public void UpdateCombatInput(CombatInput input)
     {
         _playerCombat.UpdateCombatInput(input);
+    }
+    public void OnWaveformSwitched(WaveformData newWaveform)
+    {
+        if (_selfCastController != null)
+        {
+            _selfCastController.SetCurrentWaveform(newWaveform);
+        }
     }
 
     public void UpdateRotation(ref Quaternion currentRotation, float deltaTime)
@@ -167,23 +192,23 @@ public class PlayerCharacter : CombatEntity, ICharacterController
 
             if (projectile != null && _counterSystem.TryCounterProjectile(projectile))
             {
-                Debug.Log("Projectile countered!");
-                return; // Exit early, don't take damage
+                Debug.Log("Projectile countered! No damage taken.");
+                return; // CRITICAL: Exit early, don't take damage
             }
         }
 
         // Now check hitscan counter
-        if (_counterSystem != null && sourceWaveform != null)
+        if (_counterSystem != null && sourceWaveform != null && attacker != null)
         {
             bool shouldApplyEffect;
             if (_counterSystem.TryCounterHitscan(sourceWaveform, attacker, out shouldApplyEffect))
             {
-                Debug.Log("Countered hitscan attack!");
-                return;
+                Debug.Log("Countered hitscan attack! No damage taken.");
+                return; // CRITICAL: Exit early, don't take damage
             }
         }
 
-        // Rest of your existing TakeDamage code...
+        // Check for damage reflection
         if (_counterSystem != null && _counterSystem.IsReflecting() && attacker != null)
         {
             Vector3 directionToAttacker = (attacker.transform.position - transform.position).normalized;
@@ -205,9 +230,10 @@ public class PlayerCharacter : CombatEntity, ICharacterController
                 Debug.Log($"Reflected {sourceWaveform.name} projectile back to {attacker.name}!");
             }
 
-            return;
+            return; // Don't take damage when reflecting
         }
 
+        // Apply damage reduction if not countered or reflected
         if (_counterSystem != null)
         {
             float resistance = _counterSystem.GetDamageResistance();
@@ -227,12 +253,14 @@ public class PlayerCharacter : CombatEntity, ICharacterController
 
     public override void TakeDamage(float amount, CombatEntity attacker = null)
     {
+        // Check for damage reflection
         if (_counterSystem != null && _counterSystem.IsReflecting())
         {
-            Debug.Log("Reflecting damage (no projectile - direct damage source)");
-            return;
+            Debug.Log("Reflecting damage (no projectile, direct damage source). No damage taken.");
+            return; // Don't take damage when reflecting
         }
 
+        // Apply damage reduction if not reflected
         if (_counterSystem != null)
         {
             float resistance = _counterSystem.GetDamageResistance();

@@ -1,353 +1,204 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
-
-[System.Serializable]
-public class WaveformReticleSprite
-{
-    public string waveformName; // "Sine", "Square", "Saw", "Triangle"
-    public Sprite reticleSprite;
-}
 
 public class Reticle : MonoBehaviour
 {
-    [Header("Reticle Style")]
+    [Header("Reticle Elements")]
     [SerializeField] private Image reticleImage;
+    [SerializeField] private Image shieldImage; // Assign your shield PNG here in Inspector
+
+    [Header("Reticle Settings")]
+    [SerializeField] private float defaultSize = 20f;
+    [SerializeField] private float expandedSize = 30f;
+    [SerializeField] private float expandSpeed = 10f;
+    [SerializeField] private float shrinkSpeed = 15f;
+
+    [Header("Shield Settings")]
+    [SerializeField] private float shieldFadeInSpeed = 8f;
+    [SerializeField] private float shieldFadeOutSpeed = 5f;
+    [SerializeField] private float shieldSuccessFlashDuration = 0.2f;
+    [SerializeField] private Color shieldDefaultColor = Color.white;
+
+    [Header("Waveform Reticle Sprites")]
+    [SerializeField] private Sprite sineReticleSprite;
+    [SerializeField] private Sprite squareReticleSprite;
+    [SerializeField] private Sprite sawReticleSprite;
+    [SerializeField] private Sprite triangleReticleSprite;
+
+    [Header("Color Settings")]
     [SerializeField] private Color reticleColor = Color.white;
-    [SerializeField] private float reticleSize = 64f;
 
-    [Header("Waveform-Specific Sprites")]
-    [SerializeField] private WaveformReticleSprite[] waveformReticles;
+    private float _targetSize;
+    private float _currentSize;
 
-    [Header("Transition Settings")]
-    [SerializeField] private float transitionDuration = 0.25f;
-    [SerializeField] private AnimationCurve transitionCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
-    [SerializeField] private bool scaleOnTransition = true;
-    [SerializeField] private float transitionScaleMultiplier = 1.2f;
-
-    [Header("Dynamic Behavior")]
-    [SerializeField] private bool scaleOnFire = true;
-    [SerializeField] private float fireScaleMultiplier = 1.3f;
-    [SerializeField] private float scaleReturnSpeed = 10f;
-
-    [Header("Hit Effect - Chromatic Aberration")]
-    [SerializeField] private bool chromaticAberrationOnHit = true;
-    [SerializeField] private Material chromaticMaterial;
-    [SerializeField] private float chromaticIntensity = 0.15f;
-    [SerializeField] private float chromaticDuration = 0.3f;
-    [SerializeField] private AnimationCurve chromaticFalloff = AnimationCurve.EaseInOut(0, 1, 1, 0);
-
-    [Header("References")]
-    [SerializeField] private PlayerCharacter player;
-
-    private float currentScale = 1f;
-    private float targetScale = 1f;
-    private Material reticleMaterialInstance;
-    private float chromaticTimer = 0f;
-    private bool isPlayingChromaticEffect = false;
-    private bool isTransitioning = false;
-
-    // Second image for cross-fade transitions
-    private Image transitionImage;
-    private GameObject transitionImageObject;
+    // Shield state
+    private float _shieldAlpha = 0f;
+    private float _targetShieldAlpha = 0f;
+    private Color _shieldColor;
+    private bool _isFlashingSuccess = false;
+    private float _successFlashTimer = 0f;
 
     private void Start()
     {
-        if (reticleImage == null)
+        _targetSize = defaultSize;
+        _currentSize = defaultSize;
+        _shieldColor = shieldDefaultColor;
+
+        if (reticleImage != null)
         {
-            reticleImage = GetComponent<Image>();
+            reticleImage.color = reticleColor; // Always white
         }
 
-        if (player == null)
+        if (shieldImage != null)
         {
-            player = FindFirstObjectByType<PlayerCharacter>();
+            shieldImage.color = new Color(_shieldColor.r, _shieldColor.g, _shieldColor.b, 0f);
         }
-
-        // Create material instance for chromatic effect
-        if (chromaticMaterial != null && reticleImage != null)
-        {
-            reticleMaterialInstance = new Material(chromaticMaterial);
-            reticleImage.material = reticleMaterialInstance;
-        }
-
-        // Create transition image (hidden by default)
-        CreateTransitionImage();
-
-        UpdateReticleAppearance();
-
-        // Set initial reticle based on equipped waveform
-        if (player != null && player.equippedWaveform != null)
-        {
-            UpdateReticleForWaveform(player.equippedWaveform, immediate: true);
-        }
-    }
-
-    private void CreateTransitionImage()
-    {
-        // Create a duplicate image for transitions
-        transitionImageObject = new GameObject("ReticleTransition");
-        transitionImageObject.transform.SetParent(transform, false);
-
-        transitionImage = transitionImageObject.AddComponent<Image>();
-
-        // Copy properties from main image
-        RectTransform transitionRect = transitionImage.rectTransform;
-        RectTransform mainRect = reticleImage.rectTransform;
-
-        transitionRect.anchorMin = mainRect.anchorMin;
-        transitionRect.anchorMax = mainRect.anchorMax;
-        transitionRect.pivot = mainRect.pivot;
-        transitionRect.anchoredPosition = mainRect.anchoredPosition;
-        transitionRect.sizeDelta = mainRect.sizeDelta;
-
-        // Start invisible
-        Color c = reticleColor;
-        c.a = 0;
-        transitionImage.color = c;
-
-        // Share the same material for chromatic effect
-        if (reticleMaterialInstance != null)
-        {
-            transitionImage.material = reticleMaterialInstance;
-        }
-
-        // Make sure it's behind the main image initially
-        transitionImageObject.transform.SetSiblingIndex(0);
     }
 
     private void Update()
     {
-        // Handle scale animation
-        if (currentScale != targetScale)
-        {
-            currentScale = Mathf.Lerp(currentScale, targetScale, scaleReturnSpeed * Time.deltaTime);
-            if (Mathf.Abs(currentScale - targetScale) < 0.01f)
-            {
-                currentScale = targetScale;
-            }
-            UpdateReticleSize();
-        }
-
-        // Handle chromatic aberration effect
-        if (isPlayingChromaticEffect)
-        {
-            chromaticTimer += Time.deltaTime;
-            float normalizedTime = chromaticTimer / chromaticDuration;
-
-            if (normalizedTime >= 1f)
-            {
-                // Effect finished
-                isPlayingChromaticEffect = false;
-                chromaticTimer = 0f;
-                if (reticleMaterialInstance != null)
-                {
-                    reticleMaterialInstance.SetFloat("_ChromaticIntensity", 0f);
-                }
-            }
-            else
-            {
-                // Update effect intensity based on curve
-                float intensity = chromaticFalloff.Evaluate(normalizedTime) * chromaticIntensity;
-                if (reticleMaterialInstance != null)
-                {
-                    reticleMaterialInstance.SetFloat("_ChromaticIntensity", intensity);
-                }
-            }
-        }
-    }
-
-    private void UpdateReticleAppearance()
-    {
-        if (reticleImage != null)
-        {
-            UpdateReticleSize();
-            UpdateReticleColor();
-        }
+        UpdateReticleSize();
+        UpdateShieldVisual();
     }
 
     private void UpdateReticleSize()
     {
+        // Smoothly interpolate to target size
+        float speed = _currentSize < _targetSize ? expandSpeed : shrinkSpeed;
+        _currentSize = Mathf.Lerp(_currentSize, _targetSize, Time.deltaTime * speed);
+
         if (reticleImage != null)
         {
-            float scaledSize = reticleSize * currentScale;
-            reticleImage.rectTransform.sizeDelta = new Vector2(scaledSize, scaledSize);
+            reticleImage.rectTransform.sizeDelta = new Vector2(_currentSize, _currentSize);
+        }
+    }
 
-            // Keep transition image in sync
-            if (transitionImage != null)
+    private void UpdateShieldVisual()
+    {
+        if (shieldImage == null) return;
+
+        // Handle success flash
+        if (_isFlashingSuccess)
+        {
+            _successFlashTimer -= Time.deltaTime;
+            if (_successFlashTimer <= 0f)
             {
-                transitionImage.rectTransform.sizeDelta = new Vector2(scaledSize, scaledSize);
+                _isFlashingSuccess = false;
+                // Start fading out after flash
+                _targetShieldAlpha = 0f;
             }
         }
+
+        // Smoothly interpolate shield alpha
+        float fadeSpeed = _shieldAlpha < _targetShieldAlpha ? shieldFadeInSpeed : shieldFadeOutSpeed;
+        _shieldAlpha = Mathf.Lerp(_shieldAlpha, _targetShieldAlpha, Time.deltaTime * fadeSpeed);
+
+        // Apply alpha to shield (keep shield color separate from reticle color)
+        shieldImage.color = new Color(_shieldColor.r, _shieldColor.g, _shieldColor.b, _shieldAlpha);
     }
 
-    private void UpdateReticleColor()
-    {
-        if (reticleImage != null)
-        {
-            reticleImage.color = reticleColor;
-        }
-    }
+    #region Public Methods
 
-    /// <summary>
-    /// Called when projectile is fired. Only animates if projectile was actually spawned.
-    /// </summary>
     public void OnFire()
     {
-        if (scaleOnFire && !isTransitioning)
-        {
-            targetScale = fireScaleMultiplier;
-            // Reset back to normal after a moment
-            Invoke(nameof(ResetScale), 0.1f);
-        }
+        _targetSize = expandedSize;
+    }
+
+    public void OnFireEnd()
+    {
+        _targetSize = defaultSize;
     }
 
     /// <summary>
-    /// Called when projectile hits an enemy. Triggers chromatic aberration effect.
+    /// Called when a projectile hits something (for visual feedback)
     /// </summary>
     public void OnHit()
     {
-        if (chromaticAberrationOnHit && reticleMaterialInstance != null)
+        // Brief expand on hit
+        OnFire();
+    }
+
+    public void UpdateReticleForWaveform(WaveformData waveform)
+    {
+        if (waveform == null || reticleImage == null)
+            return;
+
+        // Update reticle sprite based on waveform type (but keep color white)
+        string waveformName = waveform.waveformName.ToLower();
+
+        if (waveformName.Contains("sine"))
         {
-            // Start chromatic aberration effect
-            isPlayingChromaticEffect = true;
-            chromaticTimer = 0f;
+            reticleImage.sprite = sineReticleSprite;
         }
+        else if (waveformName.Contains("square"))
+        {
+            reticleImage.sprite = squareReticleSprite;
+        }
+        else if (waveformName.Contains("saw"))
+        {
+            reticleImage.sprite = sawReticleSprite;
+        }
+        else if (waveformName.Contains("triangle"))
+        {
+            reticleImage.sprite = triangleReticleSprite;
+        }
+
+        // Always keep reticle white
+        reticleImage.color = reticleColor;
+    }
+
+    public void SetReticleColor(Color color)
+    {
+        reticleColor = color;
+        if (reticleImage != null)
+        {
+            reticleImage.color = color;
+        }
+    }
+
+    #endregion
+
+    #region Shield/Parry Methods
+
+    /// <summary>
+    /// Called when the parry window opens
+    /// </summary>
+    public void OnParryWindowStart()
+    {
+        _targetShieldAlpha = 1f;
+        _shieldColor = shieldDefaultColor;
+        _isFlashingSuccess = false;
     }
 
     /// <summary>
-    /// Updates reticle sprite based on equipped waveform with smooth transition
+    /// Called when the parry window closes (without a successful parry)
     /// </summary>
-    public void UpdateReticleForWaveform(WaveformData waveform, bool immediate = false)
+    public void OnParryWindowEnd()
     {
-        if (waveform == null || reticleImage == null) return;
+        _targetShieldAlpha = 0f;
+        _isFlashingSuccess = false;
+    }
 
-        // Find matching sprite for this waveform
-        Sprite newSprite = null;
-        foreach (var reticleConfig in waveformReticles)
-        {
-            if (reticleConfig.waveformName.Equals(waveform.waveformName, System.StringComparison.OrdinalIgnoreCase))
-            {
-                newSprite = reticleConfig.reticleSprite;
-                break;
-            }
-        }
+    /// <summary>
+    /// Called when a parry is successful - flashes shield with attack waveform color
+    /// </summary>
+    public void OnParrySuccess(WaveformData attackWaveform)
+    {
 
-        if (newSprite == null)
+        if (attackWaveform != null && shieldImage != null)
         {
-            Debug.LogWarning($"No reticle sprite found for waveform: {waveform.waveformName}");
-            return;
-        }
+            // Change SHIELD color to the countered attack's color
+            _shieldColor = attackWaveform.waveformColor;
+            _shieldAlpha = 1f; // Set to full immediately
 
-        // If same sprite, don't transition
-        if (reticleImage.sprite == newSprite)
-            return;
+            // Apply the attack color to the shield only
+            shieldImage.color = new Color(_shieldColor.r, _shieldColor.g, _shieldColor.b, _shieldAlpha);
 
-        if (immediate)
-        {
-            // Instant change (for initialization)
-            reticleImage.sprite = newSprite;
-        }
-        else
-        {
-            // Smooth transition
-            if (!isTransitioning)
-            {
-                StartCoroutine(TransitionToSprite(newSprite));
-            }
+            // Start flash timer
+            _isFlashingSuccess = true;
+            _successFlashTimer = shieldSuccessFlashDuration;
         }
     }
 
-    private IEnumerator TransitionToSprite(Sprite newSprite)
-    {
-        isTransitioning = true;
-
-        // Setup transition image with new sprite
-        transitionImage.sprite = newSprite;
-        Color transitionColor = reticleColor;
-        transitionColor.a = 0;
-        transitionImage.color = transitionColor;
-
-        // Bring transition image to front
-        transitionImageObject.transform.SetAsLastSibling();
-
-        float elapsed = 0f;
-        Color mainColor = reticleColor;
-
-        // Store original scale to restore after
-        float originalTargetScale = targetScale;
-
-        while (elapsed < transitionDuration)
-        {
-            elapsed += Time.deltaTime;
-            float t = elapsed / transitionDuration;
-            float curveValue = transitionCurve.Evaluate(t);
-
-            // Fade out old sprite
-            mainColor.a = Mathf.Lerp(1f, 0f, curveValue);
-            reticleImage.color = mainColor;
-
-            // Fade in new sprite
-            transitionColor.a = Mathf.Lerp(0f, 1f, curveValue);
-            transitionImage.color = transitionColor;
-
-            // Optional: Scale animation during transition
-            if (scaleOnTransition)
-            {
-                // Scale up in first half, down in second half (creates a "pop" effect)
-                float scaleT = Mathf.Sin(t * Mathf.PI); // 0 -> 1 -> 0
-                currentScale = Mathf.Lerp(1f, transitionScaleMultiplier, scaleT);
-                UpdateReticleSize();
-            }
-
-            yield return null;
-        }
-
-        // Swap sprites and reset
-        reticleImage.sprite = newSprite;
-        mainColor.a = 1f;
-        reticleImage.color = mainColor;
-
-        transitionColor.a = 0f;
-        transitionImage.color = transitionColor;
-
-        // Restore scale
-        currentScale = 1f;
-        targetScale = originalTargetScale;
-        UpdateReticleSize();
-
-        // Move transition image back behind
-        transitionImageObject.transform.SetSiblingIndex(0);
-
-        isTransitioning = false;
-    }
-
-    private void ResetScale()
-    {
-        targetScale = 1f;
-    }
-
-    private void OnDestroy()
-    {
-        // Clean up material instance
-        if (reticleMaterialInstance != null)
-        {
-            Destroy(reticleMaterialInstance);
-        }
-
-        // Clean up transition image
-        if (transitionImageObject != null)
-        {
-            Destroy(transitionImageObject);
-        }
-    }
-
-    // Call this from inspector to update appearance in edit mode
-    private void OnValidate()
-    {
-        if (reticleImage != null)
-        {
-            reticleImage.color = reticleColor;
-            reticleImage.rectTransform.sizeDelta = new Vector2(reticleSize, reticleSize);
-        }
-    }
+    #endregion
 }

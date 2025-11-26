@@ -32,11 +32,16 @@ MonoBehaviour:
   rampStacks: 3
   gravityMultiplier: 1
   accelerationMultiplier: 1
-  usesConstantVelocity: 0
-  constantVelocitySpeed: 10
+  selfCastType: 2
+  selfCastEnergyCost: 20
+  selfCastCooldown: 2
   usesDash: 0
   dashForce: 20
   dashDecayRate: 0.9
+  reducedGravityMultiplier: 0.3
+  reducedGravityDuration: 3
+  thrustForce: 35
+  grantsDoubleJump: 0
   counterEffectType: 2
   counterEffectStrength: 1
   counterEffectDuration: 3
@@ -56,3 +61,17 @@ MonoBehaviour:
     idle: {fileID: 32900000, guid: 096d6fa64c64e5f4eae14f8541bcd67e, type: 3}
     fire: {fileID: 32900000, guid: 9e743b450503e9142aeb92a6fbaed1bd, type: 3}
     exit: {fileID: 32900000, guid: 42031c5315b6fa9458ff1523a91263ea, type: 3}
+  selfCastAnimations:
+  - clip: {fileID: 0}
+    playbackSpeed: 1
+  - clip: {fileID: 0}
+    playbackSpeed: 1
+  selfCastEnterAnimation:
+    clip: {fileID: 32900000, guid: 07c38533822dc4e4a88eb3fe692cff32, type: 3}
+    playbackSpeed: 1
+  selfCastLoopAnimation:
+    clip: {fileID: 32900000, guid: c2f3bc3a4257d4b4d897027cfe19e66e, type: 3}
+    playbackSpeed: 1
+  selfCastExitAnimation:
+    clip: {fileID: 32900000, guid: 652bbe48f5967d841adf9612e9de1720, type: 3}
+    playbackSpeed: 1

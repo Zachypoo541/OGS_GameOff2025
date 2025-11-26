@@ -22,6 +22,10 @@ public class WaveformProjectile : MonoBehaviour
     private CombatEntity homingTarget;
     private Vector3 initialDirection;
 
+    // Prevent double-hit
+    private bool hasHitTarget = false;
+    private bool wasCountered = false;
+
     public WaveformData Waveform => waveformType;
     public CombatEntity Owner => source;
 
@@ -216,7 +220,11 @@ public class WaveformProjectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"Projectile hit: {other.gameObject.name} on layer: {LayerMask.LayerToName(other.gameObject.layer)}");
+        // CRITICAL: If this projectile was countered, ignore ALL further collisions
+        if (wasCountered)
+        {
+            return;
+        }
 
         // Ignore UI layer
         if (other.gameObject.layer == LayerMask.NameToLayer("UI"))
@@ -230,6 +238,31 @@ public class WaveformProjectile : MonoBehaviour
 
         if (target != null && target != source)
         {
+            // CRITICAL: Prevent double-hit from multiple colliders
+            if (hasHitTarget)
+            {
+                return;
+            }
+
+            // CHECK FOR COUNTER FIRST (before dealing damage)
+            PlayerCharacter player = target as PlayerCharacter;
+            if (player != null)
+            {
+                CounterSystem counterSystem = player.GetComponent<CounterSystem>();
+                if (counterSystem != null && counterSystem.TryCounterProjectile(this))
+                {
+                    // Mark as countered to prevent any further collisions from dealing damage
+                    wasCountered = true;
+
+                    // Projectile was countered, exit without dealing damage
+                    // (CounterSystem will handle destruction)
+                    return;
+                }
+            }
+
+            // Mark that we've hit a target to prevent double-hit
+            hasHitTarget = true;
+
             // Trigger reticle hit effect (only if player shot this)
             if (reticle != null)
             {
@@ -244,7 +277,6 @@ public class WaveformProjectile : MonoBehaviour
             else
             {
                 target.TakeDamage(damage, waveformType, source);
-                Debug.Log($"{target.name} hit by {waveformType.name} for {damage} damage");
             }
 
             // Apply knockback
@@ -269,6 +301,12 @@ public class WaveformProjectile : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        // CRITICAL: If this projectile was countered, ignore ALL further collisions
+        if (wasCountered)
+        {
+            return;
+        }
+
         // Ignore UI layer
         if (collision.gameObject.layer == LayerMask.NameToLayer("UI"))
             return;

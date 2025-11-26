@@ -2,6 +2,13 @@ using UnityEngine;
 using UnityEngine.Video;
 
 [CreateAssetMenu(fileName = "New Waveform", menuName = "Combat/Waveform")]
+[System.Serializable]
+public class VideoClipWithSpeed
+{
+    public VideoClip clip;
+    [Range(0.1f, 3f)]
+    public float playbackSpeed = 1f;
+}
 public class WaveformData : ScriptableObject
 {
     [Header("Identity")]
@@ -30,14 +37,36 @@ public class WaveformData : ScriptableObject
     public float maxRampedDamage = 35f;
     public int rampStacks = 3;
 
-    [Header("Self Modifier")]
+    [Header("Passive Modifiers")]
+    [Tooltip("Gravity multiplier applied while this waveform is equipped")]
     public float gravityMultiplier = 1f;
+    [Tooltip("Movement acceleration multiplier while this waveform is equipped")]
     public float accelerationMultiplier = 1f;
-    public bool usesConstantVelocity = false;
-    public float constantVelocitySpeed = 10f;
+
+    [Header("Self-Cast Ability")]
+    public SelfCastType selfCastType = SelfCastType.None;
+    public float selfCastEnergyCost = 20f;
+    public float selfCastCooldown = 2f;
+
+    [Header("Dash Ability (Saw Wave)")]
+    [Tooltip("If true, this waveform grants a dash ability")]
     public bool usesDash = false;
     public float dashForce = 20f;
     public float dashDecayRate = 0.9f;
+
+    [Header("Sine Wave (Reduced Gravity)")]
+    [Tooltip("Gravity multiplier during reduced gravity effect")]
+    public float reducedGravityMultiplier = 0.3f;
+    [Tooltip("Duration of reduced gravity effect in seconds")]
+    public float reducedGravityDuration = 3f;
+
+    [Header("Square Wave (Thrust)")]
+    [Tooltip("Force applied each frame while thrust is active")]
+    public float thrustForce = 15f;
+
+    [Header("Triangle Wave (Double Jump)")]
+    [Tooltip("If true, grants a double jump buff when activated")]
+    public bool grantsDoubleJump = false;
 
     [Header("Counter Effect")]
     public StatusEffectType counterEffectType;
@@ -66,8 +95,32 @@ public class WaveformData : ScriptableObject
     [Tooltip("Time before damage ramp resets (seconds)")]
     public float damageRampResetTime = 3f;
 
+    [Header("Hand Animations")]
     public WaveformHandAnimations handAnimations;
+
+    [Header("Self-Cast Hand Animations")]
+    [Tooltip("Random selection between these two clips for single-use abilities (Sine, Saw, Triangle)")]
+    public VideoClipWithSpeed[] selfCastAnimations = new VideoClipWithSpeed[2];
+
+    [Header("Square Wave Loop Animations")]
+    [Tooltip("Played once when thrust starts")]
+    public VideoClipWithSpeed selfCastEnterAnimation;
+    [Tooltip("Looped while thrust is held")]
+    public VideoClipWithSpeed selfCastLoopAnimation;
+    [Tooltip("Played once when thrust ends")]
+    public VideoClipWithSpeed selfCastExitAnimation;
+
+
 }
+public enum SelfCastType
+{
+    None,
+    ReducedGravity, // Sine
+    Thrust,         // Square
+    Dash,           // Saw
+    DoubleJump      // Triangle
+}
+
 
 [System.Serializable]
 public class WaveformHandAnimations

@@ -26,6 +26,7 @@ public struct CharacterInput
     public bool Jump;
     public bool JumpSustain;
     public CrouchInput Crouch;
+    public bool SelfCast;
 }
 
 public struct CombatInput
@@ -35,4 +36,8 @@ public struct CombatInput
     public bool NextWaveform;
     public bool PrevWaveform;
     public bool Counter;
+    public bool Wave1;
+    public bool Wave2;
+    public bool Wave3;
+    public bool Wave4;
 }

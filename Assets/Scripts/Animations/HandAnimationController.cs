@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Video;
+using UnityEngine.UI;
 using System.Collections;
 
 public class HandAnimationController : MonoBehaviour
@@ -13,12 +14,24 @@ public class HandAnimationController : MonoBehaviour
     [SerializeField] private VideoClip leftHandButton;
     [SerializeField] private VideoClip leftHandCounter;
 
+    [Header("Left Hand Action Speeds")]
+    [Range(0.1f, 3f)]
+    [SerializeField] private float grabSpeed = 1f;
+    [Range(0.1f, 3f)]
+    [SerializeField] private float buttonSpeed = 1f;
+    [Range(0.1f, 3f)]
+    [SerializeField] private float counterSpeed = 1f;
+
     [Header("Debug")]
     [SerializeField] private bool enableDebugLogs = true;
 
     private WaveformHandAnimations _currentWaveform;
     private Coroutine _rightHandCoroutine;
     private Coroutine _leftHandCoroutine;
+
+    // For controlling left hand visibility via alpha
+    private CanvasGroup _leftHandCanvasGroup;
+    private RawImage _leftHandRawImage;
 
     private enum RightHandState
     {
@@ -43,20 +56,26 @@ public class HandAnimationController : MonoBehaviour
             if (enableDebugLogs)
                 Debug.Log($"[HandAnimController] Right hand player initialized. RenderMode: {rightHandPlayer.renderMode}");
         }
-        else
-        {
-            Debug.LogError("[HandAnimController] Right hand player is NULL!");
-        }
 
         if (leftHandPlayer != null)
         {
             leftHandPlayer.isLooping = false;
+
+            // Get or add CanvasGroup for alpha control
+            _leftHandCanvasGroup = leftHandPlayer.GetComponent<CanvasGroup>();
+            if (_leftHandCanvasGroup == null)
+            {
+                _leftHandCanvasGroup = leftHandPlayer.gameObject.AddComponent<CanvasGroup>();
+            }
+
+            // Try to get RawImage component (if using UI RawImage for display)
+            _leftHandRawImage = leftHandPlayer.GetComponent<RawImage>();
+
+            // Hide left hand initially
+            HideLeftHand();
+
             if (enableDebugLogs)
                 Debug.Log("[HandAnimController] Left hand player initialized.");
-        }
-        else
-        {
-            Debug.LogWarning("[HandAnimController] Left hand player is NULL!");
         }
     }
 
@@ -70,24 +89,14 @@ public class HandAnimationController : MonoBehaviour
 
     public void SwitchWaveform(WaveformHandAnimations newWaveform)
     {
-        Debug.Log($"[HandAnimController] === SwitchWaveform called ===");
-        Debug.Log($"[HandAnimController] New waveform is null? {newWaveform == null}");
+
 
         if (newWaveform == null)
         {
-            Debug.LogError("[HandAnimController] Trying to switch to NULL waveform!");
             return;
         }
 
-        Debug.Log($"[HandAnimController] New Enter clip: {(newWaveform.enter != null ? newWaveform.enter.name : "NULL")}");
-        Debug.Log($"[HandAnimController] New Idle clip: {(newWaveform.idle != null ? newWaveform.idle.name : "NULL")}");
-        Debug.Log($"[HandAnimController] New Fire clip: {(newWaveform.fire != null ? newWaveform.fire.name : "NULL")}");
-        Debug.Log($"[HandAnimController] New Exit clip: {(newWaveform.exit != null ? newWaveform.exit.name : "NULL")}");
-
-        // Store the old waveform for exit animation
         WaveformHandAnimations oldWaveform = _currentWaveform;
-
-        // IMPORTANT: Update current waveform IMMEDIATELY so fire uses the correct animation
         _currentWaveform = newWaveform;
 
         if (_rightHandCoroutine != null)
@@ -101,7 +110,6 @@ public class HandAnimationController : MonoBehaviour
         if (enableDebugLogs)
             Debug.Log("[HandAnimController] Starting transition to new waveform...");
 
-        // Play exit animation if we have an old waveform
         if (oldWaveform != null && oldWaveform.exit != null)
         {
             if (enableDebugLogs)
@@ -110,7 +118,6 @@ public class HandAnimationController : MonoBehaviour
             _rightHandState = RightHandState.Exiting;
             PlayRightHandClip(oldWaveform.exit, false);
 
-            // Wait for video to be prepared and start playing
             float prepTimeout = 2f;
             float prepElapsed = 0f;
             while (!rightHandPlayer.isPrepared && prepElapsed < prepTimeout)
@@ -122,10 +129,8 @@ public class HandAnimationController : MonoBehaviour
             if (enableDebugLogs)
                 Debug.Log($"[HandAnimController] Exit prepared. IsPrepared: {rightHandPlayer.isPrepared}, IsPlaying: {rightHandPlayer.isPlaying}");
 
-            // Now wait for it to finish playing
             if (rightHandPlayer.isPrepared)
             {
-                // Wait one more frame for isPlaying to update
                 yield return null;
 
                 float timeout = 10f;
@@ -136,18 +141,13 @@ public class HandAnimationController : MonoBehaviour
                     yield return null;
                 }
 
-                if (elapsed >= timeout)
-                {
-                    Debug.LogWarning("[HandAnimController] Exit animation timed out!");
-                }
-                else if (enableDebugLogs)
+                if (enableDebugLogs)
                 {
                     Debug.Log("[HandAnimController] Exit animation finished.");
                 }
             }
         }
 
-        // Play enter animation (note: _currentWaveform is already set to newWaveform)
         if (newWaveform.enter != null)
         {
             if (enableDebugLogs)
@@ -156,7 +156,6 @@ public class HandAnimationController : MonoBehaviour
             _rightHandState = RightHandState.Entering;
             PlayRightHandClip(newWaveform.enter, false);
 
-            // Wait for video to be prepared and start playing
             float prepTimeout = 2f;
             float prepElapsed = 0f;
             while (!rightHandPlayer.isPrepared && prepElapsed < prepTimeout)
@@ -168,10 +167,8 @@ public class HandAnimationController : MonoBehaviour
             if (enableDebugLogs)
                 Debug.Log($"[HandAnimController] Enter prepared. IsPrepared: {rightHandPlayer.isPrepared}, IsPlaying: {rightHandPlayer.isPlaying}");
 
-            // Now wait for it to finish playing
             if (rightHandPlayer.isPrepared)
             {
-                // Wait one more frame for isPlaying to update
                 yield return null;
 
                 float timeout = 10f;
@@ -184,7 +181,6 @@ public class HandAnimationController : MonoBehaviour
 
                 if (elapsed >= timeout)
                 {
-                    Debug.LogWarning("[HandAnimController] Enter animation timed out!");
                 }
                 else if (enableDebugLogs)
                 {
@@ -193,7 +189,6 @@ public class HandAnimationController : MonoBehaviour
             }
         }
 
-        // Start idle loop
         StartRightHandIdle();
     }
 
@@ -201,20 +196,17 @@ public class HandAnimationController : MonoBehaviour
     {
         if (_currentWaveform == null)
         {
-            Debug.LogWarning("[HandAnimController] Cannot fire - no current waveform!");
             return;
         }
 
         if (_currentWaveform.fire == null)
         {
-            Debug.LogWarning("[HandAnimController] Cannot fire - no fire animation assigned!");
             return;
         }
 
         if (enableDebugLogs)
             Debug.Log($"[HandAnimController] PlayFireAnimation called for {_currentWaveform.fire.name}");
 
-        // IMPORTANT: Stop any ongoing transition to allow immediate firing
         if (_rightHandCoroutine != null)
             StopCoroutine(_rightHandCoroutine);
 
@@ -229,7 +221,6 @@ public class HandAnimationController : MonoBehaviour
         _rightHandState = RightHandState.Firing;
         PlayRightHandClip(_currentWaveform.fire, false);
 
-        // Wait for video to be prepared and start playing
         float prepTimeout = 2f;
         float prepElapsed = 0f;
         while (!rightHandPlayer.isPrepared && prepElapsed < prepTimeout)
@@ -241,10 +232,8 @@ public class HandAnimationController : MonoBehaviour
         if (enableDebugLogs)
             Debug.Log($"[HandAnimController] Fire prepared. IsPrepared: {rightHandPlayer.isPrepared}, IsPlaying: {rightHandPlayer.isPlaying}");
 
-        // Now wait for it to finish playing
         if (rightHandPlayer.isPrepared)
         {
-            // Wait one more frame for isPlaying to update
             yield return null;
 
             float timeout = 10f;
@@ -255,17 +244,12 @@ public class HandAnimationController : MonoBehaviour
                 yield return null;
             }
 
-            if (elapsed >= timeout)
-            {
-                Debug.LogWarning("[HandAnimController] Fire animation timed out!");
-            }
-            else if (enableDebugLogs)
+            if (enableDebugLogs)
             {
                 Debug.Log("[HandAnimController] Fire animation finished, returning to idle.");
             }
         }
 
-        // Return to idle
         StartRightHandIdle();
     }
 
@@ -279,40 +263,30 @@ public class HandAnimationController : MonoBehaviour
             _rightHandState = RightHandState.Idle;
             PlayRightHandClip(_currentWaveform.idle, true);
         }
-        else
-        {
-            Debug.LogWarning($"[HandAnimController] Cannot start idle - waveform or idle clip is null! Waveform: {_currentWaveform != null}, Idle: {(_currentWaveform != null ? _currentWaveform.idle != null : false)}");
-        }
     }
 
     private void PlayRightHandClip(VideoClip clip, bool loop)
     {
         if (rightHandPlayer == null)
         {
-            Debug.LogError("[HandAnimController] Cannot play clip - rightHandPlayer is NULL!");
             return;
         }
 
         if (clip == null)
         {
-            Debug.LogError("[HandAnimController] Cannot play clip - clip is NULL!");
             return;
         }
 
         if (enableDebugLogs)
             Debug.Log($"[HandAnimController] Setting clip: {clip.name}, Loop: {loop}, Duration: {clip.length}s");
 
-        // Stop any current playback
         if (rightHandPlayer.isPlaying)
         {
             rightHandPlayer.Stop();
         }
 
-        // Set the clip
         rightHandPlayer.clip = clip;
         rightHandPlayer.isLooping = loop;
-
-        // Important: We need to call Play() which will prepare and play
         rightHandPlayer.Play();
 
         if (enableDebugLogs)
@@ -326,7 +300,6 @@ public class HandAnimationController : MonoBehaviour
         if (enableDebugLogs)
             Debug.Log($"[HandAnimController] Video ended. State: {_rightHandState}");
 
-        // Safety check for idle loop
         if (_rightHandState == RightHandState.Idle && _currentWaveform != null)
         {
             if (enableDebugLogs)
@@ -337,19 +310,11 @@ public class HandAnimationController : MonoBehaviour
 
     public void SetInitialWaveform(WaveformHandAnimations waveform)
     {
-        Debug.Log($"[HandAnimController] === SetInitialWaveform called ===");
-        Debug.Log($"[HandAnimController] Waveform is null? {waveform == null}");
 
         if (waveform == null)
         {
-            Debug.LogError("[HandAnimController] Trying to set NULL initial waveform!");
             return;
         }
-
-        Debug.Log($"[HandAnimController] Enter clip: {(waveform.enter != null ? waveform.enter.name : "NULL")}");
-        Debug.Log($"[HandAnimController] Idle clip: {(waveform.idle != null ? waveform.idle.name : "NULL")}");
-        Debug.Log($"[HandAnimController] Fire clip: {(waveform.fire != null ? waveform.fire.name : "NULL")}");
-        Debug.Log($"[HandAnimController] Exit clip: {(waveform.exit != null ? waveform.exit.name : "NULL")}");
 
         _currentWaveform = waveform;
 
@@ -364,7 +329,6 @@ public class HandAnimationController : MonoBehaviour
         if (enableDebugLogs)
             Debug.Log("[HandAnimController] Starting initial sequence...");
 
-        // Play enter animation
         if (_currentWaveform.enter != null)
         {
             if (enableDebugLogs)
@@ -373,7 +337,6 @@ public class HandAnimationController : MonoBehaviour
             _rightHandState = RightHandState.Entering;
             PlayRightHandClip(_currentWaveform.enter, false);
 
-            // Wait for video to be prepared and start playing
             float prepTimeout = 2f;
             float prepElapsed = 0f;
             while (!rightHandPlayer.isPrepared && prepElapsed < prepTimeout)
@@ -385,10 +348,8 @@ public class HandAnimationController : MonoBehaviour
             if (enableDebugLogs)
                 Debug.Log($"[HandAnimController] Initial enter prepared. IsPrepared: {rightHandPlayer.isPrepared}, IsPlaying: {rightHandPlayer.isPlaying}");
 
-            // Now wait for it to finish playing
             if (rightHandPlayer.isPrepared)
             {
-                // Wait one more frame for isPlaying to update
                 yield return null;
 
                 float timeout = 10f;
@@ -399,18 +360,13 @@ public class HandAnimationController : MonoBehaviour
                     yield return null;
                 }
 
-                if (elapsed >= timeout)
-                {
-                    Debug.LogWarning("[HandAnimController] Initial enter timed out!");
-                }
-                else if (enableDebugLogs)
+                if (enableDebugLogs)
                 {
                     Debug.Log("[HandAnimController] Initial enter finished.");
                 }
             }
         }
 
-        // Start idle loop
         StartRightHandIdle();
     }
 
@@ -418,44 +374,153 @@ public class HandAnimationController : MonoBehaviour
 
     #region Left Hand (Action) Control
 
-    public void PlayLeftHandAction(VideoClip actionClip, bool returnToIdle = true)
+    // Methods to show/hide left hand using alpha
+    private void ShowLeftHand()
+    {
+        if (_leftHandCanvasGroup != null)
+        {
+            _leftHandCanvasGroup.alpha = 1f;
+            if (enableDebugLogs)
+                Debug.Log("[HandAnimController] Left hand shown (alpha = 1)");
+        }
+    }
+
+    private void HideLeftHand()
+    {
+        if (_leftHandCanvasGroup != null)
+        {
+            _leftHandCanvasGroup.alpha = 0f;
+            if (enableDebugLogs)
+                Debug.Log("[HandAnimController] Left hand hidden (alpha = 0)");
+        }
+    }
+
+    public void PlayLeftHandAction(VideoClip actionClip, bool returnToIdle = true, float playbackSpeed = 1f)
     {
         if (leftHandPlayer == null || actionClip == null)
+        {
             return;
+        }
 
         if (_leftHandCoroutine != null)
             StopCoroutine(_leftHandCoroutine);
 
-        _leftHandCoroutine = StartCoroutine(PlayLeftHandActionSequence(actionClip, returnToIdle));
+        _leftHandCoroutine = StartCoroutine(PlayLeftHandActionSequence(actionClip, returnToIdle, playbackSpeed));
     }
 
-    private IEnumerator PlayLeftHandActionSequence(VideoClip clip, bool returnToIdle)
+    private IEnumerator PlayLeftHandActionSequence(VideoClip clip, bool returnToIdle, float playbackSpeed)
     {
+        if (enableDebugLogs)
+            Debug.Log($"[HandAnimController] Playing left hand action: {clip.name}, Duration: {clip.length}s, Speed: {playbackSpeed}x");
+
+        // Show left hand before playing
+        ShowLeftHand();
+
         leftHandPlayer.clip = clip;
         leftHandPlayer.isLooping = false;
+        leftHandPlayer.playbackSpeed = playbackSpeed; // Set playback speed
+
+        // Prepare and play
+        leftHandPlayer.Prepare();
+
+        // Wait for preparation
+        float prepTimeout = 2f;
+        float prepElapsed = 0f;
+        while (!leftHandPlayer.isPrepared && prepElapsed < prepTimeout)
+        {
+            prepElapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        if (!leftHandPlayer.isPrepared)
+        {
+            HideLeftHand();
+            yield break;
+        }
+
         leftHandPlayer.Play();
 
-        yield return new WaitUntil(() => !leftHandPlayer.isPlaying);
+        if (enableDebugLogs)
+            Debug.Log($"[HandAnimController] Left hand video playing. IsPlaying: {leftHandPlayer.isPlaying}");
 
+        // Wait for the video to finish
+        float timeout = 10f;
+        float elapsed = 0f;
+        while (leftHandPlayer.isPlaying && elapsed < timeout)
+        {
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        if (enableDebugLogs)
+        {
+            Debug.Log($"[HandAnimController] Left hand action finished: {clip.name}");
+        }
+
+        // Reset playback speed to normal
+        leftHandPlayer.playbackSpeed = 1f;
+
+        // Hide left hand after playing
         if (returnToIdle)
         {
-            // You can set a default left hand idle here if you have one
+            HideLeftHand();
+        }
+    }
+
+    // For Square wave thrust - doesn't auto-hide
+    public void StartLeftHandLoop(VideoClip loopClip, float playbackSpeed = 1f)
+    {
+        if (leftHandPlayer == null || loopClip == null)
+        {
+            return;
+        }
+
+        if (_leftHandCoroutine != null)
+            StopCoroutine(_leftHandCoroutine);
+
+        if (enableDebugLogs)
+            Debug.Log($"[HandAnimController] Starting left hand loop: {loopClip.name}, Speed: {playbackSpeed}x");
+
+        // Show left hand for looping
+        ShowLeftHand();
+
+        if (leftHandPlayer.isPlaying)
+        {
+            leftHandPlayer.Stop();
+        }
+
+        leftHandPlayer.clip = loopClip;
+        leftHandPlayer.isLooping = true;
+        leftHandPlayer.playbackSpeed = playbackSpeed; // Set playback speed
+        leftHandPlayer.Play();
+    }
+
+    // Method to stop left hand loop
+    public void StopLeftHandLoop()
+    {
+        if (enableDebugLogs)
+            Debug.Log("[HandAnimController] Stopping left hand loop");
+
+        if (leftHandPlayer != null && leftHandPlayer.isPlaying)
+        {
+            leftHandPlayer.Stop();
+            leftHandPlayer.playbackSpeed = 1f; // Reset to normal speed
         }
     }
 
     public void PlayGrabAction()
     {
-        PlayLeftHandAction(leftHandGrab);
+        PlayLeftHandAction(leftHandGrab, true, grabSpeed);
     }
 
     public void PlayButtonAction()
     {
-        PlayLeftHandAction(leftHandButton);
+        PlayLeftHandAction(leftHandButton, true, buttonSpeed);
     }
 
     public void PlayCounterAction()
     {
-        PlayLeftHandAction(leftHandCounter);
+        PlayLeftHandAction(leftHandCounter, true, counterSpeed);
     }
 
     #endregion

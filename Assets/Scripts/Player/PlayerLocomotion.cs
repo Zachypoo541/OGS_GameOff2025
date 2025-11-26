@@ -33,18 +33,20 @@ public class PlayerLocomotion : MonoBehaviour
     private CombatEntity _combatEntity;
     private CounterSystem _counterSystem;
     private PlayerInput _playerInput;
+    private SelfCastController _selfCastController;
 
     private float _timeSinceUngrounded;
     private bool _ungroundedDueToJump;
     private Vector3 _dashVelocity;
 
-    public void Initialize(KinematicCharacterMotor motor, Transform cameraTransform, CombatEntity combatEntity, CounterSystem counterSystem, PlayerInput playerInput)
+    public void Initialize(KinematicCharacterMotor motor, Transform cameraTransform, CombatEntity combatEntity, CounterSystem counterSystem, PlayerInput playerInput, SelfCastController selfCastController)
     {
         _motor = motor;
         _cameraTransform = cameraTransform;
         _combatEntity = combatEntity;
         _counterSystem = counterSystem;
         _playerInput = playerInput;
+        _selfCastController = selfCastController;
     }
 
     public void UpdateLocomotion(float deltaTime)
@@ -63,8 +65,15 @@ public class PlayerLocomotion : MonoBehaviour
 
         if (_motor.GroundingStatus.IsStableOnGround)
         {
+            // IMPORTANT: Reset these flags FIRST before notifying self-cast controller
             _ungroundedDueToJump = false;
             _timeSinceUngrounded = 0f;
+
+            // Notify self-cast controller that player landed
+            if (_selfCastController != null)
+            {
+                _selfCastController.OnPlayerLanded();
+            }
 
             var groundedMovement = _motor.GetDirectionTangentToSurface(
                 direction: _playerInput.RequestedMovement,
@@ -197,24 +206,52 @@ public class PlayerLocomotion : MonoBehaviour
             currentVelocity += _motor.CharacterUp * effectiveGravity * deltaTime;
         }
 
+        // Apply dash velocity
         if (_dashVelocity.magnitude > minDashSpeed)
         {
             currentVelocity += _dashVelocity;
         }
 
+        // Apply thrust velocity from self-cast system
+        if (_selfCastController != null)
+        {
+            _selfCastController.ApplyThrustVelocity(ref currentVelocity, deltaTime);
+        }
+
+        // Handle jump input
         if (_playerInput.RequestedJump)
         {
             var grounded = _motor.GroundingStatus.IsStableOnGround;
             var canCoyoteJump = _timeSinceUngrounded < coyoteTime && !_ungroundedDueToJump;
 
-            if (grounded || canCoyoteJump)
+            // Check for double jump capability
+            var jumpCount = _selfCastController != null ? _selfCastController.GetJumpCount() : 0;
+            var hasDoubleJump = _selfCastController != null && _selfCastController.HasDoubleJumpBuff();
+            var canDoubleJump = !grounded && jumpCount == 1 && hasDoubleJump;
+
+            if (grounded || canCoyoteJump || canDoubleJump)
             {
+                // Successfully jumping - consume the request
                 _playerInput.ConsumeJumpRequest();
                 _playerInput.SetRequestedCrouch(false);
                 _playerInput.SetRequestedCrouchInAir(false);
 
-                _motor.ForceUnground(time: 0.1f);
-                _ungroundedDueToJump = true;
+                // If this is a double jump, consume the buff
+                if (canDoubleJump)
+                {
+                    _selfCastController.ConsumeDoubleJump();
+                }
+                else
+                {
+                    _motor.ForceUnground(time: 0.1f);
+                    _ungroundedDueToJump = true;
+                }
+
+                // Notify self-cast controller about the jump
+                if (_selfCastController != null)
+                {
+                    _selfCastController.OnPlayerJumped();
+                }
 
                 var currentVerticalSpeed = Vector3.Dot(currentVelocity, _motor.CharacterUp);
                 var targetVerticalSpeed = Mathf.Max(currentVerticalSpeed, jumpSpeed);
@@ -222,10 +259,15 @@ public class PlayerLocomotion : MonoBehaviour
             }
             else
             {
+                // Can't jump yet, update the timer
                 _playerInput.UpdateTimeSinceJumpRequest(deltaTime);
-                var canJumpLater = _playerInput.TimeSinceJumpRequest < coyoteTime;
-                if (!canJumpLater)
+
+                // Check if we've waited too long (past coyote time)
+                if (_playerInput.TimeSinceJumpRequest >= coyoteTime)
+                {
+                    // Give up on this jump request
                     _playerInput.ConsumeJumpRequest();
+                }
             }
         }
     }

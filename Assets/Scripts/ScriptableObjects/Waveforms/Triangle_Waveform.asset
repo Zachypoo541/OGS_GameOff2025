@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   waveformName: Triangle
   waveformColor: {r: 1, g: 1, b: 0, a: 1}
-  unlockLevel: 1
+  unlockLevel: 3
   isHitscan: 0
   hitscanRange: 100
   baseDamage: 10
@@ -32,11 +32,16 @@ MonoBehaviour:
   rampStacks: 3
   gravityMultiplier: 1
   accelerationMultiplier: 1
-  usesConstantVelocity: 0
-  constantVelocitySpeed: 10
+  selfCastType: 4
+  selfCastEnergyCost: 20
+  selfCastCooldown: 2
   usesDash: 0
   dashForce: 20
   dashDecayRate: 0.9
+  reducedGravityMultiplier: 0.3
+  reducedGravityDuration: 3
+  thrustForce: 15
+  grantsDoubleJump: 0
   counterEffectType: 4
   counterEffectStrength: 1
   counterEffectDuration: 3
@@ -56,3 +61,15 @@ MonoBehaviour:
     idle: {fileID: 32900000, guid: 3171f07bab9c0b741acc393333fcd436, type: 3}
     fire: {fileID: 32900000, guid: 382b419d6fb56284f8d4280aff5ebb9a, type: 3}
     exit: {fileID: 32900000, guid: de01cf2673d1b0241930486b3bb94374, type: 3}
+  selfCastAnimations:
+  - clip: {fileID: 32900000, guid: 44b11409384830041a25cc3b896e09a3, type: 3}
+    playbackSpeed: 1.5
+  selfCastEnterAnimation:
+    clip: {fileID: 0}
+    playbackSpeed: 1
+  selfCastLoopAnimation:
+    clip: {fileID: 0}
+    playbackSpeed: 1
+  selfCastExitAnimation:
+    clip: {fileID: 0}
+    playbackSpeed: 1

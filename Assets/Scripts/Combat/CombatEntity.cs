@@ -32,6 +32,10 @@ public class CombatEntity : MonoBehaviour
     protected float constantVelSpeed = 0f;
     protected Vector3 constantVelDirection;
 
+    // Self-cast gravity override (for reduced gravity ability)
+    private float _selfCastGravityMultiplier = 1f;
+    private bool _useSelfCastGravity = false;
+
     // Events
     public System.Action<float, float> OnHealthChanged;
     public System.Action<float, float> OnEnergyChanged;
@@ -355,12 +359,6 @@ public class CombatEntity : MonoBehaviour
         currentGravityMod = equippedWaveform.gravityMultiplier;
         currentAccelMod = equippedWaveform.accelerationMultiplier;
 
-        if (equippedWaveform.usesConstantVelocity)
-        {
-            isUsingConstantVelocity = true;
-            constantVelSpeed = equippedWaveform.constantVelocitySpeed;
-        }
-
         if (equippedWaveform.usesDash)
         {
             ApplyDash();
@@ -372,8 +370,46 @@ public class CombatEntity : MonoBehaviour
         // Override in child classes
     }
 
-    public float GetGravityMultiplier() => currentGravityMod;
+    // Gravity multiplier (combines passive waveform modifier + self-cast override)
+    public float GetGravityMultiplier()
+    {
+        // If self-cast gravity is active, use that; otherwise use passive modifier
+        if (_useSelfCastGravity)
+            return _selfCastGravityMultiplier;
+
+        return currentGravityMod;
+    }
+
+    // Self-cast specific gravity control (for Sine wave ability)
+    public void SetGravityMultiplier(float multiplier)
+    {
+        _selfCastGravityMultiplier = multiplier;
+        _useSelfCastGravity = true;
+    }
+
+    // Reset to passive gravity (called when self-cast effect ends)
+    public void ResetToPassiveGravity()
+    {
+        _useSelfCastGravity = false;
+    }
+
     public float GetAccelerationMultiplier() => currentAccelMod;
+
+    // Energy management for self-cast
+    public float GetCurrentEnergy()
+    {
+        return currentEnergy;
+    }
+
+    public void ConsumeEnergy(float amount)
+    {
+        currentEnergy = Mathf.Max(0f, currentEnergy - amount);
+        OnEnergyChanged?.Invoke(currentEnergy, maxEnergy);
+    }
+
+    // ========================================
+    // DAMAGE RAMP TRACKING (PER-ENTITY)
+    // ========================================
 
     [System.Serializable]
     public class DamageRampData
