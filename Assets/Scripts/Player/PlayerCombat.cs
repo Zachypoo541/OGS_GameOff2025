@@ -170,7 +170,6 @@ public class PlayerCombat : MonoBehaviour
         if (currentWaveformIndex < 0) currentWaveformIndex = unlockedWaveforms.Count - 1;
 
         EquipWaveform(currentWaveformIndex);
-        Debug.Log($"Switched to waveform: {_combatEntity.equippedWaveform.name}");
     }
 
     public void EquipWaveform(int index)
@@ -183,12 +182,8 @@ public class PlayerCombat : MonoBehaviour
             // Check if this waveform is already equipped
             if (_combatEntity.equippedWaveform == newWaveform && !isInitial)
             {
-                Debug.Log($"[PlayerCombat] {newWaveform.name} is already equipped, skipping switch.");
                 return;
             }
-
-            Debug.Log($"[PlayerCombat] EquipWaveform: {newWaveform.name}, IsInitial: {isInitial}");
-            Debug.Log($"[PlayerCombat] HandAnimations is null? {newWaveform.handAnimations == null}");
 
             _combatEntity.equippedWaveform = newWaveform;
             currentWaveformIndex = index;
@@ -205,12 +200,10 @@ public class PlayerCombat : MonoBehaviour
             {
                 if (isInitial)
                 {
-                    Debug.Log($"[PlayerCombat] Calling SetInitialWaveform for {newWaveform.name}");
                     _handAnimationController.SetInitialWaveform(newWaveform.handAnimations);
                 }
                 else
                 {
-                    Debug.Log($"[PlayerCombat] Calling SwitchWaveform to {newWaveform.name}");
                     _handAnimationController.SwitchWaveform(newWaveform.handAnimations);
                 }
             }

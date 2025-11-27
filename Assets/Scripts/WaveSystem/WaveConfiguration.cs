@@ -20,6 +20,9 @@ public class WaveConfiguration : ScriptableObject
     public SpawnGroup[] spawnGroups;
 
     [Header("Wave Completion")]
+    [Tooltip("Automatically start next wave after delay (uncheck for manual triggers like waveform unlocks)")]
+    public bool autoStartNextWave = true;
+
     [Tooltip("Delay before next wave starts (0 = immediate)")]
     [Min(0f)]
     public float delayBeforeNextWave = 2f;

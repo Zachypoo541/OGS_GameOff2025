@@ -17,6 +17,8 @@ MonoBehaviour:
   arenaDescription: 
   waves:
   - {fileID: 11400000, guid: 1312624b411fe5746b6b36317c07e3b5, type: 2}
+  - {fileID: 11400000, guid: d873ed1fb038a5145929106f59c4caee, type: 2}
+  - {fileID: 11400000, guid: 451d611e8722fcf4e94d67b4772142f4, type: 2}
   arenaSceneName: 
   spawnPointGroupTag: 
   nextArena: {fileID: 0}
