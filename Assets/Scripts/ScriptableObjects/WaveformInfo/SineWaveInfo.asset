@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4046fa092f7070f49a1bf077d40c7533, type: 3}
+  m_Name: SineWaveInfo
+  m_EditorClassIdentifier: 
+  waveformToUnlock: {fileID: 11400000, guid: 0ff7b0fbb04f9344fb1b4d9bc4526198, type: 2}
+  waveToStart: 0
+  waveformName: Sine
+  waveformColor: {r: 0, g: 1, b: 0, a: 1}
+  flavorText: Organic, Steady, Sustainable, Soothing
+  shootDetailsText: Low energy cost, ineffective against green enemies
+  damageLevel: 0
+  projectileType: 0
+  selfCastEffect: Reduces gravity and directional acceleration on self
+  counterEffect: Burst of healing

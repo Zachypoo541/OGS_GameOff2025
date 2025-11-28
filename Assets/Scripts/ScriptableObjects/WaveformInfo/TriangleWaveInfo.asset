@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4046fa092f7070f49a1bf077d40c7533, type: 3}
+  m_Name: TriangleWaveInfo
+  m_EditorClassIdentifier: 
+  waveformToUnlock: {fileID: 11400000, guid: 493d8bdd963f48a489fe1e7a4a5e33b6, type: 2}
+  waveToStart: 0
+  waveformName: Triangle
+  waveformColor: {r: 1, g: 1, b: 0, a: 1}
+  flavorText: Adaptive, Moderate, Mediating
+  shootDetailsText: Damage and energy cost increases with success attacks
+  damageLevel: 3
+  projectileType: 2
+  selfCastEffect: Grants a single-use double jump
+  counterEffect: Briefly increase energy regeneration rate
