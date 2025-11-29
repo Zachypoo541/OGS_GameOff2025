@@ -97,16 +97,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 267f1d6c4bafffe44a523de7de57d8ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 25
-  currentHealth: 100
+  isPlayer: 0
+  genericHitSound: {fileID: 0}
+  hitSoundVolume: 0.5
+  hitSoundPitchRange: {x: 0.95, y: 1.05}
+  deathSound: {fileID: 0}
+  deathSoundVolume: 0.7
+  maxHealth: 30
+  currentHealth: 30
   maxEnergy: 100
   currentEnergy: 100
   baseEnergyRegenRate: 10
   equippedWaveform: {fileID: 11400000, guid: 62b0960bb54103e4ca4a4acffa48187e, type: 2}
   projectileSpawnPoint: {fileID: 6604138230457622507}
-  immuneToWaveforms: []
+  immuneToWaveforms:
+  - {fileID: 11400000, guid: 62b0960bb54103e4ca4a4acffa48187e, type: 2}
   attackRange: 200
   detectionRange: 200
+  aimHeightOffset: 0
   energyPickupPrefab: {fileID: 0}
   dropChance: 0.7
   attackIndicatorPrefab: {fileID: 0}
@@ -120,7 +128,8 @@ MonoBehaviour:
   flyHeight: 4
   heightAdjustSpeed: 5
   lungeDamage: 30
-  lungeRange: 2.2
+  lungeRange: 4
+  lungeCooldown: 1.5
   obstacleLayerMask:
     serializedVersion: 2
     m_Bits: 449
@@ -145,6 +154,8 @@ MonoBehaviour:
   spawnRadius: 3
   particleSpeed: 2
   spawnParticleDestructionRadius: 0.01
+  spawnParticleOriginOffset: {x: 0, y: 0, z: 0}
+  spawnParticleTargetOffset: {x: 0, y: 0, z: 0}
   hitFlashDuration: 0.4
   hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   hitFlashCurve:
@@ -188,8 +199,10 @@ MonoBehaviour:
   deathRadius: 4
   deathParticleSpeed: 2
   deathParticleStartRadius: 0.1
+  deathParticleOriginOffset: {x: 0, y: 0, z: 0}
   whiteFlashSpeed: 0.15
   deathGlowIntensity: 2
+  debugDeathEffect: 0
   enemyRenderer: {fileID: 2526023563507449750}
 --- !u!1 &2159529264085684927
 GameObject:

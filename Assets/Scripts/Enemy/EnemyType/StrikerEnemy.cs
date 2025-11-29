@@ -13,6 +13,7 @@ public class StrikerEnemy : EnemyAI
     [Header("Striker Attack")]
     public float lungeDamage = 30f;
     public float lungeRange = 2f;
+    public float lungeCooldown = 1.5f; // Add cooldown between lunge attacks
 
     [Header("Collision Settings")]
     public LayerMask obstacleLayerMask = ~0; // Default to all layers
@@ -22,6 +23,7 @@ public class StrikerEnemy : EnemyAI
     private Vector3 rushDirection;
     private float rushTimer;
     private float nextRushTime;
+    private float nextLungeTime; // Track when next lunge attack is allowed
     private float stuckTimer;
     private Vector3 lastPosition;
 
@@ -151,11 +153,15 @@ public class StrikerEnemy : EnemyAI
 
     private void HandleLungeAttack(float distanceToPlayer)
     {
-        if (distanceToPlayer <= lungeRange && !isRushing)
+        // FIXED: Only attack if within range, not rushing, and cooldown is ready
+        if (distanceToPlayer <= lungeRange && !isRushing && Time.time >= nextLungeTime)
         {
-            // Fire high-damage projectile at close range
-            Vector3 direction = (player.position - transform.position).normalized;
+            // Fire high-damage projectile at close range using GetAimPosition()
+            Vector3 direction = (GetAimPosition() - transform.position).normalized;
             FireProjectile(direction);
+
+            // Set cooldown for next lunge attack
+            nextLungeTime = Time.time + lungeCooldown;
         }
     }
 

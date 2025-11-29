@@ -19,6 +19,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: fed4b54f20cbfee4887a7751fec40142, type: 2}
   - {fileID: 11400000, guid: 642d820cf47e79d48bb774edbc98364f, type: 2}
   - {fileID: 11400000, guid: fa005374dbf91fb4780a10e77201de64, type: 2}
+  - {fileID: 11400000, guid: f8e0aa222c7d2544f89472f0e15b7fb2, type: 2}
+  - {fileID: 11400000, guid: f25b4d838cec9a44da0f583c16d4469a, type: 2}
+  - {fileID: 11400000, guid: c533d9919300cf14bb93ed02fffe9f7e, type: 2}
+  - {fileID: 11400000, guid: a21271eaccf6d6246bcf717fd6813bbd, type: 2}
+  - {fileID: 11400000, guid: e5ae46281aebe8d4088f17aba78735b6, type: 2}
+  - {fileID: 11400000, guid: ddd4a32b58974e047a9a6fbe895bb99d, type: 2}
   arenaSceneName: 
   spawnPointGroupTag: 
   nextArena: {fileID: 0}

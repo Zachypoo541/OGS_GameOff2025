@@ -87,7 +87,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
+  m_Radius: 1.17
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &6145619446478309187
 MonoBehaviour:
@@ -107,23 +107,24 @@ MonoBehaviour:
   hitSoundPitchRange: {x: 0.95, y: 1.05}
   deathSound: {fileID: 8300000, guid: f2090b4171e34f448b649cdbc63ba029, type: 3}
   deathSoundVolume: 0.7
-  maxHealth: 40
-  currentHealth: 40
+  maxHealth: 30
+  currentHealth: 30
   maxEnergy: 100
   currentEnergy: 100
   baseEnergyRegenRate: 100
   equippedWaveform: {fileID: 11400000, guid: 0ff7b0fbb04f9344fb1b4d9bc4526198, type: 2}
   projectileSpawnPoint: {fileID: 608079375915348522}
-  immuneToWaveforms: []
+  immuneToWaveforms:
+  - {fileID: 11400000, guid: 0ff7b0fbb04f9344fb1b4d9bc4526198, type: 2}
   attackRange: 65
   detectionRange: 75
-  aimHeightOffset: 10
+  aimHeightOffset: 1
   energyPickupPrefab: {fileID: 0}
   dropChance: 0.7
   attackIndicatorPrefab: {fileID: 7392259308721087985}
   attackIndicatorSprite: {fileID: 21300000, guid: 53369bbc6f722c543be0097e9d0b928b, type: 3}
   attackIndicatorColor: {r: 0, g: 1, b: 0, a: 1}
-  indicatorOffset: {x: 0, y: 1.2, z: 0}
+  indicatorOffset: {x: 0, y: 1.75, z: 0}
   floatSpeed: 3
   floatHeight: 0.5
   driftSpeed: 1
@@ -213,15 +214,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 5f4ae483e3cd4944aa6b014a2343d6ff, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.5
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5f4ae483e3cd4944aa6b014a2343d6ff, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.5
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5f4ae483e3cd4944aa6b014a2343d6ff, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.5
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5f4ae483e3cd4944aa6b014a2343d6ff, type: 3}
       propertyPath: m_LocalPosition.x
@@ -262,6 +263,10 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 5f4ae483e3cd4944aa6b014a2343d6ff, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5f4ae483e3cd4944aa6b014a2343d6ff, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -6652725513331149018, guid: 5f4ae483e3cd4944aa6b014a2343d6ff, type: 3}
       propertyPath: m_CastShadows

@@ -84,7 +84,7 @@ MonoBehaviour:
   equippedWaveform: {fileID: 11400000, guid: 62b0960bb54103e4ca4a4acffa48187e, type: 2}
   projectileSpawnPoint: {fileID: 7054419513934335895}
   immuneToWaveforms:
-  - {fileID: 11400000, guid: 15a84da28a63faa4f8c4d8ad11630f2c, type: 2}
+  - {fileID: 11400000, guid: 62b0960bb54103e4ca4a4acffa48187e, type: 2}
   attackRange: 300
   detectionRange: 320
   aimHeightOffset: -1

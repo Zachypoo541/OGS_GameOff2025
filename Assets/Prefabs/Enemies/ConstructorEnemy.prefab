@@ -265,9 +265,11 @@ MonoBehaviour:
   baseEnergyRegenRate: 100
   equippedWaveform: {fileID: 11400000, guid: 15a84da28a63faa4f8c4d8ad11630f2c, type: 2}
   projectileSpawnPoint: {fileID: 6742997873306826933}
-  immuneToWaveforms: []
+  immuneToWaveforms:
+  - {fileID: 11400000, guid: 15a84da28a63faa4f8c4d8ad11630f2c, type: 2}
   attackRange: 50
   detectionRange: 60
+  aimHeightOffset: 1
   energyPickupPrefab: {fileID: 0}
   dropChance: 0.7
   attackIndicatorPrefab: {fileID: 5595904848480258418}

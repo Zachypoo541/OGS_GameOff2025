@@ -1,0 +1,127 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdd5ad11e1c1eb14a96de2570d8b4728, type: 3}
+  m_Name: Forest_Wave8
+  m_EditorClassIdentifier: 
+  waveNumber: 8
+  waveDescription: 
+  spawnGroups:
+  - delayBeforeSpawn: 0
+    spawnEntries:
+    - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
+      count: 1
+      spawnPointID: SP_34
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+    - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
+      count: 1
+      spawnPointID: SP_35
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+    - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
+      count: 1
+      spawnPointID: SP_36
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+    - enemyPrefab: {fileID: 6995608200857491679, guid: 75a82096146ebf04c863afda022930f3, type: 3}
+      count: 1
+      spawnPointID: SP_37
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+    - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
+      count: 1
+      spawnPointID: SP_38
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+    - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
+      count: 1
+      spawnPointID: SP_39
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+    - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
+      count: 1
+      spawnPointID: SP_40
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+    - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
+      count: 1
+      spawnPointID: SP_41
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+    - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
+      count: 1
+      spawnPointID: SP_42
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+    - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
+      count: 1
+      spawnPointID: SP_43
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+    - enemyPrefab: {fileID: 6995608200857491679, guid: 75a82096146ebf04c863afda022930f3, type: 3}
+      count: 1
+      spawnPointID: SP_44
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+    - enemyPrefab: {fileID: 6995608200857491679, guid: 75a82096146ebf04c863afda022930f3, type: 3}
+      count: 1
+      spawnPointID: SP_45
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+    - enemyPrefab: {fileID: 6995608200857491679, guid: 75a82096146ebf04c863afda022930f3, type: 3}
+      count: 1
+      spawnPointID: SP_46
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+    - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
+      count: 1
+      spawnPointID: SP_47
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+    - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
+      count: 1
+      spawnPointID: SP_48
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+    - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
+      count: 1
+      spawnPointID: SP_49
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+    - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
+      count: 1
+      spawnPointID: SP_50
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+    groupName: 
+    spawnSound: {fileID: 0}
+  autoStartNextWave: 1
+  delayBeforeNextWave: 1.5
+  waveMusic: {fileID: 0}
+  waveAnnouncementSound: {fileID: 0}

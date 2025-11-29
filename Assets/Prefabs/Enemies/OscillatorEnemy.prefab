@@ -69,6 +69,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c429ed4ec5dc674e87e30290c98477d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isPlayer: 0
+  genericHitSound: {fileID: 0}
+  hitSoundVolume: 0.5
+  hitSoundPitchRange: {x: 0.95, y: 1.05}
+  deathSound: {fileID: 0}
+  deathSoundVolume: 0.7
   maxHealth: 100
   currentHealth: 100
   maxEnergy: 100
@@ -76,9 +82,11 @@ MonoBehaviour:
   baseEnergyRegenRate: 10
   equippedWaveform: {fileID: 11400000, guid: 493d8bdd963f48a489fe1e7a4a5e33b6, type: 2}
   projectileSpawnPoint: {fileID: 3576081988137954073}
-  immuneToWaveforms: []
+  immuneToWaveforms:
+  - {fileID: 11400000, guid: 493d8bdd963f48a489fe1e7a4a5e33b6, type: 2}
   attackRange: 70
   detectionRange: 80
+  aimHeightOffset: 1
   energyPickupPrefab: {fileID: 0}
   dropChance: 0.7
   attackIndicatorPrefab: {fileID: 0}
@@ -117,6 +125,8 @@ MonoBehaviour:
   spawnRadius: 3
   particleSpeed: 2
   spawnParticleDestructionRadius: 0.01
+  spawnParticleOriginOffset: {x: 0, y: 0, z: 0}
+  spawnParticleTargetOffset: {x: 0, y: 0, z: 0}
   hitFlashDuration: 0.4
   hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   hitFlashCurve:
@@ -160,8 +170,11 @@ MonoBehaviour:
   deathRadius: 5
   deathParticleSpeed: 2
   deathParticleStartRadius: 0.1
+  deathParticleOriginOffset: {x: 0, y: 0, z: 0}
   whiteFlashSpeed: 0.15
-  enemyRenderer: {fileID: 6865267203124563928, guid: 75a82096146ebf04c863afda022930f3, type: 3}
+  deathGlowIntensity: 2
+  debugDeathEffect: 0
+  enemyRenderer: {fileID: 6799831976622425965}
 --- !u!1 &7935893870596739299
 GameObject:
   m_ObjectHideFlags: 0
@@ -307,6 +320,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 5919833212042307480}
   m_SourcePrefab: {fileID: 100100000, guid: d8e9f0d73bac58a4498710a862179ed6, type: 3}
+--- !u!23 &6799831976622425965 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -4683669308469848369, guid: d8e9f0d73bac58a4498710a862179ed6, type: 3}
+  m_PrefabInstance: {fileID: 7015931692933009826}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7410428883109951049 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d8e9f0d73bac58a4498710a862179ed6, type: 3}
