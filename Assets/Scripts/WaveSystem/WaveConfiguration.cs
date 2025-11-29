@@ -15,6 +15,10 @@ public class WaveConfiguration : ScriptableObject
     [TextArea(2, 4)]
     public string waveDescription;
 
+    [Header("Player Spawn")]
+    [Tooltip("Spawn Point ID where the player spawns when starting/restarting this wave")]
+    public string playerWaveStartID;
+
     [Header("Spawn Groups")]
     [Tooltip("All spawn groups in this wave (executed in order with delays)")]
     public SpawnGroup[] spawnGroups;

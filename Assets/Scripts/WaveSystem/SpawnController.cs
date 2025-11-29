@@ -361,11 +361,6 @@ public class SpawnController : MonoBehaviour
             Debug.Log("Final arena completed!");
         }
 
-        // You can add hooks here for:
-        // - Unlocking next arena in save system
-        // - Giving rewards (energy pickups, new waveforms, etc.)
-        // - Transitioning to victory screen or next arena
-        // - Saving player progress
     }
 
     /// <summary>
@@ -391,5 +386,60 @@ public class SpawnController : MonoBehaviour
             }
         }
         activeEnemies.Clear();
+    }
+
+    /// <summary>
+    /// Get the current wave index
+    /// </summary>
+    public int GetCurrentWaveIndex()
+    {
+        return currentWaveIndex;
+    }
+
+    /// <summary>
+    /// Restart the current wave from the beginning
+    /// </summary>
+    public void RestartCurrentWave()
+    {
+        if (currentArena == null)
+        {
+            Debug.LogError("SpawnController: Cannot restart wave, no arena assigned!");
+            return;
+        }
+
+        if (currentWaveIndex < 0 || currentWaveIndex >= currentArena.GetWaveCount())
+        {
+            Debug.LogError($"SpawnController: Cannot restart wave. Invalid index {currentWaveIndex}");
+            return;
+        }
+
+        WaveConfiguration currentWave = currentArena.GetWave(currentWaveIndex);
+
+        Debug.Log($"SpawnController: Restarting wave {currentWave.waveNumber}");
+
+        // Stop any ongoing spawning coroutines
+        StopAllCoroutines();
+
+        // Clear all active enemies
+        ClearAllEnemies();
+
+        // Reset state
+        isSpawning = false;
+        waveCompleting = false;
+        pendingWaveStartCoroutine = null;
+
+        // Start the current wave again
+        StartWave(currentWaveIndex);
+    }
+
+    /// <summary>
+    /// Set the current wave (called by GameStateManager when starting/restarting)
+    /// </summary>
+    public void SetCurrentWave(int waveIndex)
+    {
+        if (waveIndex >= 0 && waveIndex < currentArena.GetWaveCount())
+        {
+            currentWaveIndex = waveIndex;
+        }
     }
 }
