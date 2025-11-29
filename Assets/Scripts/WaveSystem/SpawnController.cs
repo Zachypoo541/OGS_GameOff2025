@@ -26,10 +26,14 @@ public class SpawnController : MonoBehaviour
     [Tooltip("Called when all enemies in a wave have been spawned")]
     public UnityEngine.Events.UnityEvent<int> OnWaveSpawnComplete;
 
+    [Tooltip("Called when all enemies in a wave are defeated")]
+    public UnityEngine.Events.UnityEvent<int> OnWaveCompleted;
+
     // Private state
     private int currentWaveIndex = 0;
     private List<GameObject> activeEnemies = new List<GameObject>();
     private bool isSpawning = false;
+    private Coroutine pendingWaveStartCoroutine = null;
 
     // Cache of spawn points by ID for fast lookup
     private Dictionary<string, SpawnPoint> spawnPointCache = new Dictionary<string, SpawnPoint>();
@@ -104,6 +108,14 @@ public class SpawnController : MonoBehaviour
             return;
         }
 
+        // Cancel any pending auto-start from previous wave
+        if (pendingWaveStartCoroutine != null)
+        {
+            StopCoroutine(pendingWaveStartCoroutine);
+            pendingWaveStartCoroutine = null;
+            Debug.Log("SpawnController: Cancelled pending wave auto-start");
+        }
+
         currentWaveIndex = waveIndex;
         WaveConfiguration wave = currentArena.GetWave(waveIndex);
         StartCoroutine(SpawnWaveCoroutine(wave));
@@ -114,7 +126,16 @@ public class SpawnController : MonoBehaviour
     /// </summary>
     public void StartNextWave()
     {
-        StartWave(currentWaveIndex + 1);
+        int nextWaveIndex = currentWaveIndex + 1;
+
+        // Safety check to prevent starting waves that don't exist
+        if (nextWaveIndex >= currentArena.GetWaveCount())
+        {
+            Debug.LogWarning($"SpawnController: Cannot start wave {nextWaveIndex}, arena only has {currentArena.GetWaveCount()} waves. Arena should be complete.");
+            return;
+        }
+
+        StartWave(nextWaveIndex);
     }
 
     /// <summary>
@@ -264,13 +285,24 @@ public class SpawnController : MonoBehaviour
     {
         Debug.Log($"Wave {currentWaveIndex + 1} complete!");
 
+        // Invoke event with the completed wave index
+        OnWaveCompleted?.Invoke(currentWaveIndex);
+
         WaveConfiguration completedWave = currentArena.GetWave(currentWaveIndex);
 
         // Check if there's another wave
         if (currentWaveIndex + 1 < currentArena.GetWaveCount())
         {
-            // Start next wave after delay
-            StartCoroutine(StartNextWaveAfterDelay(completedWave.delayBeforeNextWave));
+            // Only auto-start if the completed wave has autoStartNextWave enabled
+            if (completedWave.autoStartNextWave)
+            {
+                // Start next wave after delay and store coroutine reference
+                pendingWaveStartCoroutine = StartCoroutine(StartNextWaveAfterDelay(completedWave.delayBeforeNextWave));
+            }
+            else
+            {
+                Debug.Log($"Wave {currentWaveIndex + 1} requires manual trigger to continue (autoStartNextWave is disabled)");
+            }
         }
         else
         {

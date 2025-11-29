@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3611956607884458411}
   - component: {fileID: 6067503067420755646}
+  - component: {fileID: 1805569203664128081}
   m_Layer: 0
   m_Name: WaveManager
   m_TagString: Untagged
@@ -51,5 +52,25 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   OnWaveSpawnComplete:
+    m_PersistentCalls:
+      m_Calls: []
+  OnWaveCompleted:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &1805569203664128081
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1514218520611804947}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1f15a82090fcf4cbb6d35aa874063a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnController: {fileID: 6067503067420755646}
+  unlockSpawns: []
+  OnUnlockSpawned:
     m_PersistentCalls:
       m_Calls: []
