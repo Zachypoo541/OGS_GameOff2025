@@ -10,13 +10,16 @@ public class HandAnimationController : MonoBehaviour
     [SerializeField] private VideoPlayer leftHandPlayer;
 
     [Header("Left Hand Action Clips")]
-    [SerializeField] private VideoClip leftHandGrab;
+    [SerializeField] private VideoClip leftHandWaveformGrab; // RENAMED from leftHandGrab
+    [SerializeField] private VideoClip leftHandPickupGrab;   // NEW: For energy/general pickups
     [SerializeField] private VideoClip leftHandButton;
     [SerializeField] private VideoClip leftHandCounter;
 
     [Header("Left Hand Action Speeds")]
     [Range(0.1f, 3f)]
-    [SerializeField] private float grabSpeed = 1f;
+    [SerializeField] private float waveformGrabSpeed = 1f; // RENAMED from grabSpeed
+    [Range(0.1f, 3f)]
+    [SerializeField] private float pickupGrabSpeed = 1f;   // NEW: For energy/general pickups
     [Range(0.1f, 3f)]
     [SerializeField] private float buttonSpeed = 1f;
     [Range(0.1f, 3f)]
@@ -29,7 +32,7 @@ public class HandAnimationController : MonoBehaviour
     private Coroutine _rightHandCoroutine;
     private Coroutine _leftHandCoroutine;
 
-    // *** NEW: For looping thrust audio ***
+    // For looping thrust audio
     private AudioSource _thrustLoopAudioSource;
     private Coroutine _thrustAudioCoroutine;
 
@@ -82,7 +85,7 @@ public class HandAnimationController : MonoBehaviour
                 Debug.Log("[HandAnimController] Left hand player initialized.");
         }
 
-        // *** NEW: Create AudioSource for looping thrust sound ***
+        // Create AudioSource for looping thrust sound
         _thrustLoopAudioSource = gameObject.AddComponent<AudioSource>();
         _thrustLoopAudioSource.loop = true;
         _thrustLoopAudioSource.playOnAwake = false;
@@ -94,7 +97,7 @@ public class HandAnimationController : MonoBehaviour
         if (rightHandPlayer != null)
             rightHandPlayer.loopPointReached -= OnRightHandVideoEnd;
 
-        // *** NEW: Clean up thrust audio ***
+        // Clean up thrust audio
         if (_thrustAudioCoroutine != null)
             StopCoroutine(_thrustAudioCoroutine);
     }
@@ -423,7 +426,7 @@ public class HandAnimationController : MonoBehaviour
         }
     }
 
-    // *** NEW: Play left hand action with audio support ***
+    // Play left hand action with audio support
     public void PlayLeftHandAction(VideoClip actionClip, bool returnToIdle = true, float playbackSpeed = 1f, WaveformData waveformData = null)
     {
         if (leftHandPlayer == null || actionClip == null)
@@ -469,7 +472,7 @@ public class HandAnimationController : MonoBehaviour
 
         leftHandPlayer.Play();
 
-        // *** NEW: Play self-cast sound with delay ***
+        // Play self-cast sound with delay
         if (waveformData != null && waveformData.selfCastSound != null)
         {
             if (waveformData.selfCastSoundDelay > 0f)
@@ -512,7 +515,7 @@ public class HandAnimationController : MonoBehaviour
         }
     }
 
-    // *** NEW: For Square wave thrust with enter/loop/exit audio ***
+    // For Square wave thrust with enter/loop/exit audio
     public void StartLeftHandLoop(VideoClip loopClip, float playbackSpeed = 1f, WaveformData waveformData = null)
     {
         if (leftHandPlayer == null || loopClip == null)
@@ -542,14 +545,14 @@ public class HandAnimationController : MonoBehaviour
         leftHandPlayer.playbackSpeed = playbackSpeed;
         leftHandPlayer.Play();
 
-        // *** NEW: Start thrust audio sequence ***
+        // Start thrust audio sequence
         if (waveformData != null)
         {
             _thrustAudioCoroutine = StartCoroutine(PlayThrustAudioSequence(waveformData));
         }
     }
 
-    // *** NEW: Thrust audio sequence (start -> loop -> end) ***
+    // Thrust audio sequence (start -> loop -> end)
     private IEnumerator PlayThrustAudioSequence(WaveformData waveformData)
     {
         // Play start sound
@@ -576,7 +579,7 @@ public class HandAnimationController : MonoBehaviour
         }
     }
 
-    // *** MODIFIED: Stop left hand loop with exit audio ***
+    // Stop left hand loop with exit audio
     public void StopLeftHandLoop(WaveformData waveformData = null)
     {
         if (enableDebugLogs)
@@ -588,7 +591,7 @@ public class HandAnimationController : MonoBehaviour
             leftHandPlayer.playbackSpeed = 1f;
         }
 
-        // *** NEW: Stop thrust audio and play end sound ***
+        // Stop thrust audio and play end sound
         if (_thrustAudioCoroutine != null)
         {
             StopCoroutine(_thrustAudioCoroutine);
@@ -614,9 +617,16 @@ public class HandAnimationController : MonoBehaviour
         }
     }
 
-    public void PlayGrabAction()
+    // NEW: Specific grab action for waveform unlocks
+    public void PlayWaveformGrabAction()
     {
-        PlayLeftHandAction(leftHandGrab, true, grabSpeed);
+        PlayLeftHandAction(leftHandWaveformGrab, true, waveformGrabSpeed);
+    }
+
+    // NEW: Specific grab action for energy/general pickups
+    public void PlayPickupGrabAction()
+    {
+        PlayLeftHandAction(leftHandPickupGrab, true, pickupGrabSpeed);
     }
 
     public void PlayButtonAction()

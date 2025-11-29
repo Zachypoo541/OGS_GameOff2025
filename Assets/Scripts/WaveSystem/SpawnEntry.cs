@@ -29,4 +29,15 @@ public class SpawnEntry
     [Tooltip("Time between spawning each individual enemy in this group")]
     [Min(0f)]
     public float spawnInterval = 0.2f;
+
+    [Header("Drop Override (Optional)")]
+    [Tooltip("Override the enemy's default drop prefab (leave null to use enemy's default)")]
+    public GameObject overrideDropPrefab;
+
+    [Tooltip("Override the drop chance (only used if overrideDropPrefab is set)")]
+    [Range(0f, 1f)]
+    public float overrideDropChance = 0.5f;
+
+    [Tooltip("Apply drop override to this spawn entry")]
+    public bool useDropOverride = false;
 }

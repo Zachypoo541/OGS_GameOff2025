@@ -10,7 +10,9 @@ public abstract class EnemyAI : CombatEntity
     [Header("Drops")]
     public GameObject energyPickupPrefab;
     [Range(0f, 1f)]
-    public float dropChance = 0.7f;
+    public float dropChance = 0.0f;
+    private bool hasDropOverride = false;
+    public Transform pickupSpawnPoint;
 
     [Header("Attack Indicator")]
     public GameObject attackIndicatorPrefab;
@@ -22,6 +24,8 @@ public abstract class EnemyAI : CombatEntity
     protected bool isPlayerDetected;
     protected GameObject currentIndicator;
     protected EnemyEffects enemyEffects;
+
+    private bool isDead = false;
 
     protected override void Start()
     {
@@ -187,6 +191,12 @@ public abstract class EnemyAI : CombatEntity
 
     public override void TakeDamage(float damage, WaveformData sourceWaveform, CombatEntity attacker = null)
     {
+        // Ignore damage if already dead
+        if (isDead)
+        {
+            return;
+        }
+
         // Play hit effect before processing damage
         if (enemyEffects != null && currentHealth > 0)
         {
@@ -198,6 +208,12 @@ public abstract class EnemyAI : CombatEntity
 
     public override void TakeDamage(float damage, CombatEntity attacker = null)
     {
+        // Ignore damage if already dead
+        if (isDead)
+        {
+            return;
+        }
+
         // Play hit effect before processing damage
         if (enemyEffects != null && currentHealth > 0)
         {
@@ -207,8 +223,24 @@ public abstract class EnemyAI : CombatEntity
         base.TakeDamage(damage, attacker);
     }
 
+    public void SetDropOverride(GameObject dropPrefab, float chance)
+    {
+        energyPickupPrefab = dropPrefab;
+        dropChance = Mathf.Clamp01(chance);
+        hasDropOverride = true;
+
+        Debug.Log($"{gameObject.name}: Drop override applied - Prefab: {(dropPrefab != null ? dropPrefab.name : "None")}, Chance: {chance:P0}");
+    }
+
     protected override void Die()
     {
+        // Mark as dead immediately to prevent multiple Die() calls
+        if (isDead)
+        {
+            return;
+        }
+        isDead = true;
+
         base.Die();
 
         // Clean up indicator on death
@@ -217,7 +249,16 @@ public abstract class EnemyAI : CombatEntity
         // Drop energy pickup based on chance
         if (energyPickupPrefab != null && Random.value <= dropChance)
         {
-            Instantiate(energyPickupPrefab, transform.position, Quaternion.identity);
+            // Use pickup spawn point if assigned, otherwise use enemy position
+            Vector3 spawnPosition = pickupSpawnPoint != null
+                ? pickupSpawnPoint.position
+                : transform.position;
+
+            Quaternion spawnRotation = pickupSpawnPoint != null
+                ? pickupSpawnPoint.rotation
+                : Quaternion.identity;
+
+            Instantiate(energyPickupPrefab, spawnPosition, spawnRotation);
         }
 
         OnEnemyDeath();

@@ -46,8 +46,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   infoData: {fileID: 11400000, guid: 1d41463cfb7273d40b80f5d4076d8779, type: 2}
-  interactionRange: 3
-  viewAngleThreshold: 0.3
+  interactionRange: 4
+  viewAngleThreshold: 0.7
   interactionKey: 103
   interactionPromptText: Press G to Synthesize Sine Wave
   pickupSound: {fileID: 8300000, guid: 93a5bda832283e1498b1ab09e7398dcf, type: 3}

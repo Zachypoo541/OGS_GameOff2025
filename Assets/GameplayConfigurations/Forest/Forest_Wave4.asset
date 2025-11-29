@@ -23,30 +23,45 @@ MonoBehaviour:
       useRandomSpread: 0
       spreadRadius: 0
       spawnInterval: 0
+      overrideDropPrefab: {fileID: 1457257405789544094, guid: 9e55aceab035e0b439f6ee3fa4b76738, type: 3}
+      overrideDropChance: 1
+      useDropOverride: 1
     - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
       count: 1
       spawnPointID: SP_8
       useRandomSpread: 0
       spreadRadius: 0
       spawnInterval: 0
+      overrideDropPrefab: {fileID: 0}
+      overrideDropChance: 0.5
+      useDropOverride: 0
     - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
       count: 1
       spawnPointID: SP_9
       useRandomSpread: 0
       spreadRadius: 0
       spawnInterval: 0
+      overrideDropPrefab: {fileID: 0}
+      overrideDropChance: 0.5
+      useDropOverride: 0
     - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
       count: 1
       spawnPointID: SP_10
       useRandomSpread: 0
       spreadRadius: 0
       spawnInterval: 0
+      overrideDropPrefab: {fileID: 0}
+      overrideDropChance: 0.5
+      useDropOverride: 0
     - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
       count: 1
       spawnPointID: SP_11
       useRandomSpread: 0
       spreadRadius: 0
       spawnInterval: 0
+      overrideDropPrefab: {fileID: 0}
+      overrideDropChance: 0.5
+      useDropOverride: 0
     groupName: 
     spawnSound: {fileID: 0}
   autoStartNextWave: 1
