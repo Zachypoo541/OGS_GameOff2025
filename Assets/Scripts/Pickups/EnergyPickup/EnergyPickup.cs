@@ -1,16 +1,17 @@
 using UnityEngine;
 using System.Collections;
 
-public class WaveformUnlock : MonoBehaviour
+public class EnergyPickup : MonoBehaviour
 {
-    [Header("Info Panel Data")]
-    [SerializeField] private WaveformInfoData infoData;
-
     [Header("Interaction Settings")]
     [SerializeField] private float interactionRange = 3f;
     [SerializeField] private float viewAngleThreshold = 0.7f; // Dot product threshold for "looking at"
-    [SerializeField] private KeyCode interactionKey = KeyCode.E;
-    [SerializeField] private string interactionPromptText = "Press E to Synthesize Waveform";
+    [SerializeField] private KeyCode interactionKey = KeyCode.G;
+    [SerializeField] private string interactionPromptText = "Press G to Collect Energy";
+
+    [Header("Energy Boost Settings")]
+    [SerializeField] private float energyRegenBoostAmount = 5f; // Added to base regen rate
+    [SerializeField] private float boostDuration = 10f; // How long the boost lasts
 
     [Header("Audio")]
     [SerializeField] private AudioClip pickupSound;
@@ -19,10 +20,9 @@ public class WaveformUnlock : MonoBehaviour
 
     [Header("UI Prefabs")]
     [SerializeField] private GameObject interactionPromptPrefab;
-    [SerializeField] private GameObject waveformInfoPanelPrefab;
 
     [Header("Hand Animation")]
-    [SerializeField] private float grabAnimationDelay = 0.5f; // Delay before unlock activates after grab starts
+    [SerializeField] private float grabAnimationDelay = 0.5f; // Delay before pickup activates after grab starts
 
     [Header("Visual Effects")]
     [SerializeField] private Renderer objectRenderer;
@@ -34,14 +34,12 @@ public class WaveformUnlock : MonoBehaviour
     [SerializeField] private float maxRotationSpeed = 180f; // Degrees per second
     [SerializeField] private float rotationRampDistance = 5f; // Distance where rotation starts ramping up
 
-    [Header("Particle Settings (Shared)")]
+    [Header("Particle Settings")]
     [SerializeField] private Sprite particleSprite;
-    [SerializeField] private Color particleColor = Color.white;
+    [SerializeField] private Color particleColor = Color.cyan;
     [SerializeField] private float particleSize = 0.5f;
     [SerializeField] private int particleCount = 30;
     [SerializeField] private float particleSpeed = 5f;
-
-    [Header("Despawn Particle Settings")]
     [SerializeField] private float particleLifetime = 1f;
     [SerializeField] private float particlePullDelay = 0.3f; // Delay before particles start moving to camera
     [SerializeField] private float particlePullSpeed = 20f; // Speed at which particles move to camera
@@ -52,13 +50,11 @@ public class WaveformUnlock : MonoBehaviour
     [SerializeField] private float spawnParticleRadius = 3f; // Initial spawn radius around object
     [SerializeField] private float spawnParticleFadeInDuration = 0.3f;
 
-    [Header("Timing")]
-    [SerializeField] private float delayBeforeInfoPanel = 1.5f;
-
     private Transform playerTransform;
     private Camera playerCamera;
+    private CombatEntity playerCombatEntity;
     private InteractionPrompt currentPrompt;
-    private bool hasBeenUnlocked = false;
+    private bool hasBeenCollected = false;
     private bool isPlayerInRange = false;
     private bool isPlayerLookingAt = false;
     private Vector3 initialScale;
@@ -77,6 +73,23 @@ public class WaveformUnlock : MonoBehaviour
 
             if (playerCamera == null)
                 Debug.LogError("Camera.main not found! Tag your camera with 'MainCamera'");
+
+            // Get player's CombatEntity component - PlayerCharacter is on a child object
+            PlayerCharacter playerCharacter = player.GetComponentInChildren<PlayerCharacter>();
+            if (playerCharacter != null)
+            {
+                playerCombatEntity = playerCharacter;
+            }
+            else
+            {
+                // Fallback: try to get CombatEntity directly from children
+                playerCombatEntity = player.GetComponentInChildren<CombatEntity>();
+            }
+
+            if (playerCombatEntity == null)
+            {
+                Debug.LogError("EnergyPickup: Player does not have PlayerCharacter or CombatEntity component in hierarchy!");
+            }
 
             // Find HandAnimationController on player's Canvas
             Canvas playerCanvas = player.GetComponentInChildren<Canvas>();
@@ -113,11 +126,11 @@ public class WaveformUnlock : MonoBehaviour
         if (playerCamera == null)
             return;
 
-        // Always update rotation (even when unlocked or scaling down)
+        // Always update rotation (even when collected or scaling down)
         UpdateRotation();
 
-        // Only check for interaction if not unlocked, fully spawned, and not scaling down
-        if (hasBeenUnlocked || !isFullySpawned || isScalingDown)
+        // Only check for interaction if not collected, fully spawned, and not scaling down
+        if (hasBeenCollected || !isFullySpawned || isScalingDown)
             return;
 
         CheckPlayerProximityAndGaze();
@@ -128,7 +141,7 @@ public class WaveformUnlock : MonoBehaviour
 
             if (Input.GetKeyDown(interactionKey))
             {
-                StartCoroutine(PlayGrabAndUnlock());
+                StartCoroutine(PlayGrabAndCollect());
             }
         }
         else
@@ -191,14 +204,11 @@ public class WaveformUnlock : MonoBehaviour
             return;
         }
 
-        // Use transform position instead of renderer bounds (which may be scaled down)
         Vector3 centerPosition = transform.position;
 
         // Create a temporary GameObject for the particle system
-        GameObject particleObj = new GameObject("WaveformSpawnParticles");
+        GameObject particleObj = new GameObject("EnergyPickupSpawnParticles");
         particleObj.transform.position = centerPosition;
-
-        Debug.Log($"Creating spawn particles at {centerPosition} with radius {spawnParticleRadius}");
 
         // Add particle system component
         ParticleSystem ps = particleObj.AddComponent<ParticleSystem>();
@@ -206,7 +216,7 @@ public class WaveformUnlock : MonoBehaviour
         // STOP IT IMMEDIATELY before configuring
         ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 
-        // Configure main module - set initial alpha to something visible
+        // Configure main module
         var main = ps.main;
         main.loop = false;
         main.playOnAwake = false;
@@ -214,7 +224,6 @@ public class WaveformUnlock : MonoBehaviour
         main.startLifetime = particleSpeed > 0 ? spawnParticleRadius / particleSpeed : 3f;
         main.startSpeed = 0f;
         main.startSize = particleSize;
-        // Start with a visible alpha instead of 0
         main.startColor = new Color(particleColor.r, particleColor.g, particleColor.b, particleColor.a);
         main.simulationSpace = ParticleSystemSimulationSpace.World;
         main.maxParticles = 1000;
@@ -237,16 +246,15 @@ public class WaveformUnlock : MonoBehaviour
         float lifetime = main.startLifetime.constant;
         float fadeInRatio = Mathf.Clamp01(spawnParticleFadeInDuration / lifetime);
 
-        // Fade from transparent to full alpha
         gradient.SetKeys(
             new GradientColorKey[] {
-            new GradientColorKey(particleColor, 0f),
-            new GradientColorKey(particleColor, 1f)
+                new GradientColorKey(particleColor, 0f),
+                new GradientColorKey(particleColor, 1f)
             },
             new GradientAlphaKey[] {
-            new GradientAlphaKey(0f, 0f),
-            new GradientAlphaKey(particleColor.a, fadeInRatio),
-            new GradientAlphaKey(particleColor.a, 1f)
+                new GradientAlphaKey(0f, 0f),
+                new GradientAlphaKey(particleColor.a, fadeInRatio),
+                new GradientAlphaKey(particleColor.a, 1f)
             }
         );
         colorOverLifetime.color = gradient;
@@ -262,48 +270,31 @@ public class WaveformUnlock : MonoBehaviour
             Material mat = new Material(Shader.Find("Sprites/Default"));
             mat.mainTexture = particleSprite.texture;
             renderer.material = mat;
-            Debug.Log($"Using sprite texture: {particleSprite.name}");
         }
         else
         {
-            // Use default particle material if no sprite
             Material mat = new Material(Shader.Find("Particles/Standard Unlit"));
             mat.color = particleColor;
             renderer.material = mat;
-            Debug.Log("Using default particle material (no sprite assigned)");
         }
 
         // Play the system first
         ps.Play(true);
 
-        // Manually emit particles - don't override the color with EmitParams
+        // Manually emit particles
         ps.Emit(particleCount);
 
-        Debug.Log($"Manually emitted {particleCount} particles");
-
-        // Verify emission immediately
-        StartCoroutine(DebugAndPullParticles(ps, particleObj, centerPosition));
+        // Start pulling particles to center
+        StartCoroutine(PullParticlesToCenter(ps, particleObj, centerPosition));
     }
 
-    private IEnumerator DebugAndPullParticles(ParticleSystem ps, GameObject particleObj, Vector3 centerPosition)
+    private IEnumerator PullParticlesToCenter(ParticleSystem ps, GameObject particleObj, Vector3 centerPosition)
     {
         // Wait one frame for particles to be created
         yield return null;
 
         if (ps == null)
         {
-            Debug.LogError("Particle system is null!");
-            if (particleObj != null)
-                Destroy(particleObj);
-            yield break;
-        }
-
-        int initialCount = ps.particleCount;
-        Debug.Log($"Particles after emit: {initialCount}");
-
-        if (initialCount == 0)
-        {
-            Debug.LogError("No particles were emitted! Something is wrong with the particle system setup.");
             if (particleObj != null)
                 Destroy(particleObj);
             yield break;
@@ -311,27 +302,15 @@ public class WaveformUnlock : MonoBehaviour
 
         // Get initial particle data
         ParticleSystem.Particle[] particles = new ParticleSystem.Particle[ps.main.maxParticles];
-        int count = ps.GetParticles(particles);
-        if (count > 0)
-        {
-            Debug.Log($"First particle - Position: {particles[0].position}, Size: {particles[0].GetCurrentSize(ps)}, Color: {particles[0].GetCurrentColor(ps)}");
-        }
-
-        // Now start pulling particles
         float maxLifetime = ps.main.startLifetime.constant;
         float elapsed = 0f;
-
-        Debug.Log($"Starting particle pull towards {centerPosition}");
 
         while (elapsed < maxLifetime && ps != null)
         {
             int particleCount = ps.GetParticles(particles);
 
             if (particleCount == 0)
-            {
-                Debug.Log("All particles expired");
                 break;
-            }
 
             for (int i = 0; i < particleCount; i++)
             {
@@ -355,8 +334,6 @@ public class WaveformUnlock : MonoBehaviour
             elapsed += Time.deltaTime;
             yield return null;
         }
-
-        Debug.Log("Particle pull complete, cleaning up");
 
         // Cleanup
         if (ps != null)
@@ -417,29 +394,43 @@ public class WaveformUnlock : MonoBehaviour
         }
     }
 
-    private IEnumerator PlayGrabAndUnlock()
+    private IEnumerator PlayGrabAndCollect()
     {
-        // Immediately mark as unlocked to prevent multiple interactions
-        hasBeenUnlocked = true;
+        // Immediately mark as collected to prevent multiple interactions
+        hasBeenCollected = true;
 
         // Hide prompt
         HidePrompt();
 
-        // Play waveform-specific grab animation if controller is assigned
+        // Play pickup-specific grab animation if controller is assigned
         if (handAnimController != null)
         {
-            handAnimController.PlayWaveformGrabAction(); // CHANGED from PlayGrabAction()
+            handAnimController.PlayPickupGrabAction(); // Uses the new pickup grab animation
         }
 
         // Wait for grab animation delay
         yield return new WaitForSeconds(grabAnimationDelay);
 
-        // Now perform unlock
-        Unlock();
+        // Now perform collection
+        CollectPickup();
     }
 
-    private void Unlock()
+    private void CollectPickup()
     {
+        // Apply energy regen boost to player
+        if (playerCombatEntity != null)
+        {
+            PlayerCharacter player = playerCombatEntity as PlayerCharacter;
+            if (player != null)
+            {
+                player.ApplyEnergyRegenBoost(energyRegenBoostAmount, boostDuration);
+            }
+            else
+            {
+                Debug.LogWarning("EnergyPickup: playerCombatEntity is not a PlayerCharacter. Energy boost will not apply.");
+            }
+        }
+
         // Play pickup sound at the object's position
         if (pickupSound != null)
         {
@@ -456,16 +447,15 @@ public class WaveformUnlock : MonoBehaviour
         CreateParticleBurst();
 
         // Start scale down (rotation will continue in Update)
-        StartCoroutine(ScaleDownAndShowInfo());
+        StartCoroutine(ScaleDownAndDestroy());
     }
-
     private void CreateParticleBurst()
     {
         if (objectRenderer == null || playerCamera == null)
             return;
 
         // Create a temporary GameObject for the particle system at the object's center
-        GameObject particleObj = new GameObject("WaveformBurstParticles");
+        GameObject particleObj = new GameObject("EnergyPickupBurstParticles");
         Vector3 burstPosition = objectRenderer.bounds.center;
         particleObj.transform.position = burstPosition;
         particleObj.transform.rotation = Quaternion.identity;
@@ -589,7 +579,7 @@ public class WaveformUnlock : MonoBehaviour
             Destroy(particleObj);
     }
 
-    private IEnumerator ScaleDownAndShowInfo()
+    private IEnumerator ScaleDownAndDestroy()
     {
         isScalingDown = true;
 
@@ -610,52 +600,25 @@ public class WaveformUnlock : MonoBehaviour
             modelTransform.localScale = targetScale;
         }
 
-        // Wait for delay before showing info panel
-        yield return new WaitForSeconds(delayBeforeInfoPanel);
-
-        // Show waveform info panel
-        ShowWaveformInfo();
-
-        // Destroy the unlock object
+        // Destroy the pickup object
         Destroy(gameObject);
-    }
-
-    private void ShowWaveformInfo()
-    {
-        Canvas canvas = FindFirstObjectByType<Canvas>();
-        if (canvas != null && waveformInfoPanelPrefab != null && infoData != null)
-        {
-            GameObject panelObj = Instantiate(waveformInfoPanelPrefab, canvas.transform);
-            WaveformInfoPanel panel = panelObj.GetComponent<WaveformInfoPanel>();
-
-            if (panel != null)
-            {
-                panel.Initialize(infoData);
-
-                // Subscribe to continue button event if you need to trigger level start
-                panel.OnContinueClicked.AddListener(OnInfoPanelClosed);
-            }
-        }
-    }
-
-    private void OnInfoPanelClosed()
-    {
-        // This is where you can trigger your level start event
-        Debug.Log($"Info panel closed for {infoData.waveformName}");
-        // Example: LevelManager.Instance.StartLevel();
     }
 
     private void OnDrawGizmosSelected()
     {
         // Visualize interaction range in editor
-        Gizmos.color = Color.yellow;
+        Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, interactionRange);
 
         // Visualize spawn particle radius
         if (isSpawned)
         {
-            Gizmos.color = Color.cyan;
+            Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(transform.position, spawnParticleRadius);
         }
+
+        // Visualize rotation ramp distance
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, rotationRampDistance);
     }
 }

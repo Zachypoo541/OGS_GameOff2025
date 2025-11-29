@@ -35,6 +35,7 @@ Transform:
   - {fileID: 7054419513934335895}
   - {fileID: 6623418141131111855}
   - {fileID: 7178426795316992625}
+  - {fileID: 948511730991475483}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &4533455389107496042
@@ -89,7 +90,8 @@ MonoBehaviour:
   detectionRange: 320
   aimHeightOffset: -1
   energyPickupPrefab: {fileID: 0}
-  dropChance: 0.7
+  dropChance: 0
+  pickupSpawnPoint: {fileID: 948511730991475483}
   attackIndicatorPrefab: {fileID: 6164680634676455470}
   attackIndicatorSprite: {fileID: 21300000, guid: 1a0eb7306f286bc458457d9558565422, type: 3}
   attackIndicatorColor: {r: 1, g: 0, b: 0, a: 1}
@@ -193,6 +195,37 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 3.258, z: 0.021}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3667757875513446318}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7057311065234419732
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 948511730991475483}
+  m_Layer: 7
+  m_Name: PickupSpawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &948511730991475483
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7057311065234419732}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 2.65, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

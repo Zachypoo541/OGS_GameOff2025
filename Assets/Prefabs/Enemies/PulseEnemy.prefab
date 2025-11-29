@@ -31,6 +31,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7246700864745825256}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6536765377175020824
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 931826983632704141}
+  m_Layer: 7
+  m_Name: PickupSpawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &931826983632704141
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6536765377175020824}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7246700864745825256}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7327358941035645116
 GameObject:
   m_ObjectHideFlags: 0
@@ -66,6 +97,7 @@ Transform:
   - {fileID: 608079375915348522}
   - {fileID: 87146870459353030}
   - {fileID: 7561780684961149040}
+  - {fileID: 931826983632704141}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!135 &5387700145548018359
@@ -120,7 +152,8 @@ MonoBehaviour:
   detectionRange: 75
   aimHeightOffset: 1
   energyPickupPrefab: {fileID: 0}
-  dropChance: 0.7
+  dropChance: 0
+  pickupSpawnPoint: {fileID: 931826983632704141}
   attackIndicatorPrefab: {fileID: 7392259308721087985}
   attackIndicatorSprite: {fileID: 21300000, guid: 53369bbc6f722c543be0097e9d0b928b, type: 3}
   attackIndicatorColor: {r: 0, g: 1, b: 0, a: 1}

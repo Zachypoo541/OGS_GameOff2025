@@ -947,10 +947,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rightHandPlayer: {fileID: 7206680863368340230}
   leftHandPlayer: {fileID: 7693210391658583198}
-  leftHandGrab: {fileID: 32900000, guid: c9e76c4cff146d64da2e1a618f68bae8, type: 3}
+  leftHandWaveformGrab: {fileID: 32900000, guid: c9e76c4cff146d64da2e1a618f68bae8, type: 3}
+  leftHandPickupGrab: {fileID: 32900000, guid: 3010ae7ef5db44643ba12debe4cadaf3, type: 3}
   leftHandButton: {fileID: 32900000, guid: b1eafae7aa7c9664aac18067e154251d, type: 3}
   leftHandCounter: {fileID: 32900000, guid: ba73f71d503ccfd49a14959a8192a92e, type: 3}
-  grabSpeed: 1
+  waveformGrabSpeed: 1
+  pickupGrabSpeed: 1
   buttonSpeed: 1
   counterSpeed: 1
   enableDebugLogs: 0

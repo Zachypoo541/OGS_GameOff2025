@@ -255,6 +255,20 @@ public class SpawnController : MonoBehaviour
         GameObject enemy = Instantiate(entry.enemyPrefab, spawnPosition, spawnRotation, enemyContainer);
         activeEnemies.Add(enemy);
 
+        // Apply drop override if enabled
+        if (entry.useDropOverride)
+        {
+            EnemyAI enemyAI = enemy.GetComponent<EnemyAI>();
+            if (enemyAI != null)
+            {
+                enemyAI.SetDropOverride(entry.overrideDropPrefab, entry.overrideDropChance);
+            }
+            else
+            {
+                Debug.LogWarning($"SpawnController: Enemy {enemy.name} does not have EnemyAI component, cannot apply drop override!");
+            }
+        }
+
         // Subscribe to enemy death event
         CombatEntity combatEntity = enemy.GetComponent<CombatEntity>();
         if (combatEntity != null)

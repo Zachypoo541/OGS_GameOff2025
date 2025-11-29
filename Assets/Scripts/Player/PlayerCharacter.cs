@@ -284,6 +284,32 @@ public class PlayerCharacter : CombatEntity, ICharacterController
         base.TakeDamage(amount, attacker);
     }
 
+    /// <summary>
+    /// Apply a temporary energy regeneration boost
+    /// </summary>
+    public void ApplyEnergyRegenBoost(float boostAmount, float duration)
+    {
+        StartCoroutine(EnergyRegenBoostCoroutine(boostAmount, duration));
+    }
+
+    private System.Collections.IEnumerator EnergyRegenBoostCoroutine(float boostAmount, float duration)
+    {
+        // Store original regen rate
+        float originalRegenRate = baseEnergyRegenRate;
+
+        // Apply boost
+        baseEnergyRegenRate += boostAmount;
+
+        Debug.Log($"Energy regen boosted! {originalRegenRate} -> {baseEnergyRegenRate} for {duration} seconds");
+
+        // Wait for duration
+        yield return new WaitForSeconds(duration);
+
+        // Restore original regen rate
+        baseEnergyRegenRate = originalRegenRate;
+        Debug.Log($"Energy regen boost expired. Restored to {originalRegenRate}");
+    }
+
     protected override float GetEnergyRegenRate()
     {
         float baseRegen = base.GetEnergyRegenRate();

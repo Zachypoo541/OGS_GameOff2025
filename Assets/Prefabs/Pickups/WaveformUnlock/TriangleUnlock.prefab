@@ -46,8 +46,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   infoData: {fileID: 11400000, guid: 45e9d44ae30dca44eb07302b7cf26071, type: 2}
-  interactionRange: 3
-  viewAngleThreshold: 0.3
+  interactionRange: 4
+  viewAngleThreshold: 0.7
   interactionKey: 103
   interactionPromptText: Press G to Synthesize Triangle Wave
   pickupSound: {fileID: 8300000, guid: 93a5bda832283e1498b1ab09e7398dcf, type: 3}
