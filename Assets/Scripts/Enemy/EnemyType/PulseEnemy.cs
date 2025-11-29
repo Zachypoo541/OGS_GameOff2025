@@ -105,7 +105,8 @@ public class PulseEnemy : EnemyAI
         // Fire staggered projectiles
         if (projectilesRemaining > 0 && Time.time >= nextProjectileTime)
         {
-            Vector3 direction = (player.position - transform.position).normalized;
+            // FIXED: Use GetAimPosition() instead of player.position directly
+            Vector3 direction = (GetAimPosition() - transform.position).normalized;
             FireProjectile(direction);
 
             projectilesRemaining--;

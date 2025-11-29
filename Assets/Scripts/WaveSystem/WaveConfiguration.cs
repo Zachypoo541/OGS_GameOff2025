@@ -25,7 +25,7 @@ public class WaveConfiguration : ScriptableObject
 
     [Tooltip("Delay before next wave starts (0 = immediate)")]
     [Min(0f)]
-    public float delayBeforeNextWave = 2f;
+    public float delayBeforeNextWave = 1.5f;
 
     [Header("Optional Audio")]
     [Tooltip("Music or audio that plays when this wave starts")]

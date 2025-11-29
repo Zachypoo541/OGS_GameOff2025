@@ -539,8 +539,8 @@ MonoBehaviour:
   deathSoundVolume: 0.7
   maxHealth: 100
   currentHealth: 100
-  maxEnergy: 10000
-  currentEnergy: 10000
+  maxEnergy: 100
+  currentEnergy: 100
   baseEnergyRegenRate: 10
   equippedWaveform: {fileID: 0}
   projectileSpawnPoint: {fileID: 6213082776322981998}
@@ -627,7 +627,7 @@ MonoBehaviour:
   maxAimDistance: 1000
   aimRaycastMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 403
 --- !u!114 &9174459494521400922
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -685,10 +685,6 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 1230314146162917259, guid: c3756b3e8c41a584f8e49a5fff1c7cbe, type: 3}
-      propertyPath: waveformAnimation
-      value: 
-      objectReference: {fileID: 141724816452768721}
     - target: {fileID: 1385515099531622043, guid: c3756b3e8c41a584f8e49a5fff1c7cbe, type: 3}
       propertyPath: m_Layer
       value: 5
@@ -859,17 +855,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c3756b3e8c41a584f8e49a5fff1c7cbe, type: 3}
---- !u!114 &141724816452768721 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8901826745595983752, guid: c3756b3e8c41a584f8e49a5fff1c7cbe, type: 3}
-  m_PrefabInstance: {fileID: 8826533804309455961}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fdf1ec1664dfa3c49b4705a3b7e42841, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &7710825128209563514 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1260021785529785123, guid: c3756b3e8c41a584f8e49a5fff1c7cbe, type: 3}

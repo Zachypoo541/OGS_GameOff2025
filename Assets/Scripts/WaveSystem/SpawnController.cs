@@ -33,6 +33,7 @@ public class SpawnController : MonoBehaviour
     private int currentWaveIndex = 0;
     private List<GameObject> activeEnemies = new List<GameObject>();
     private bool isSpawning = false;
+    private bool waveCompleting = false;  // NEW: Prevents multiple wave completions
     private Coroutine pendingWaveStartCoroutine = null;
 
     // Cache of spawn points by ID for fast lookup
@@ -117,6 +118,8 @@ public class SpawnController : MonoBehaviour
         }
 
         currentWaveIndex = waveIndex;
+        isSpawning = true;
+        waveCompleting = false;  // NEW: Reset the flag when starting a new wave
         WaveConfiguration wave = currentArena.GetWave(waveIndex);
         StartCoroutine(SpawnWaveCoroutine(wave));
     }
@@ -131,7 +134,7 @@ public class SpawnController : MonoBehaviour
         // Safety check to prevent starting waves that don't exist
         if (nextWaveIndex >= currentArena.GetWaveCount())
         {
-            Debug.LogWarning($"SpawnController: Cannot start wave {nextWaveIndex}, arena only has {currentArena.GetWaveCount()} waves. Arena should be complete.");
+            Debug.LogWarning($"SpawnController: Cannot start wave {nextWaveIndex + 1}, arena only has {currentArena.GetWaveCount()} waves. Arena should be complete.");
             return;
         }
 
@@ -143,7 +146,7 @@ public class SpawnController : MonoBehaviour
     /// </summary>
     private IEnumerator SpawnWaveCoroutine(WaveConfiguration wave)
     {
-        isSpawning = true;
+        // Note: isSpawning is now set in StartWave() before this coroutine starts
 
         // Play wave announcement sound
         if (wave.waveAnnouncementSound != null)
@@ -272,8 +275,10 @@ public class SpawnController : MonoBehaviour
         activeEnemies.Remove(enemy);
 
         // Check if wave is complete
-        if (activeEnemies.Count == 0 && !isSpawning)
+        // NEW: Added waveCompleting check to prevent multiple completions
+        if (activeEnemies.Count == 0 && !isSpawning && !waveCompleting)
         {
+            waveCompleting = true;  // NEW: Set flag immediately to prevent re-entry
             OnWaveComplete();
         }
     }

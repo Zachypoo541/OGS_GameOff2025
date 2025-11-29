@@ -18,7 +18,7 @@ MonoBehaviour:
   isHitscan: 0
   hitscanRange: 100
   baseDamage: 10
-  energyCost: 10
+  energyCost: 8
   projectileSpeed: 60
   projectilePrefab: {fileID: 8115411382015281130, guid: a8fe23f536355134984809fef988e81d, type: 3}
   knockbackForce: 0

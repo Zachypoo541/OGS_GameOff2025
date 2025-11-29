@@ -32,6 +32,6 @@ MonoBehaviour:
     groupName: 
     spawnSound: {fileID: 0}
   autoStartNextWave: 1
-  delayBeforeNextWave: 2
+  delayBeforeNextWave: 1.5
   waveMusic: {fileID: 0}
   waveAnnouncementSound: {fileID: 0}
