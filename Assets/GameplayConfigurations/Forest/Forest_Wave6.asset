@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   waveNumber: 6
   waveDescription: 
+  playerWaveStartID: SP_17
   spawnGroups:
   - delayBeforeSpawn: 0
     spawnEntries:

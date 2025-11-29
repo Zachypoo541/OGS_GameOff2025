@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   waveNumber: 2
   waveDescription: 
+  playerWaveStartID: SquareUnlockSpawn
   spawnGroups:
   - delayBeforeSpawn: 0
     spawnEntries:
@@ -23,12 +24,18 @@ MonoBehaviour:
       useRandomSpread: 0
       spreadRadius: 0
       spawnInterval: 0
+      overrideDropPrefab: {fileID: 0}
+      overrideDropChance: 0.5
+      useDropOverride: 0
     - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
       count: 1
       spawnPointID: SP_3
       useRandomSpread: 0
       spreadRadius: 0
       spawnInterval: 0
+      overrideDropPrefab: {fileID: 0}
+      overrideDropChance: 0.5
+      useDropOverride: 0
     groupName: 
     spawnSound: {fileID: 0}
   autoStartNextWave: 1

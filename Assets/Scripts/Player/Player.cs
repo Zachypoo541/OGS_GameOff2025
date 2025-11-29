@@ -12,6 +12,8 @@ public class Player : MonoBehaviour
     [Header("Debug")]
     [SerializeField] private bool debugInput = false;
 
+    private bool inputEnabled = true;
+    private bool isPaused = false;
     private PlayerInputActions _inputActions;
 
     void Awake()
@@ -60,11 +62,24 @@ public class Player : MonoBehaviour
         {
             Instance = null;
         }
-        _inputActions?.Dispose();
+
+        // Properly cleanup input actions
+        if (_inputActions != null)
+        {
+            _inputActions.Disable();
+            _inputActions.Dispose();
+            _inputActions = null;
+        }
     }
 
     void Update()
     {
+        // Early exit if input is disabled or game is paused
+        if (!inputEnabled || isPaused)
+        {
+            return;
+        }
+
         var input = _inputActions.Gameplay;
         var deltaTime = Time.deltaTime;
 
@@ -116,7 +131,7 @@ public class Player : MonoBehaviour
             Wave1 = input.Wave1.WasPressedThisFrame(),
             Wave2 = input.Wave2.WasPressedThisFrame(),
             Wave3 = input.Wave3.WasPressedThisFrame(),
-            Wave4 = input.Wave4.WasPressedThisFrame() 
+            Wave4 = input.Wave4.WasPressedThisFrame()
         };
         playerCharacter.UpdateCombatInput(combatInput);
 
@@ -149,5 +164,47 @@ public class Player : MonoBehaviour
     public void TriggerCameraShake(float intensity)
     {
         playerCamera.AddCameraShake(intensity);
+    }
+
+    public PlayerCharacter GetPlayerCharacter()
+    {
+        return playerCharacter;
+    }
+
+    public void SetInputEnabled(bool enabled)
+    {
+        inputEnabled = enabled;
+
+        if (!enabled)
+        {
+            Debug.Log("Player input disabled");
+        }
+        else
+        {
+            Debug.Log("Player input enabled");
+        }
+    }
+
+    public void SetPaused(bool paused)
+    {
+        isPaused = paused;
+
+        if (paused)
+        {
+            Debug.Log("Player paused");
+        }
+        else
+        {
+            Debug.Log("Player unpaused");
+        }
+    }
+
+    public void CleanupInputActions()
+    {
+        if (_inputActions != null)
+        {
+            _inputActions.Disable();
+            Debug.Log("Player: Input actions disabled for scene cleanup");
+        }
     }
 }

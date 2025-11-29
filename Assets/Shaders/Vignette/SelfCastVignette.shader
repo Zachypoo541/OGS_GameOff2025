@@ -12,6 +12,7 @@ Shader "Custom/SelfCastGlowingBorder"
         _GlowIntensity ("Glow Intensity", Range(0, 2)) = 1.5
         _PulseSpeed ("Pulse Speed", Float) = 2.0
         _PulseAmount ("Pulse Amount", Range(0, 1)) = 0.2
+        _MainTex ("Texture", 2D) = "white" {}
     }
     
     SubShader

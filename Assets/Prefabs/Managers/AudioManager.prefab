@@ -51,7 +51,7 @@ MonoBehaviour:
   sampleSize: 1024
   useBassReactivity: 1
   bassParameter: 1
-  bassMinValue: 3
+  bassMinValue: 5
   bassMaxValue: 75
   bassSensitivity: 100
   useMidReactivity: 1

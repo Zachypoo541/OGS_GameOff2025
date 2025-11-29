@@ -27,5 +27,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ddd4a32b58974e047a9a6fbe895bb99d, type: 2}
   arenaSceneName: 
   spawnPointGroupTag: 
-  nextArena: {fileID: 0}
+  nextArena: {fileID: 11400000, guid: cdc187875dd6f4448a20d47206ffd1eb, type: 2}
   completionRewards: []

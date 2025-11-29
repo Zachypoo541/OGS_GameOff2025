@@ -331,6 +331,16 @@ public class PlayerCharacter : CombatEntity, ICharacterController
     {
         base.Die();
         Debug.Log("Player died!");
+
+        // Notify GameStateManager of player death
+        if (GameStateManager.Instance != null)
+        {
+            GameStateManager.Instance.OnPlayerDeath();
+        }
+        else
+        {
+            Debug.LogError("PlayerCharacter: GameStateManager.Instance is null! Cannot trigger death sequence.");
+        }
     }
 
     public Transform GetCameraTarget() => cameraTarget;

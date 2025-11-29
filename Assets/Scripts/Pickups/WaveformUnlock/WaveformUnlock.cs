@@ -57,6 +57,7 @@ public class WaveformUnlock : MonoBehaviour
 
     private Transform playerTransform;
     private Camera playerCamera;
+    private Canvas mainUICanvas; // Cached reference to main UI canvas (not DeathUICanvas)
     private InteractionPrompt currentPrompt;
     private bool hasBeenUnlocked = false;
     private bool isPlayerInRange = false;
@@ -78,11 +79,37 @@ public class WaveformUnlock : MonoBehaviour
             if (playerCamera == null)
                 Debug.LogError("Camera.main not found! Tag your camera with 'MainCamera'");
 
-            // Find HandAnimationController on player's Canvas
-            Canvas playerCanvas = player.GetComponentInChildren<Canvas>();
-            if (playerCanvas != null)
+            // Find the MAIN Canvas (not DeathUICanvas)
+            Canvas[] allCanvases = player.GetComponentsInChildren<Canvas>(true);
+            foreach (Canvas canvas in allCanvases)
             {
-                handAnimController = playerCanvas.GetComponent<HandAnimationController>();
+                if (!canvas.name.Contains("DeathUI"))
+                {
+                    mainUICanvas = canvas;
+                    Debug.Log($"WaveformUnlock: Found main UI canvas: {canvas.name}");
+                    break;
+                }
+            }
+
+            if (mainUICanvas == null)
+            {
+                // Fallback: search entire scene
+                Canvas[] sceneCanvases = FindObjectsByType<Canvas>(FindObjectsSortMode.None);
+                foreach (Canvas canvas in sceneCanvases)
+                {
+                    if (!canvas.name.Contains("DeathUI"))
+                    {
+                        mainUICanvas = canvas;
+                        Debug.Log($"WaveformUnlock: Found canvas in scene: {canvas.name}");
+                        break;
+                    }
+                }
+            }
+
+            // Find HandAnimationController on player's Canvas (use mainUICanvas)
+            if (mainUICanvas != null)
+            {
+                handAnimController = mainUICanvas.GetComponent<HandAnimationController>();
             }
         }
 
@@ -392,11 +419,9 @@ public class WaveformUnlock : MonoBehaviour
     {
         if (currentPrompt == null)
         {
-            Canvas canvas = FindFirstObjectByType<Canvas>();
-
-            if (canvas != null && interactionPromptPrefab != null)
+            if (mainUICanvas != null && interactionPromptPrefab != null)
             {
-                GameObject promptObj = Instantiate(interactionPromptPrefab, canvas.transform);
+                GameObject promptObj = Instantiate(interactionPromptPrefab, mainUICanvas.transform);
                 currentPrompt = promptObj.GetComponent<InteractionPrompt>();
 
                 if (currentPrompt != null)
@@ -622,19 +647,20 @@ public class WaveformUnlock : MonoBehaviour
 
     private void ShowWaveformInfo()
     {
-        Canvas canvas = FindFirstObjectByType<Canvas>();
-        if (canvas != null && waveformInfoPanelPrefab != null && infoData != null)
+        if (mainUICanvas != null && waveformInfoPanelPrefab != null && infoData != null)
         {
-            GameObject panelObj = Instantiate(waveformInfoPanelPrefab, canvas.transform);
+            GameObject panelObj = Instantiate(waveformInfoPanelPrefab, mainUICanvas.transform);
             WaveformInfoPanel panel = panelObj.GetComponent<WaveformInfoPanel>();
 
             if (panel != null)
             {
                 panel.Initialize(infoData);
-
-                // Subscribe to continue button event if you need to trigger level start
                 panel.OnContinueClicked.AddListener(OnInfoPanelClosed);
             }
+        }
+        else if (mainUICanvas == null)
+        {
+            Debug.LogError("WaveformUnlock: mainUICanvas is null! Cannot show info panel.");
         }
     }
 
