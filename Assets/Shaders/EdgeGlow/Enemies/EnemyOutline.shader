@@ -129,8 +129,12 @@ Shader "Custom/EnemyOutline"
                 // Apply fog
                 color.rgb = MixFog(color.rgb, input.fogCoord);
                 
-                // Safety clamp to ensure we never go completely black
-                color.rgb = max(color.rgb, float3(0.1, 0.1, 0.1) * _Color.rgb);
+                // MODIFIED: Only apply safety clamp when alpha is above a threshold
+                // This allows proper fade-out during death while keeping normal visibility
+                if (_Color.a > 0.1)
+                {
+                    color.rgb = max(color.rgb, float3(0.1, 0.1, 0.1) * _Color.rgb);
+                }
                 
                 // Add emission for glow effect
                 color.rgb += _EmissionColor.rgb * _EmissionStrength;

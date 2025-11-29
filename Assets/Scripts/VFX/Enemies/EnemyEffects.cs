@@ -19,6 +19,12 @@ public class EnemyEffects : MonoBehaviour
     [SerializeField]
     [Tooltip("How close particles get to center before being destroyed")]
     private float spawnParticleDestructionRadius = 0.5f;
+    [SerializeField]
+    [Tooltip("Offset from enemy position where spawn particles originate")]
+    private Vector3 spawnParticleOriginOffset = Vector3.zero;
+    [SerializeField]
+    [Tooltip("Target position offset where spawn particles converge (relative to enemy position)")]
+    private Vector3 spawnParticleTargetOffset = Vector3.zero;
 
     [Header("Hit Effect Settings")]
     [SerializeField] private float hitFlashDuration = 0.15f;
@@ -37,6 +43,9 @@ public class EnemyEffects : MonoBehaviour
     [Tooltip("How far from center death particles start spawning")]
     private float deathParticleStartRadius = 0.5f;
     [SerializeField]
+    [Tooltip("Offset from enemy position where death particles originate")]
+    private Vector3 deathParticleOriginOffset = Vector3.zero;
+    [SerializeField]
     [Tooltip("How quickly enemy turns white (as % of death duration, 0.1 = 10% of duration)")]
     [Range(0.05f, 0.5f)]
     private float whiteFlashSpeed = 0.15f;
@@ -44,6 +53,9 @@ public class EnemyEffects : MonoBehaviour
     [Tooltip("Glow intensity during death (higher = brighter glow)")]
     [Range(0f, 5f)]
     private float deathGlowIntensity = 2f;
+    [SerializeField]
+    [Tooltip("Enable debug logging for death effect")]
+    private bool debugDeathEffect = false;
 
     [Header("Material Settings")]
     [SerializeField] private Renderer enemyRenderer;
@@ -54,6 +66,7 @@ public class EnemyEffects : MonoBehaviour
     private CombatEntity combatEntity;
     private bool isSpawning = false;
     private bool isDying = false;
+    private bool deathAnimationComplete = false;
     private Coroutine currentHitFlash;
 
     // Public property to check if spawn effect is complete
@@ -61,6 +74,9 @@ public class EnemyEffects : MonoBehaviour
 
     // Public property to check if enemy is dying
     public bool IsDying => isDying;
+
+    // Public property to check if death animation is complete
+    public bool IsDeathAnimationComplete => deathAnimationComplete;
 
     private void Awake()
     {
@@ -83,6 +99,28 @@ public class EnemyEffects : MonoBehaviour
         {
             enemyMaterial = enemyRenderer.material;
             originalColor = enemyMaterial.GetColor("_Color");
+
+            // Check if material supports transparency
+            if (debugDeathEffect)
+            {
+                Debug.Log($"{gameObject.name}: Material shader: {enemyMaterial.shader.name}");
+                Debug.Log($"{gameObject.name}: Material name: {enemyMaterial.name}");
+                Debug.Log($"{gameObject.name}: Original color: {originalColor}");
+                Debug.Log($"{gameObject.name}: Original color alpha: {originalColor.a}");
+                Debug.Log($"{gameObject.name}: Render queue: {enemyMaterial.renderQueue}");
+                Debug.Log($"{gameObject.name}: Renderer enabled: {enemyRenderer.enabled}");
+                Debug.Log($"{gameObject.name}: GameObject active: {gameObject.activeSelf}");
+
+                // Check all material properties
+                if (enemyMaterial.HasProperty("_TintColor"))
+                {
+                    Debug.Log($"{gameObject.name}: Tint Color: {enemyMaterial.GetColor("_TintColor")}");
+                }
+                if (enemyMaterial.HasProperty("_TintStrength"))
+                {
+                    Debug.Log($"{gameObject.name}: Tint Strength: {enemyMaterial.GetFloat("_TintStrength")}");
+                }
+            }
         }
     }
 
@@ -144,14 +182,18 @@ public class EnemyEffects : MonoBehaviour
         // Start enemy fully transparent
         SetEnemyAlpha(0f);
 
+        // Calculate actual origin and target positions
+        Vector3 effectOrigin = transform.position + spawnParticleOriginOffset;
+        Vector3 targetPosition = transform.position + spawnParticleTargetOffset;
+
         // Spawn particles if prefab exists
         if (spawnParticlePrefab != null)
         {
             for (int i = 0; i < spawnParticleCount; i++)
             {
-                // Generate random position on a sphere around the enemy
+                // Generate random position on a sphere around the origin
                 Vector3 randomDirection = Random.onUnitSphere;
-                Vector3 spawnPos = transform.position + (randomDirection * spawnRadius);
+                Vector3 spawnPos = effectOrigin + (randomDirection * spawnRadius);
 
                 GameObject particle = Instantiate(spawnParticlePrefab, spawnPos, Quaternion.identity);
                 SpawnParticle particleScript = particle.GetComponent<SpawnParticle>();
@@ -162,7 +204,7 @@ public class EnemyEffects : MonoBehaviour
                 }
 
                 particleScript.Initialize(
-                    transform.position,
+                    targetPosition,
                     spawnParticleSprite,
                     spawnParticleColor,
                     spawnDuration,
@@ -224,6 +266,14 @@ public class EnemyEffects : MonoBehaviour
     {
         isDying = true;
 
+        if (debugDeathEffect)
+        {
+            Debug.Log($"{gameObject.name}: Starting death effect. Material: {enemyMaterial.shader.name}");
+        }
+
+        // Calculate actual origin position for death particles
+        Vector3 effectOrigin = transform.position + deathParticleOriginOffset;
+
         // Spawn death particles if prefab exists
         if (deathParticlePrefab != null)
         {
@@ -232,8 +282,8 @@ public class EnemyEffects : MonoBehaviour
                 // Generate random direction on a sphere for full 3D explosion effect
                 Vector3 direction = Random.onUnitSphere;
 
-                // Spawn particles offset from center by the start radius
-                Vector3 spawnPosition = transform.position + (direction * deathParticleStartRadius);
+                // Spawn particles offset from origin by the start radius
+                Vector3 spawnPosition = effectOrigin + (direction * deathParticleStartRadius);
 
                 GameObject particle = Instantiate(deathParticlePrefab, spawnPosition, Quaternion.identity);
                 DeathParticle particleScript = particle.GetComponent<DeathParticle>();
@@ -258,6 +308,11 @@ public class EnemyEffects : MonoBehaviour
         float whiteFadeDuration = deathDuration * whiteFlashSpeed;
         float elapsed = 0f;
 
+        if (debugDeathEffect)
+        {
+            Debug.Log($"{gameObject.name}: Phase 1 - Fading to white over {whiteFadeDuration}s");
+        }
+
         while (elapsed < whiteFadeDuration)
         {
             elapsed += Time.deltaTime;
@@ -270,9 +325,16 @@ public class EnemyEffects : MonoBehaviour
             if (enemyMaterial != null)
             {
                 enemyMaterial.SetColor("_Color", deathColor);
-                // Ramp up emission as we get whiter
-                enemyMaterial.SetColor("_EmissionColor", Color.white);
-                enemyMaterial.SetFloat("_EmissionStrength", progress * deathGlowIntensity);
+
+                // Set emission if the material supports it
+                if (enemyMaterial.HasProperty("_EmissionColor"))
+                {
+                    enemyMaterial.SetColor("_EmissionColor", Color.white);
+                }
+                if (enemyMaterial.HasProperty("_EmissionStrength"))
+                {
+                    enemyMaterial.SetFloat("_EmissionStrength", progress * deathGlowIntensity);
+                }
             }
 
             yield return null;
@@ -284,13 +346,31 @@ public class EnemyEffects : MonoBehaviour
             Color whiteColor = Color.white;
             whiteColor.a = 1f;
             enemyMaterial.SetColor("_Color", whiteColor);
-            enemyMaterial.SetColor("_EmissionColor", Color.white);
-            enemyMaterial.SetFloat("_EmissionStrength", deathGlowIntensity);
+
+            if (enemyMaterial.HasProperty("_EmissionColor"))
+            {
+                enemyMaterial.SetColor("_EmissionColor", Color.white);
+            }
+            if (enemyMaterial.HasProperty("_EmissionStrength"))
+            {
+                enemyMaterial.SetFloat("_EmissionStrength", deathGlowIntensity);
+            }
+
+            if (debugDeathEffect)
+            {
+                Color currentColor = enemyMaterial.GetColor("_Color");
+                Debug.Log($"{gameObject.name}: End of Phase 1 - Color: {currentColor}, Alpha: {currentColor.a}");
+            }
         }
 
         // Phase 2: Fade out opacity while staying white and glowing
         float fadeOutDuration = deathDuration - whiteFadeDuration;
         elapsed = 0f;
+
+        if (debugDeathEffect)
+        {
+            Debug.Log($"{gameObject.name}: Phase 2 - Fading out opacity over {fadeOutDuration}s");
+        }
 
         while (elapsed < fadeOutDuration)
         {
@@ -305,20 +385,48 @@ public class EnemyEffects : MonoBehaviour
                 Color whiteColor = Color.white;
                 whiteColor.a = alpha;
                 enemyMaterial.SetColor("_Color", whiteColor);
+
                 // Keep emission at full intensity during fade out
-                enemyMaterial.SetFloat("_EmissionStrength", deathGlowIntensity);
+                if (enemyMaterial.HasProperty("_EmissionStrength"))
+                {
+                    enemyMaterial.SetFloat("_EmissionStrength", deathGlowIntensity);
+                }
+
+                if (debugDeathEffect && (int)(elapsed * 10) % 2 == 0) // Log every ~0.2 seconds
+                {
+                    Color currentColor = enemyMaterial.GetColor("_Color");
+                    Debug.Log($"{gameObject.name}: Fading - Progress: {progress:F2}, Alpha: {alpha:F2}, Actual Alpha: {currentColor.a:F2}");
+                    Debug.Log($"{gameObject.name}: Renderer enabled: {enemyRenderer.enabled}, GameObject active: {gameObject.activeSelf}");
+                }
             }
 
             yield return null;
         }
 
+        if (debugDeathEffect)
+        {
+            Color finalColor = enemyMaterial.GetColor("_Color");
+            Debug.Log($"{gameObject.name}: Death effect complete - Final alpha: {finalColor.a}");
+        }
+
         // Reset emission
         if (enemyMaterial != null)
         {
-            enemyMaterial.SetFloat("_EmissionStrength", 0f);
+            if (enemyMaterial.HasProperty("_EmissionStrength"))
+            {
+                enemyMaterial.SetFloat("_EmissionStrength", 0f);
+            }
         }
 
         SetEnemyAlpha(0f);
+
+        // Mark death animation as complete
+        deathAnimationComplete = true;
+
+        if (debugDeathEffect)
+        {
+            Debug.Log($"{gameObject.name}: Death animation marked as complete. Safe to destroy now.");
+        }
     }
 
     private void SetEnemyAlpha(float alpha)

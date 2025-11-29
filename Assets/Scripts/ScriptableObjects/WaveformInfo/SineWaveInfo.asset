@@ -20,5 +20,5 @@ MonoBehaviour:
   shootDetailsText: Low energy cost, ineffective against green enemies
   damageLevel: 0
   projectileType: 0
-  selfCastEffect: Reduces gravity and directional acceleration on self
+  selfCastEffect: Reduces gravity
   counterEffect: Burst of healing

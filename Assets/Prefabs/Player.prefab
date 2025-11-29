@@ -531,6 +531,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0825f1e804ee2844ba86f57813ab6fc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isPlayer: 1
+  genericHitSound: {fileID: 8300000, guid: 15b7a4657c72cb948a2533973c5e13c2, type: 3}
+  hitSoundVolume: 1
+  hitSoundPitchRange: {x: 0.95, y: 1.05}
+  deathSound: {fileID: 0}
+  deathSoundVolume: 0.7
   maxHealth: 100
   currentHealth: 100
   maxEnergy: 10000

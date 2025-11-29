@@ -79,6 +79,36 @@ public class WaveformData : ScriptableObject
     public float decalSize = 0.5f; // Size of the decal
     public float decalLifetime = 10f; // How long the decal lasts before fading
 
+    [Header("Audio")]
+    public AudioClip fireSound;
+    [Range(0f, 1f)] public float fireSoundVolume = 0.7f;
+    public Vector2 fireSoundPitchRange = new Vector2(0.95f, 1.05f);
+
+    public AudioClip impactSound;
+    [Range(0f, 1f)] public float impactSoundVolume = 0.6f;
+    public Vector2 impactSoundPitchRange = new Vector2(0.9f, 1.1f);
+
+    [Header("Self-Cast Audio")]
+    [Tooltip("Sound played when self-cast ability activates (Sine/Saw/Triangle)")]
+    public AudioClip selfCastSound;
+    [Range(0f, 1f)] public float selfCastSoundVolume = 0.7f;
+    public Vector2 selfCastSoundPitchRange = new Vector2(0.95f, 1.05f);
+    [Tooltip("Delay before playing self-cast sound (to sync with animation)")]
+    public float selfCastSoundDelay = 0f;
+
+    [Header("Square Wave Thrust Audio")]
+    [Tooltip("Sound played once when thrust starts")]
+    public AudioClip thrustStartSound;
+    [Range(0f, 1f)] public float thrustStartVolume = 0.7f;
+
+    [Tooltip("Looping sound while thrust is held")]
+    public AudioClip thrustLoopSound;
+    [Range(0f, 1f)] public float thrustLoopVolume = 0.5f;
+
+    [Tooltip("Sound played once when thrust ends")]
+    public AudioClip thrustEndSound;
+    [Range(0f, 1f)] public float thrustEndVolume = 0.6f;
+
     [Header("Homing Settings")]
     public bool enableHoming = false;
     [Tooltip("How strongly the projectile turns towards target (radians per second)")]

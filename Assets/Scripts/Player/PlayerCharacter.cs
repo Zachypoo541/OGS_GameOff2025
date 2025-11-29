@@ -72,10 +72,16 @@ public class PlayerCharacter : CombatEntity, ICharacterController
             Debug.LogWarning("HandAnimationController not assigned in Inspector. Hand animations will not play.");
         }
 
+        SelfCastVignetteController vignetteController = GetComponentInChildren<SelfCastVignetteController>();
+        if (vignetteController == null)
+        {
+            // Try finding it in the scene
+            vignetteController = FindFirstObjectByType<SelfCastVignetteController>();
+        }
         // Initialize SelfCastController
         _selfCastController = gameObject.AddComponent<SelfCastController>();
         _selfCastController.Initialize(this, _playerLocomotion, handAnimationController,
-                                       cameraTransform, _playerInput, motor);
+                                       cameraTransform, _playerInput, motor, vignetteController);
 
         // Initialize components (note: pass selfCastController to locomotion)
         _playerCombat.Initialize(cameraTransform, reticle, _counterSystem, this, projectileSpawnPoint, handAnimationController);

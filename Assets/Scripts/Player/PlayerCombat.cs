@@ -122,6 +122,16 @@ public class PlayerCombat : MonoBehaviour
             _handAnimationController.PlayFireAnimation();
         }
 
+        if (_combatEntity.equippedWaveform != null && _combatEntity.equippedWaveform.fireSound != null)
+        {
+            SoundFXManager.instance.PlayPlayerSound(
+                _combatEntity.equippedWaveform.fireSound,
+                _combatEntity.equippedWaveform.fireSoundVolume,
+                _combatEntity.equippedWaveform.fireSoundPitchRange.x,
+                _combatEntity.equippedWaveform.fireSoundPitchRange.y
+            );
+        }
+
         float damage = _combatEntity.CalculateDamage();
         if (_counterSystem != null)
             damage *= _counterSystem.GetDamageMultiplier();

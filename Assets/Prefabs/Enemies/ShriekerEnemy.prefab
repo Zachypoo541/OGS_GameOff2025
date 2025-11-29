@@ -70,6 +70,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1874e65df9b1bfb4f87b53b13864d5c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isPlayer: 0
+  genericHitSound: {fileID: 0}
+  hitSoundVolume: 0.5
+  hitSoundPitchRange: {x: 0.95, y: 1.05}
+  deathSound: {fileID: 0}
+  deathSoundVolume: 0.7
   maxHealth: 100
   currentHealth: 100
   maxEnergy: 100
@@ -81,6 +87,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 15a84da28a63faa4f8c4d8ad11630f2c, type: 2}
   attackRange: 300
   detectionRange: 320
+  aimHeightOffset: -1
   energyPickupPrefab: {fileID: 0}
   dropChance: 0.7
   attackIndicatorPrefab: {fileID: 6164680634676455470}
@@ -110,6 +117,8 @@ MonoBehaviour:
   spawnRadius: 3
   particleSpeed: 2
   spawnParticleDestructionRadius: 0.01
+  spawnParticleOriginOffset: {x: 0, y: 0, z: 0}
+  spawnParticleTargetOffset: {x: 0, y: 0, z: 0}
   hitFlashDuration: 0.4
   hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   hitFlashCurve:
@@ -153,8 +162,10 @@ MonoBehaviour:
   deathRadius: 4
   deathParticleSpeed: 2
   deathParticleStartRadius: 0.1
+  deathParticleOriginOffset: {x: 0, y: 0, z: 0}
   whiteFlashSpeed: 0.15
   deathGlowIntensity: 2
+  debugDeathEffect: 0
   enemyRenderer: {fileID: 6562905511258221397}
 --- !u!1 &5598097636152834955
 GameObject:

@@ -49,6 +49,22 @@ MonoBehaviour:
   decalColor: {r: 1, g: 0, b: 0, a: 1}
   decalSize: 0.5
   decalLifetime: 1.5
+  fireSound: {fileID: 8300000, guid: 402865708c0695c40b0bdc158dfcf901, type: 3}
+  fireSoundVolume: 0.7
+  fireSoundPitchRange: {x: 0.95, y: 1.05}
+  impactSound: {fileID: 8300000, guid: 7056b67691cf44a4999fd4bf8c4fff66, type: 3}
+  impactSoundVolume: 0.6
+  impactSoundPitchRange: {x: 0.9, y: 1.1}
+  selfCastSound: {fileID: 8300000, guid: c4872ab52684c7344aaadec55b86f260, type: 3}
+  selfCastSoundVolume: 1
+  selfCastSoundPitchRange: {x: 0.95, y: 1.05}
+  selfCastSoundDelay: 0.15
+  thrustStartSound: {fileID: 0}
+  thrustStartVolume: 0.7
+  thrustLoopSound: {fileID: 0}
+  thrustLoopVolume: 0.5
+  thrustEndSound: {fileID: 0}
+  thrustEndVolume: 0.6
   enableHoming: 0
   homingStrength: 3
   homingRange: 20
