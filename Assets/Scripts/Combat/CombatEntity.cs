@@ -3,6 +3,18 @@ using System.Collections.Generic;
 
 public class CombatEntity : MonoBehaviour
 {
+    [Header("Audio Settings")]
+    [SerializeField] protected bool isPlayer = false;
+
+    [Header("Impact Audio")]
+    [SerializeField] protected AudioClip genericHitSound;
+    [SerializeField] protected float hitSoundVolume = 0.5f;
+    [SerializeField] protected Vector2 hitSoundPitchRange = new Vector2(0.95f, 1.05f);
+
+    [Header("Death Audio")]
+    [SerializeField] protected AudioClip deathSound;
+    [SerializeField] protected float deathSoundVolume = 0.7f;
+
     [Header("Resources")]
     public float maxHealth = 100f;
     public float currentHealth = 100f;
@@ -96,6 +108,9 @@ public class CombatEntity : MonoBehaviour
         currentHealth = Mathf.Max(currentHealth - finalDamage, 0);
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
 
+        // Play hit sound
+        PlayHitSound(sourceWaveform);
+
         if (currentHealth <= 0)
         {
             Die();
@@ -112,9 +127,41 @@ public class CombatEntity : MonoBehaviour
         currentHealth = Mathf.Max(currentHealth - finalDamage, 0);
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
 
+        // Play generic hit sound (no waveform-specific sound)
+        PlayHitSound(null);
+
         if (currentHealth <= 0)
         {
             Die();
+        }
+    }
+
+    protected virtual void PlayHitSound(WaveformData sourceWaveform)
+    {
+        // Prefer waveform-specific impact sound, fall back to generic
+        AudioClip hitClip = (sourceWaveform != null && sourceWaveform.impactSound != null)
+            ? sourceWaveform.impactSound
+            : genericHitSound;
+
+        if (hitClip == null) return;
+
+        float volume = (sourceWaveform != null && sourceWaveform.impactSound != null)
+            ? sourceWaveform.impactSoundVolume
+            : hitSoundVolume;
+
+        Vector2 pitchRange = (sourceWaveform != null && sourceWaveform.impactSound != null)
+            ? sourceWaveform.impactSoundPitchRange
+            : hitSoundPitchRange;
+
+        if (isPlayer)
+        {
+            // 2D sound for player getting hit
+            SoundFXManager.instance.PlayPlayerSound(hitClip, volume, pitchRange.x, pitchRange.y);
+        }
+        else
+        {
+            // 3D sound for enemies getting hit
+            SoundFXManager.instance.PlaySoundFXClip(hitClip, transform, volume, pitchRange.x, pitchRange.y);
         }
     }
 
@@ -126,6 +173,19 @@ public class CombatEntity : MonoBehaviour
 
     protected virtual void Die()
     {
+        // Play death sound
+        if (deathSound != null)
+        {
+            if (isPlayer)
+            {
+                SoundFXManager.instance.PlayPlayerSound(deathSound, deathSoundVolume);
+            }
+            else
+            {
+                SoundFXManager.instance.PlaySoundFXClip(deathSound, transform, deathSoundVolume);
+            }
+        }
+
         OnDeath?.Invoke();
     }
 
@@ -159,6 +219,9 @@ public class CombatEntity : MonoBehaviour
         // Consume resources
         ConsumeAttackResources();
 
+        // Play fire sound
+        PlayFireSound();
+
         // Spawn projectile
         if (equippedWaveform.projectilePrefab != null && projectileSpawnPoint != null)
         {
@@ -183,6 +246,44 @@ public class CombatEntity : MonoBehaviour
                     projectile.Initialize(damage, equippedWaveform, this, direction);
                 }
             }
+        }
+    }
+    protected virtual void PlayFireSound()
+    {
+        if (equippedWaveform == null)
+        {
+            Debug.LogWarning($"{gameObject.name}: No equipped waveform!");
+            return;
+        }
+
+        if (equippedWaveform.fireSound == null)
+        {
+            Debug.LogWarning($"{gameObject.name}: No fire sound assigned to {equippedWaveform.waveformName}!");
+            return;
+        }
+
+        Debug.Log($"{gameObject.name} firing sound: {equippedWaveform.fireSound.name}, isPlayer: {isPlayer}");
+
+        if (isPlayer)
+        {
+            // 2D sound for player
+            SoundFXManager.instance.PlayPlayerSound(
+                equippedWaveform.fireSound,
+                equippedWaveform.fireSoundVolume,
+                equippedWaveform.fireSoundPitchRange.x,
+                equippedWaveform.fireSoundPitchRange.y
+            );
+        }
+        else
+        {
+            // 3D sound for enemies
+            SoundFXManager.instance.PlaySoundFXClip(
+                equippedWaveform.fireSound,
+                transform,
+                equippedWaveform.fireSoundVolume,
+                equippedWaveform.fireSoundPitchRange.x,
+                equippedWaveform.fireSoundPitchRange.y
+            );
         }
     }
 

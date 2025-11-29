@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6067079530541300564}
   - component: {fileID: 5374314007375798462}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: SawUnlock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 603052129254724402}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.214, z: -45.31}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -50,6 +50,9 @@ MonoBehaviour:
   viewAngleThreshold: 0.3
   interactionKey: 103
   interactionPromptText: Press G to Synthesize Saw Wave
+  pickupSound: {fileID: 8300000, guid: 93a5bda832283e1498b1ab09e7398dcf, type: 3}
+  pickupSoundVolume: 0.8
+  pickupSoundPitchRange: {x: 0.95, y: 1.05}
   interactionPromptPrefab: {fileID: 6735610657792640819, guid: c940838b716003f468c0b677da3389cc, type: 3}
   waveformInfoPanelPrefab: {fileID: 634171610977420746, guid: 4c035a8ea4bcafa4b9139ea370443eb5, type: 3}
   grabAnimationDelay: 1.5
@@ -65,7 +68,13 @@ MonoBehaviour:
   particleCount: 30
   particleSpeed: 3
   particleLifetime: 10
-  delayBeforeInfoPanel: 1.5
+  particlePullDelay: 0.3
+  particlePullSpeed: 20
+  isSpawned: 0
+  spawnScaleDuration: 0.8
+  spawnParticleRadius: 3
+  spawnParticleFadeInDuration: 0.3
+  delayBeforeInfoPanel: 1
 --- !u!1 &5819835414201521089
 GameObject:
   m_ObjectHideFlags: 0
@@ -78,7 +87,7 @@ GameObject:
   - component: {fileID: 148836758141184998}
   - component: {fileID: 902595439140795036}
   - component: {fileID: 719137981270894445}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Diamond
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,7 +104,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 30, y: 30, z: 30}
+  m_LocalScale: {x: 50, y: 50, z: 50}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 6067079530541300564}

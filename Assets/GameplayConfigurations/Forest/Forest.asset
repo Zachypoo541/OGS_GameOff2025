@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1b551a655616324db5252729ba65ca9, type: 3}
+  m_Name: Forest
+  m_EditorClassIdentifier: 
+  arenaNumber: 1
+  arenaName: Forest
+  arenaDescription: 
+  waves:
+  - {fileID: 11400000, guid: fed4b54f20cbfee4887a7751fec40142, type: 2}
+  - {fileID: 11400000, guid: 642d820cf47e79d48bb774edbc98364f, type: 2}
+  - {fileID: 11400000, guid: fa005374dbf91fb4780a10e77201de64, type: 2}
+  arenaSceneName: 
+  spawnPointGroupTag: 
+  nextArena: {fileID: 0}
+  completionRewards: []

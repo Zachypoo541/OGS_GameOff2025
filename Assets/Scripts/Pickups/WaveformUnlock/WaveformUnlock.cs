@@ -12,6 +12,11 @@ public class WaveformUnlock : MonoBehaviour
     [SerializeField] private KeyCode interactionKey = KeyCode.E;
     [SerializeField] private string interactionPromptText = "Press E to Synthesize Waveform";
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip pickupSound;
+    [SerializeField] private float pickupSoundVolume = 0.8f;
+    [SerializeField] private Vector2 pickupSoundPitchRange = new Vector2(0.95f, 1.05f);
+
     [Header("UI Prefabs")]
     [SerializeField] private GameObject interactionPromptPrefab;
     [SerializeField] private GameObject waveformInfoPanelPrefab;
@@ -29,15 +34,23 @@ public class WaveformUnlock : MonoBehaviour
     [SerializeField] private float maxRotationSpeed = 180f; // Degrees per second
     [SerializeField] private float rotationRampDistance = 5f; // Distance where rotation starts ramping up
 
-    [Header("Particle Burst Settings")]
+    [Header("Particle Settings (Shared)")]
     [SerializeField] private Sprite particleSprite;
     [SerializeField] private Color particleColor = Color.white;
     [SerializeField] private float particleSize = 0.5f;
     [SerializeField] private int particleCount = 30;
     [SerializeField] private float particleSpeed = 5f;
+
+    [Header("Despawn Particle Settings")]
     [SerializeField] private float particleLifetime = 1f;
     [SerializeField] private float particlePullDelay = 0.3f; // Delay before particles start moving to camera
     [SerializeField] private float particlePullSpeed = 20f; // Speed at which particles move to camera
+
+    [Header("Spawn Effect Settings")]
+    [SerializeField] private bool isSpawned = false; // Set to true if spawned by SpawnController
+    [SerializeField] private float spawnScaleDuration = 0.8f;
+    [SerializeField] private float spawnParticleRadius = 3f; // Initial spawn radius around object
+    [SerializeField] private float spawnParticleFadeInDuration = 0.3f;
 
     [Header("Timing")]
     [SerializeField] private float delayBeforeInfoPanel = 1.5f;
@@ -50,6 +63,8 @@ public class WaveformUnlock : MonoBehaviour
     private bool isPlayerLookingAt = false;
     private Vector3 initialScale;
     private HandAnimationController handAnimController;
+    private bool isScalingDown = false;
+    private bool isFullySpawned = false;
 
     private void Start()
     {
@@ -75,16 +90,37 @@ public class WaveformUnlock : MonoBehaviour
         if (modelTransform != null)
         {
             initialScale = modelTransform.localScale;
+
+            // If this is a spawned object, start with zero scale and play spawn effect
+            if (isSpawned)
+            {
+                modelTransform.localScale = Vector3.zero;
+                StartCoroutine(PlaySpawnEffect());
+            }
+            else
+            {
+                isFullySpawned = true;
+            }
+        }
+        else
+        {
+            isFullySpawned = true;
         }
     }
 
     private void Update()
     {
-        if (hasBeenUnlocked || playerCamera == null)
+        if (playerCamera == null)
+            return;
+
+        // Always update rotation (even when unlocked or scaling down)
+        UpdateRotation();
+
+        // Only check for interaction if not unlocked, fully spawned, and not scaling down
+        if (hasBeenUnlocked || !isFullySpawned || isScalingDown)
             return;
 
         CheckPlayerProximityAndGaze();
-        UpdateRotation();
 
         if (isPlayerInRange && isPlayerLookingAt)
         {
@@ -124,6 +160,214 @@ public class WaveformUnlock : MonoBehaviour
 
         // Rotate around Y axis
         modelTransform.Rotate(0f, rotationSpeed * Time.deltaTime, 0f, Space.Self);
+    }
+
+    private IEnumerator PlaySpawnEffect()
+    {
+        // Create spawn particles that move inward
+        CreateSpawnParticles();
+
+        // Scale up the object
+        float elapsed = 0f;
+        while (elapsed < spawnScaleDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / spawnScaleDuration;
+            // Use ease-out curve for smoother spawn
+            float easedT = 1f - Mathf.Pow(1f - t, 3f);
+            modelTransform.localScale = Vector3.Lerp(Vector3.zero, initialScale, easedT);
+            yield return null;
+        }
+
+        modelTransform.localScale = initialScale;
+        isFullySpawned = true;
+    }
+
+    private void CreateSpawnParticles()
+    {
+        if (transform == null)
+        {
+            Debug.LogError("CreateSpawnParticles: transform is null!");
+            return;
+        }
+
+        // Use transform position instead of renderer bounds (which may be scaled down)
+        Vector3 centerPosition = transform.position;
+
+        // Create a temporary GameObject for the particle system
+        GameObject particleObj = new GameObject("WaveformSpawnParticles");
+        particleObj.transform.position = centerPosition;
+
+        Debug.Log($"Creating spawn particles at {centerPosition} with radius {spawnParticleRadius}");
+
+        // Add particle system component
+        ParticleSystem ps = particleObj.AddComponent<ParticleSystem>();
+
+        // STOP IT IMMEDIATELY before configuring
+        ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+
+        // Configure main module - set initial alpha to something visible
+        var main = ps.main;
+        main.loop = false;
+        main.playOnAwake = false;
+        main.duration = 5f;
+        main.startLifetime = particleSpeed > 0 ? spawnParticleRadius / particleSpeed : 3f;
+        main.startSpeed = 0f;
+        main.startSize = particleSize;
+        // Start with a visible alpha instead of 0
+        main.startColor = new Color(particleColor.r, particleColor.g, particleColor.b, particleColor.a);
+        main.simulationSpace = ParticleSystemSimulationSpace.World;
+        main.maxParticles = 1000;
+
+        // Disable emission module since we'll emit manually
+        var emission = ps.emission;
+        emission.enabled = false;
+
+        // Configure shape - spawn particles in a sphere around the object
+        var shape = ps.shape;
+        shape.enabled = true;
+        shape.shapeType = ParticleSystemShapeType.Sphere;
+        shape.radius = spawnParticleRadius;
+
+        // Configure color over lifetime for fade in effect
+        var colorOverLifetime = ps.colorOverLifetime;
+        colorOverLifetime.enabled = true;
+
+        Gradient gradient = new Gradient();
+        float lifetime = main.startLifetime.constant;
+        float fadeInRatio = Mathf.Clamp01(spawnParticleFadeInDuration / lifetime);
+
+        // Fade from transparent to full alpha
+        gradient.SetKeys(
+            new GradientColorKey[] {
+            new GradientColorKey(particleColor, 0f),
+            new GradientColorKey(particleColor, 1f)
+            },
+            new GradientAlphaKey[] {
+            new GradientAlphaKey(0f, 0f),
+            new GradientAlphaKey(particleColor.a, fadeInRatio),
+            new GradientAlphaKey(particleColor.a, 1f)
+            }
+        );
+        colorOverLifetime.color = gradient;
+
+        // Configure renderer
+        ParticleSystemRenderer renderer = ps.GetComponent<ParticleSystemRenderer>();
+        renderer.renderMode = ParticleSystemRenderMode.Billboard;
+        renderer.sortMode = ParticleSystemSortMode.Distance;
+
+        // Simple material setup
+        if (particleSprite != null)
+        {
+            Material mat = new Material(Shader.Find("Sprites/Default"));
+            mat.mainTexture = particleSprite.texture;
+            renderer.material = mat;
+            Debug.Log($"Using sprite texture: {particleSprite.name}");
+        }
+        else
+        {
+            // Use default particle material if no sprite
+            Material mat = new Material(Shader.Find("Particles/Standard Unlit"));
+            mat.color = particleColor;
+            renderer.material = mat;
+            Debug.Log("Using default particle material (no sprite assigned)");
+        }
+
+        // Play the system first
+        ps.Play(true);
+
+        // Manually emit particles - don't override the color with EmitParams
+        ps.Emit(particleCount);
+
+        Debug.Log($"Manually emitted {particleCount} particles");
+
+        // Verify emission immediately
+        StartCoroutine(DebugAndPullParticles(ps, particleObj, centerPosition));
+    }
+
+    private IEnumerator DebugAndPullParticles(ParticleSystem ps, GameObject particleObj, Vector3 centerPosition)
+    {
+        // Wait one frame for particles to be created
+        yield return null;
+
+        if (ps == null)
+        {
+            Debug.LogError("Particle system is null!");
+            if (particleObj != null)
+                Destroy(particleObj);
+            yield break;
+        }
+
+        int initialCount = ps.particleCount;
+        Debug.Log($"Particles after emit: {initialCount}");
+
+        if (initialCount == 0)
+        {
+            Debug.LogError("No particles were emitted! Something is wrong with the particle system setup.");
+            if (particleObj != null)
+                Destroy(particleObj);
+            yield break;
+        }
+
+        // Get initial particle data
+        ParticleSystem.Particle[] particles = new ParticleSystem.Particle[ps.main.maxParticles];
+        int count = ps.GetParticles(particles);
+        if (count > 0)
+        {
+            Debug.Log($"First particle - Position: {particles[0].position}, Size: {particles[0].GetCurrentSize(ps)}, Color: {particles[0].GetCurrentColor(ps)}");
+        }
+
+        // Now start pulling particles
+        float maxLifetime = ps.main.startLifetime.constant;
+        float elapsed = 0f;
+
+        Debug.Log($"Starting particle pull towards {centerPosition}");
+
+        while (elapsed < maxLifetime && ps != null)
+        {
+            int particleCount = ps.GetParticles(particles);
+
+            if (particleCount == 0)
+            {
+                Debug.Log("All particles expired");
+                break;
+            }
+
+            for (int i = 0; i < particleCount; i++)
+            {
+                Vector3 directionToCenter = (centerPosition - particles[i].position).normalized;
+                float distanceToCenter = Vector3.Distance(particles[i].position, centerPosition);
+
+                // Kill particle if very close to center
+                if (distanceToCenter < 0.1f)
+                {
+                    particles[i].remainingLifetime = 0f;
+                }
+                else
+                {
+                    // Move particle towards center
+                    particles[i].position += directionToCenter * particleSpeed * Time.deltaTime;
+                }
+            }
+
+            ps.SetParticles(particles, particleCount);
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        Debug.Log("Particle pull complete, cleaning up");
+
+        // Cleanup
+        if (ps != null)
+        {
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        }
+
+        yield return null;
+
+        if (particleObj != null)
+            Destroy(particleObj);
     }
 
     private void CheckPlayerProximityAndGaze()
@@ -196,10 +440,22 @@ public class WaveformUnlock : MonoBehaviour
 
     private void Unlock()
     {
+        // Play pickup sound at the object's position
+        if (pickupSound != null)
+        {
+            SoundFXManager.instance.PlaySoundFXClip(
+                pickupSound,
+                transform,
+                pickupSoundVolume,
+                pickupSoundPitchRange.x,
+                pickupSoundPitchRange.y
+            );
+        }
+
         // Create and play particle burst
         CreateParticleBurst();
 
-        // Start scale down
+        // Start scale down (rotation will continue in Update)
         StartCoroutine(ScaleDownAndShowInfo());
     }
 
@@ -239,7 +495,7 @@ public class WaveformUnlock : MonoBehaviour
             new ParticleSystem.Burst(0f, particleCount)
         });
 
-        // Configure shape - sphere emitting in all directions
+        // Configure shape (sphere emitting in all directions)
         var shape = ps.shape;
         shape.shapeType = ParticleSystemShapeType.Sphere;
         shape.radius = 0.1f;
@@ -249,19 +505,13 @@ public class WaveformUnlock : MonoBehaviour
         renderer.renderMode = ParticleSystemRenderMode.Billboard;
 
         // Set up material
+        Material particleMat = new Material(Shader.Find("Particles/Standard Unlit"));
         if (particleSprite != null)
         {
-            Material particleMat = new Material(Shader.Find("Particles/Standard Unlit"));
             particleMat.SetTexture("_MainTex", particleSprite.texture);
-            particleMat.SetColor("_Color", particleColor);
-            renderer.material = particleMat;
         }
-        else
-        {
-            Material particleMat = new Material(Shader.Find("Particles/Standard Unlit"));
-            particleMat.SetColor("_Color", particleColor);
-            renderer.material = particleMat;
-        }
+        particleMat.SetColor("_Color", particleColor);
+        renderer.material = particleMat;
 
         // Now play the configured system
         ps.Play();
@@ -341,7 +591,9 @@ public class WaveformUnlock : MonoBehaviour
 
     private IEnumerator ScaleDownAndShowInfo()
     {
-        // Scale down the model
+        isScalingDown = true;
+
+        // Scale down the model (rotation continues in Update)
         if (modelTransform != null)
         {
             float elapsed = 0f;
@@ -398,5 +650,12 @@ public class WaveformUnlock : MonoBehaviour
         // Visualize interaction range in editor
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, interactionRange);
+
+        // Visualize spawn particle radius
+        if (isSpawned)
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireSphere(transform.position, spawnParticleRadius);
+        }
     }
 }

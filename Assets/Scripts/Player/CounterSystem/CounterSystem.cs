@@ -91,7 +91,6 @@ public class CounterSystem : MonoBehaviour
     {
         _playerCharacter = GetComponent<PlayerCharacter>();
         SetupCounterCollider();
-        Debug.Log("[CounterSystem] Awake - System initialized");
     }
 
     private void SetupCounterCollider()
@@ -114,14 +113,11 @@ public class CounterSystem : MonoBehaviour
 
         // Initially disable it
         _counterCollider.enabled = false;
-
-        Debug.Log($"[CounterSystem] Counter collider created: Offset={counterColliderOffset}, Radius={counterColliderRadius}, Height={counterColliderHeight}, Layer={LayerMask.LayerToName(gameObject.layer)}");
     }
 
     public void Initialize(Reticle reticle)
     {
         _reticle = reticle;
-        Debug.Log("[CounterSystem] Initialize called with reticle");
     }
 
     private void Update()
@@ -135,7 +131,6 @@ public class CounterSystem : MonoBehaviour
 
             if (_counterWindowTimer <= 0f)
             {
-                Debug.Log("[CounterSystem] Counter window expired");
                 EndCounterWindow(false);
             }
         }
@@ -147,7 +142,6 @@ public class CounterSystem : MonoBehaviour
             if (_cooldownTimer <= 0f)
             {
                 _isOnCooldown = false;
-                Debug.Log("[CounterSystem] Cooldown finished");
             }
         }
 
@@ -157,7 +151,6 @@ public class CounterSystem : MonoBehaviour
 
     public void AttemptCounter()
     {
-        Debug.Log($"[CounterSystem] AttemptCounter called. IsOnCooldown={_isOnCooldown}, IsCounterActive={_isCounterActive}");
 
         if (_isOnCooldown || _isCounterActive)
             return;
@@ -170,7 +163,6 @@ public class CounterSystem : MonoBehaviour
         if (_counterCollider != null)
         {
             _counterCollider.enabled = true;
-            Debug.Log("[CounterSystem] Counter collider ENABLED");
         }
         else
         {
@@ -183,37 +175,28 @@ public class CounterSystem : MonoBehaviour
             _reticle.OnParryWindowStart();
         }
 
-        Debug.Log("Counter window opened!");
     }
 
     public bool TryCounterProjectile(WaveformProjectile projectile)
     {
-        Debug.Log($"[CounterSystem] TryCounterProjectile called. Projectile={projectile.name}, IsActive={_isCounterActive}");
 
         if (!_isCounterActive)
         {
-            Debug.Log("[CounterSystem] Counter window NOT ACTIVE - cannot counter");
             return false;
         }
 
         // Don't process the same projectile twice
         if (_processedProjectiles.Contains(projectile))
         {
-            Debug.Log("[CounterSystem] Projectile already processed");
             return false;
         }
 
-        Debug.Log($"[CounterSystem] Checking if can counter. Player waveform: {(_playerCharacter.equippedWaveform != null ? _playerCharacter.equippedWaveform.name : "NULL")}, Projectile waveform: {(projectile.Waveform != null ? projectile.Waveform.name : "NULL")}, Projectile owner: {(projectile.Owner != null ? projectile.Owner.name : "NULL")}");
-
         if (CanCounterProjectile(projectile))
         {
-            Debug.Log($"[CounterSystem] ✓ CAN COUNTER! Processing counter for {projectile.Waveform.name}");
             _processedProjectiles.Add(projectile);
             CounterProjectile(projectile);
             return true;
         }
-
-        Debug.Log("[CounterSystem] ✗ CANNOT COUNTER - conditions not met");
         return false;
     }
 
@@ -222,26 +205,21 @@ public class CounterSystem : MonoBehaviour
         // Check if player has the matching waveform equipped
         if (_playerCharacter.equippedWaveform != projectile.Waveform)
         {
-            Debug.Log($"[CounterSystem] Waveform mismatch: {_playerCharacter.equippedWaveform?.name} != {projectile.Waveform?.name}");
             return false;
         }
 
         // Don't counter own projectiles
         if (projectile.Owner == _playerCharacter)
         {
-            Debug.Log("[CounterSystem] Cannot counter own projectile");
             return false;
         }
 
-        Debug.Log("[CounterSystem] All counter conditions met!");
         return true;
     }
 
     private void CounterProjectile(WaveformProjectile projectile)
     {
         WaveformData waveformType = projectile.Waveform;
-
-        Debug.Log($"[CounterSystem] CounterProjectile executing for {waveformType.name}");
 
         // Notify reticle of successful parry
         if (_reticle != null)
@@ -251,7 +229,6 @@ public class CounterSystem : MonoBehaviour
 
         // Destroy the projectile
         Destroy(projectile.gameObject);
-        Debug.Log($"[CounterSystem] Projectile {projectile.name} destroyed");
 
         // Update stack count
         if (!_stackCounts.ContainsKey(waveformType))
@@ -292,9 +269,9 @@ public class CounterSystem : MonoBehaviour
             _stackCounts[waveformType] = 0;
         }
 
-        EndCounterWindow(true);
+        // DON'T end the counter window here - let it stay open for multiple counters!
+        // EndCounterWindow(true);  // REMOVED
 
-        Debug.Log($"[CounterSystem] ✓✓✓ COUNTER SUCCESSFUL! {waveformType.name} projectile countered! Stack count: {currentStacks}");
     }
 
     private void ApplyCounterEffect(WaveformData waveformType, int stackCount)
@@ -328,7 +305,6 @@ public class CounterSystem : MonoBehaviour
         {
             _regenRate = sineRegenRate;
             _regenEndTime = Time.time + sineRegenDuration;
-            Debug.Log($"CHROMATIC SATURATION: Regeneration Aura activated!");
         }
     }
 
@@ -342,7 +318,6 @@ public class CounterSystem : MonoBehaviour
         {
             _isReflecting = true;
             _reflectionEndTime = Time.time + squareReflectionDuration;
-            Debug.Log($"CHROMATIC SATURATION: Damage Reflection activated!");
         }
     }
 
@@ -353,7 +328,6 @@ public class CounterSystem : MonoBehaviour
         if (stackCount >= maxStacksForChromaticEffect)
         {
             _hasChainAttack = true;
-            Debug.Log($"CHROMATIC SATURATION: Chain Attack activated!");
         }
     }
 
@@ -367,7 +341,6 @@ public class CounterSystem : MonoBehaviour
             _hasUnlimitedEnergy = true;
             _unlimitedEnergyEndTime = Time.time + triangleUnlimitedEnergyDuration;
             _movementSpeedMultiplier = triangleMovementSpeedBonus;
-            Debug.Log($"CHROMATIC SATURATION: Unlimited Energy + Speed Boost activated!");
         }
     }
 
@@ -419,7 +392,6 @@ public class CounterSystem : MonoBehaviour
 
     private void EndCounterWindow(bool successful)
     {
-        Debug.Log($"[CounterSystem] EndCounterWindow called. Successful={successful}");
 
         _isCounterActive = false;
         _processedProjectiles.Clear();
@@ -428,7 +400,6 @@ public class CounterSystem : MonoBehaviour
         if (_counterCollider != null)
         {
             _counterCollider.enabled = false;
-            Debug.Log("[CounterSystem] Counter collider DISABLED");
         }
 
         // Notify reticle that parry window ended (only if not successful, as successful parry handles its own visual)
@@ -441,7 +412,6 @@ public class CounterSystem : MonoBehaviour
         {
             _isOnCooldown = true;
             _cooldownTimer = counterCooldown;
-            Debug.Log("[CounterSystem] Counter failed - cooldown started");
         }
     }
 
@@ -481,31 +451,25 @@ public class CounterSystem : MonoBehaviour
 
     public bool TryCounterHitscan(WaveformData waveformType, CombatEntity attacker, out bool applyEffect)
     {
-        Debug.Log($"[CounterSystem] TryCounterHitscan called. Waveform={waveformType?.name}, Attacker={attacker?.name}, IsActive={_isCounterActive}");
 
         applyEffect = false;
 
         if (!_isCounterActive)
         {
-            Debug.Log("[CounterSystem] Counter window NOT ACTIVE - cannot counter hitscan");
             return false;
         }
 
         if (_playerCharacter.equippedWaveform != waveformType)
         {
-            Debug.Log($"[CounterSystem] Waveform mismatch for hitscan: {_playerCharacter.equippedWaveform?.name} != {waveformType?.name}");
             return false;
         }
 
         if (attacker == _playerCharacter)
         {
-            Debug.Log("[CounterSystem] Cannot counter own hitscan");
             return false;
         }
 
         applyEffect = true;
-
-        Debug.Log($"[CounterSystem] ✓ Hitscan counter successful!");
 
         // Notify reticle of successful parry
         if (_reticle != null)
@@ -550,9 +514,8 @@ public class CounterSystem : MonoBehaviour
             _stackCounts[waveformType] = 0;
         }
 
-        EndCounterWindow(true);
-
-        Debug.Log($"[CounterSystem] ✓✓✓ HITSCAN COUNTER SUCCESSFUL! {waveformType.name} hitscan attack countered! Stack count: {currentStacks}");
+        // DON'T end the counter window here - let it stay open for multiple counters!
+        // EndCounterWindow(true);  // REMOVED
 
         return true;
     }

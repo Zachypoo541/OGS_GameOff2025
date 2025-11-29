@@ -119,9 +119,9 @@ Material:
     - _OutlineThickness: 0.00583
     - _Parallax: 0.005
     - _QueueOffset: 0
-    - _RainbowIntensity: 3.1457365
+    - _RainbowIntensity: 2.5658119
     - _RainbowSamples: 12
-    - _RainbowSpread: 2.2409556
+    - _RainbowSpread: 2.0001402
     - _ReceiveShadows: 1
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0

@@ -10,6 +10,7 @@ public class SelfCastController : MonoBehaviour
     private Transform _cameraTransform;
     private PlayerInput _playerInput;
     private KinematicCharacterController.KinematicCharacterMotor _motor;
+    private SelfCastVignetteController _vignetteController;
 
     [Header("State")]
     private WaveformData _currentWaveform;
@@ -29,12 +30,17 @@ public class SelfCastController : MonoBehaviour
     private float _thrustEnterTimer = 0f;
     private const float THRUST_ENTER_DURATION = 0.5f; // Adjust based on your animation length
 
+    // Dash vignette state
+    private float _dashVignetteTimer = 0f;
+    private const float DASH_VIGNETTE_DURATION = 0.5f; // How long the dash vignette stays visible
+
     [Header("Debug")]
     [SerializeField] private bool enableDebugLogs = false;
 
     public void Initialize(CombatEntity combatEntity, PlayerLocomotion locomotion,
                           HandAnimationController handAnimController, Transform cameraTransform,
-                          PlayerInput playerInput, KinematicCharacterController.KinematicCharacterMotor motor)
+                          PlayerInput playerInput, KinematicCharacterController.KinematicCharacterMotor motor,
+                          SelfCastVignetteController vignetteController)
     {
         _combatEntity = combatEntity;
         _locomotion = locomotion;
@@ -42,6 +48,7 @@ public class SelfCastController : MonoBehaviour
         _cameraTransform = cameraTransform;
         _playerInput = playerInput;
         _motor = motor;
+        _vignetteController = vignetteController;
 
         if (enableDebugLogs)
             Debug.Log("[SelfCastController] Initialized");
@@ -61,6 +68,12 @@ public class SelfCastController : MonoBehaviour
         if (_isGravityReduced)
         {
             EndReducedGravity();
+        }
+
+        // Hide vignette when switching waveforms
+        if (_vignetteController != null)
+        {
+            _vignetteController.HideVignette();
         }
     }
 
@@ -85,6 +98,16 @@ public class SelfCastController : MonoBehaviour
             if (_reducedGravityTimer <= 0f)
             {
                 EndReducedGravity();
+            }
+        }
+
+        // Update dash vignette timer
+        if (_dashVignetteTimer > 0f)
+        {
+            _dashVignetteTimer -= deltaTime;
+            if (_dashVignetteTimer <= 0f && _vignetteController != null)
+            {
+                _vignetteController.HideVignette();
             }
         }
 
@@ -175,7 +198,7 @@ public class SelfCastController : MonoBehaviour
                 break;
         }
 
-        // Play random hand animation (if available)
+        // Play random hand animation (if available) WITH AUDIO
         PlayRandomSelfCastAnimation();
     }
 
@@ -187,6 +210,12 @@ public class SelfCastController : MonoBehaviour
         _reducedGravityTimer = _currentWaveform.reducedGravityDuration;
         _combatEntity.SetGravityMultiplier(_currentWaveform.reducedGravityMultiplier);
 
+        // Show vignette
+        if (_vignetteController != null && _currentWaveform.waveformColor != null)
+        {
+            _vignetteController.ShowVignette(_currentWaveform.waveformColor);
+        }
+
         if (enableDebugLogs)
             Debug.Log($"[SelfCastController] Reduced gravity activated for {_currentWaveform.reducedGravityDuration}s");
     }
@@ -197,6 +226,12 @@ public class SelfCastController : MonoBehaviour
 
         // Reset to passive gravity (waveform's base gravity multiplier)
         _combatEntity.ResetToPassiveGravity();
+
+        // Hide vignette
+        if (_vignetteController != null)
+        {
+            _vignetteController.HideVignette();
+        }
 
         if (enableDebugLogs)
             Debug.Log("[SelfCastController] Reduced gravity ended");
@@ -240,15 +275,23 @@ public class SelfCastController : MonoBehaviour
         // Start cooldown
         _selfCastCooldownTimer = _currentWaveform.selfCastCooldown;
 
-        // Play enter animation if available
+        // Show vignette
+        if (_vignetteController != null && _currentWaveform.waveformColor != null)
+        {
+            _vignetteController.ShowVignette(_currentWaveform.waveformColor);
+        }
+
+        // Play enter animation if available (WITH AUDIO via StartLeftHandLoop)
         if (_currentWaveform.selfCastEnterAnimation != null &&
             _currentWaveform.selfCastEnterAnimation.clip != null &&
             _handAnimController != null)
         {
+            // *** CHANGED: Pass waveform data for audio - but this is just the enter animation ***
             _handAnimController.PlayLeftHandAction(
                 _currentWaveform.selfCastEnterAnimation.clip,
                 false,
-                _currentWaveform.selfCastEnterAnimation.playbackSpeed
+                _currentWaveform.selfCastEnterAnimation.playbackSpeed,
+                null  // Don't pass waveform here - we'll handle thrust audio in StartThrustLoop
             );
             _thrustEnterPlayed = true;
         }
@@ -284,14 +327,16 @@ public class SelfCastController : MonoBehaviour
 
         _thrustLoopStarted = true;
 
-        // Start looping animation
+        // Start looping animation WITH AUDIO
         if (_currentWaveform.selfCastLoopAnimation != null &&
             _currentWaveform.selfCastLoopAnimation.clip != null &&
             _handAnimController != null)
         {
+            // *** CHANGED: Pass waveform data for thrust audio (start->loop->end sequence) ***
             _handAnimController.StartLeftHandLoop(
                 _currentWaveform.selfCastLoopAnimation.clip,
-                _currentWaveform.selfCastLoopAnimation.playbackSpeed
+                _currentWaveform.selfCastLoopAnimation.playbackSpeed,
+                _currentWaveform  // Pass waveform for thrust audio
             );
         }
 
@@ -309,10 +354,16 @@ public class SelfCastController : MonoBehaviour
         _thrustLoopStarted = false;
         _thrustEnterTimer = 0f;
 
-        // Stop the left hand loop first (but don't hide yet)
+        // Hide vignette
+        if (_vignetteController != null)
+        {
+            _vignetteController.HideVignette();
+        }
+
+        // *** CHANGED: Stop the left hand loop WITH AUDIO (plays thrust end sound) ***
         if (_handAnimController != null)
         {
-            _handAnimController.StopLeftHandLoop();
+            _handAnimController.StopLeftHandLoop(_currentWaveform);  // Pass waveform for end sound
         }
 
         // Play exit animation (this will hide when done via PlayLeftHandAction)
@@ -323,7 +374,8 @@ public class SelfCastController : MonoBehaviour
             _handAnimController.PlayLeftHandAction(
                 _currentWaveform.selfCastExitAnimation.clip,
                 true,
-                _currentWaveform.selfCastExitAnimation.playbackSpeed
+                _currentWaveform.selfCastExitAnimation.playbackSpeed,
+                null  // Don't pass waveform - we already played end sound above
             );
         }
 
@@ -358,6 +410,13 @@ public class SelfCastController : MonoBehaviour
     {
         _locomotion.ApplyDash();
 
+        // Show vignette briefly
+        if (_vignetteController != null && _currentWaveform.waveformColor != null)
+        {
+            _vignetteController.ShowVignette(_currentWaveform.waveformColor);
+            _dashVignetteTimer = DASH_VIGNETTE_DURATION;
+        }
+
         if (enableDebugLogs)
             Debug.Log("[SelfCastController] Dash activated");
     }
@@ -369,6 +428,12 @@ public class SelfCastController : MonoBehaviour
     private void ActivateDoubleJump()
     {
         _hasDoubleJumpBuff = true;
+
+        // Show vignette
+        if (_vignetteController != null && _currentWaveform.waveformColor != null)
+        {
+            _vignetteController.ShowVignette(_currentWaveform.waveformColor);
+        }
 
         if (enableDebugLogs)
             Debug.Log("[SelfCastController] Double jump buff granted");
@@ -382,6 +447,12 @@ public class SelfCastController : MonoBehaviour
     public void ConsumeDoubleJump()
     {
         _hasDoubleJumpBuff = false;
+
+        // Hide vignette when buff is consumed
+        if (_vignetteController != null)
+        {
+            _vignetteController.HideVignette();
+        }
 
         if (enableDebugLogs)
             Debug.Log("[SelfCastController] Double jump buff consumed");
@@ -432,9 +503,15 @@ public class SelfCastController : MonoBehaviour
         int randomIndex = Random.Range(0, validClips.Length);
         VideoClipWithSpeed selected = validClips[randomIndex];
 
+        // *** CHANGED: Pass waveform data for audio support ***
         if (_handAnimController != null)
         {
-            _handAnimController.PlayLeftHandAction(selected.clip, true, selected.playbackSpeed);
+            _handAnimController.PlayLeftHandAction(
+                selected.clip,
+                true,
+                selected.playbackSpeed,
+                _currentWaveform  // Pass waveform for self-cast audio
+            );
         }
 
     }
