@@ -1,0 +1,17 @@
+Button {
+    width: 250px;
+    height: 50px;
+    margin: 10px;
+    font-size: 18px;
+    background-color: transparent;
+    border-width: 0;
+    color: rgba(255, 255, 255, 0.7);
+    -unity-text-align: middle-center;
+    transition: all 0.15s ease;
+}
+
+Button:hover {
+    background-color: transparent;
+    color: white;
+    scale: 1.05;
+}

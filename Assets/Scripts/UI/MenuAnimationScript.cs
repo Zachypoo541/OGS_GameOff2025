@@ -8,7 +8,8 @@ public class MenuRotationAnimation : MonoBehaviour
     [SerializeField] private float animationSpeed = 0.5f; // Speed of rotation (lower is slower)
     
     private UIDocument uiDocument;
-    private VisualElement container;
+    private VisualElement mainMenuPanel;
+    private VisualElement settingsPanel;
     private float currentRotation = 0f;
     private float time = 0f;
 
@@ -22,25 +23,37 @@ public class MenuRotationAnimation : MonoBehaviour
             return;
         }
 
-        // Find the container element
-        container = uiDocument.rootVisualElement.Q<VisualElement>("container");
-        if (container == null)
+        // Find both panel elements
+        mainMenuPanel = uiDocument.rootVisualElement.Q<VisualElement>("main-menu-panel");
+        settingsPanel = uiDocument.rootVisualElement.Q<VisualElement>("settings-panel");
+        
+        if (mainMenuPanel == null)
         {
-            Debug.LogError("Container element not found in USS!");
-            return;
+            Debug.LogError("Main menu panel element not found!");
+        }
+        if (settingsPanel == null)
+        {
+            Debug.LogError("Settings panel element not found!");
         }
     }
 
     void Update()
     {
-        if (container == null) return;
+        if (mainMenuPanel == null && settingsPanel == null) return;
 
         // Calculate rotation using sine wave for smooth back and forth motion
         time += Time.deltaTime * animationSpeed;
         currentRotation = Mathf.Sin(time) * rotationAmount;
 
-        // Apply rotation to the container
-        container.style.rotate = new Rotate(Angle.Degrees(currentRotation));
+        // Apply rotation to both panels (only the visible one will be seen)
+        if (mainMenuPanel != null)
+        {
+            mainMenuPanel.style.rotate = new Rotate(Angle.Degrees(currentRotation));
+        }
+        if (settingsPanel != null)
+        {
+            settingsPanel.style.rotate = new Rotate(Angle.Degrees(currentRotation));
+        }
         
         // Optional: Apply to all children instead of container
         // ApplyRotationToChildren();
@@ -49,9 +62,20 @@ public class MenuRotationAnimation : MonoBehaviour
     // Alternative method to rotate individual children
     void ApplyRotationToChildren()
     {
-        foreach (VisualElement child in container.Children())
+        if (mainMenuPanel != null)
         {
-            child.style.rotate = new Rotate(Angle.Degrees(currentRotation));
+            foreach (VisualElement child in mainMenuPanel.Children())
+            {
+                child.style.rotate = new Rotate(Angle.Degrees(currentRotation));
+            }
+        }
+        
+        if (settingsPanel != null)
+        {
+            foreach (VisualElement child in settingsPanel.Children())
+            {
+                child.style.rotate = new Rotate(Angle.Degrees(currentRotation));
+            }
         }
     }
 

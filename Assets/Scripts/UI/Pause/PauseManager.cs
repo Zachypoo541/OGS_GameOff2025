@@ -1,111 +1,182 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
+using Cursor = UnityEngine.Cursor;
 
 public class PauseManager : MonoBehaviour
 {
-    [SerializeField] private GameObject pauseMenuPrefab;
-
+    [Header("UI References")]
+    [SerializeField] private UIDocument uiDocument;
+    
+    [Header("Input")]
     private PlayerInputActions inputActions;
-    private GameObject pauseMenuInstance;
-    private Transform playerTransform;
+    
+    private VisualElement root;
     private bool isPaused = false;
+    
+    // Cursor state tracking
+    private bool wasCursorVisible;
+    private CursorLockMode previousLockState;
+    
+    // UI Elements - we'll query these once
+    private Button resumeButton;
+    private Button settingsButton;
+    private Button mainMenuButton;
+    private Button backButton;
+    private VisualElement mainPausePanel;
+    private VisualElement settingsPanel;
 
     private void Awake()
     {
         inputActions = new PlayerInputActions();
-
-        // Find the player at runtime
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
-        {
-            playerTransform = player.transform;
-        }
-        else
-        {
-            Debug.LogWarning("Player GameObject not found! Make sure it has the 'Player' tag.");
-        }
+        DontDestroyOnLoad(gameObject);
     }
 
     private void OnEnable()
     {
+        // Enable input
         inputActions.Enable();
-        inputActions.Gameplay.Pause.performed += OnPausePressed;
+        inputActions.Gameplay.Pause.performed += OnPauseInput;
+        
+        // Get the root visual element
+        if (uiDocument != null)
+        {
+            root = uiDocument.rootVisualElement;
+            
+            // Query all UI elements by name
+            resumeButton = root.Q<Button>("ResumeButton");
+            settingsButton = root.Q<Button>("SettingsButton");
+            mainMenuButton = root.Q<Button>("MainMenuButton");
+            backButton = root.Q<Button>("BackButton");
+            mainPausePanel = root.Q<VisualElement>("MainPausePanel");
+            settingsPanel = root.Q<VisualElement>("SettingsPanel");
+            
+            // Register button click events
+            if (resumeButton != null)
+                resumeButton.RegisterCallback<ClickEvent>(evt => Resume());
+            
+            if (settingsButton != null)
+                settingsButton.RegisterCallback<ClickEvent>(evt => OpenSettings());
+            
+            if (mainMenuButton != null)
+                mainMenuButton.RegisterCallback<ClickEvent>(evt => LoadMainMenu());
+            
+            if (backButton != null)
+                backButton.RegisterCallback<ClickEvent>(evt => CloseSettings());
+            
+            // Hide the pause menu initially
+            HidePauseMenu();
+        }
     }
 
     private void OnDisable()
     {
-        inputActions.Gameplay.Pause.performed -= OnPausePressed;
+        inputActions.Gameplay.Pause.performed -= OnPauseInput;
         inputActions.Disable();
+        
+        // Unregister callbacks
+        if (resumeButton != null)
+            resumeButton.UnregisterCallback<ClickEvent>(evt => Resume());
+        
+        if (settingsButton != null)
+            settingsButton.UnregisterCallback<ClickEvent>(evt => OpenSettings());
+        
+        if (mainMenuButton != null)
+            mainMenuButton.UnregisterCallback<ClickEvent>(evt => LoadMainMenu());
+        
+        if (backButton != null)
+            backButton.UnregisterCallback<ClickEvent>(evt => CloseSettings());
     }
 
-    private void OnPausePressed(InputAction.CallbackContext context)
+    private void OnPauseInput(InputAction.CallbackContext context)
     {
         if (isPaused)
-        {
             Resume();
-        }
         else
-        {
             Pause();
-        }
     }
 
-    public void Pause()
+    private void Pause()
     {
-        // Instantiate the pause menu as a child of the Player
-        if (playerTransform != null)
-        {
-            pauseMenuInstance = Instantiate(pauseMenuPrefab, playerTransform);
-
-            // Set the reference to this manager using SendMessage to avoid circular dependency
-            pauseMenuInstance.SendMessage("SetPauseManager", this);
-        }
-        else
-        {
-            pauseMenuInstance = Instantiate(pauseMenuPrefab);
-            Debug.LogWarning("Player not found, instantiating pause menu at root.");
-        }
-
+        // Save cursor state
+        wasCursorVisible = Cursor.visible;
+        previousLockState = Cursor.lockState;
+        
+        // Pause game
         Time.timeScale = 0f;
         isPaused = true;
-
-        // Pause the player's input
+        
+        // Show pause menu
+        ShowPauseMenu();
+        
+        // Show main pause panel (not settings)
+        if (mainPausePanel != null)
+            mainPausePanel.style.display = DisplayStyle.Flex;
+        
+        if (settingsPanel != null)
+            settingsPanel.style.display = DisplayStyle.None;
+        
+        // Pause player
         if (Player.Instance != null)
-        {
             Player.Instance.SetPaused(true);
-        }
-
-        // Show and unlock cursor
+        
+        // Show cursor
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
     }
 
-    public void Resume()
+    private void Resume()
     {
-        // Destroy the pause menu instance
-        if (pauseMenuInstance != null)
-        {
-            Destroy(pauseMenuInstance);
-        }
-
+        // Hide pause menu
+        HidePauseMenu();
+        
+        // Resume game
         Time.timeScale = 1f;
         isPaused = false;
-
-        // Unpause the player's input
+        
+        // Unpause player
         if (Player.Instance != null)
-        {
             Player.Instance.SetPaused(false);
-        }
-
-        // Hide and lock cursor
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
+        
+        // Restore cursor state
+        Cursor.visible = wasCursorVisible;
+        Cursor.lockState = previousLockState;
     }
 
-    public void LoadMainMenu()
+    private void OpenSettings()
     {
-        Time.timeScale = 1f; // Reset time scale before loading scene
-        SceneManager.LoadScene("MainMenu"); // Make sure your main menu scene is named "MainMenu"
+        if (mainPausePanel != null)
+            mainPausePanel.style.display = DisplayStyle.None;
+        
+        if (settingsPanel != null)
+            settingsPanel.style.display = DisplayStyle.Flex;
+    }
+
+    private void CloseSettings()
+    {
+        if (mainPausePanel != null)
+            mainPausePanel.style.display = DisplayStyle.Flex;
+        
+        if (settingsPanel != null)
+            settingsPanel.style.display = DisplayStyle.None;
+    }
+
+    private void LoadMainMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MainMenu");
+    }
+
+    private void ShowPauseMenu()
+    {
+        if (root != null)
+            root.style.display = DisplayStyle.Flex;
+    }
+
+    private void HidePauseMenu()
+    {
+        if (root != null)
+            root.style.display = DisplayStyle.None;
     }
 }

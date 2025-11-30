@@ -25780,6 +25780,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75ce882fcdc17104d8b578a56a00d1bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainMixer: {fileID: 0}
 --- !u!114 &1854405064
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25794,7 +25795,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PanelSettings: {fileID: 11400000, guid: 88399591837699549b38e8a542515f55, type: 2}
   m_ParentUI: {fileID: 0}
-  sourceAsset: {fileID: 9197481963319205126, guid: 901f645870b030942844511270686df4, type: 3}
+  sourceAsset: {fileID: 9197481963319205126, guid: f3b77d47a9413b240b8d74785fca8770, type: 3}
   m_SortingOrder: 0
   m_WorldSpaceSizeMode: 1
   m_WorldSpaceWidth: 1920

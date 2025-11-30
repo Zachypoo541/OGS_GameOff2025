@@ -1,11 +1,41 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI%20Toolkit/MainMenuStyles.uss?fileID=7433441132597879392&amp;guid=99afefd2b5bebe64c93d97a0e0270e01&amp;type=3#MainMenuStyles" />
-    <ui:VisualElement name="container" style="flex-grow: 1; -unity-text-align: upper-left; top: auto; padding-top: 150px;">
-        <ui:Label text="Chromasonic &#10;&#x9;Overrdrive" name="title" style="margin-bottom: 60px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/BEATTECH.otf?fileID=12800000&amp;guid=4954f4166bee8164aa89dbde69a6116e&amp;type=3#BEATTECH&quot;); font-size: 64px; height: 100px;" />
+    
+    <!-- Main Menu Panel -->
+    <ui:VisualElement name="main-menu-panel" class="container" style="flex-grow: 1; -unity-text-align: upper-left; top: auto; padding-top: 150px;">
+        <ui:Label text="PHOTOSYNTH" name="title" style="margin-bottom: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/BEATTECH.otf?fileID=12800000&amp;guid=4954f4166bee8164aa89dbde69a6116e&amp;type=3#BEATTECH&quot;); font-size: 64px; height: 100px; -unity-text-align: upper-center; align-self: auto; align-content: auto; align-items: auto;" />
         <ui:VisualElement name="button-container" style="flex-grow: 1; background-size: 100% 100%; flex-shrink: 1;">
             <ui:Button text="Start" name="start-button" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/BEATTECH-Line.otf?fileID=12800000&amp;guid=a3ded64774c7f0845a13201d947da5c0&amp;type=3#BEATTECH-Line&quot;); font-size: 32px; -unity-font-style: bold;" />
             <ui:Button text="Options" name="options-button" style="font-size: 32px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/BEATTECH-Line.otf?fileID=12800000&amp;guid=a3ded64774c7f0845a13201d947da5c0&amp;type=3#BEATTECH-Line&quot;); -unity-font-style: bold;" />
             <ui:Button text="Quit" name="quit-button" style="font-size: 32px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/BEATTECH-Line.otf?fileID=12800000&amp;guid=a3ded64774c7f0845a13201d947da5c0&amp;type=3#BEATTECH-Line&quot;); -unity-font-style: bold;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+    
+    <!-- Settings Panel (Hidden by default) -->
+    <ui:VisualElement name="settings-panel" class="container" style="flex-grow: 1; display: none; padding-top: 150px;">
+        <ui:Label text="SETTINGS" name="settings-title" style="margin-bottom: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/BEATTECH.otf?fileID=12800000&amp;guid=4954f4166bee8164aa89dbde69a6116e&amp;type=3#BEATTECH&quot;); font-size: 64px; height: 100px; -unity-text-align: upper-center;" />
+        
+        <ui:VisualElement name="settings-content" style="flex-grow: 1; align-items: center; justify-content: flex-start; padding-top: 20px;">
+            <!-- Master Volume -->
+            <ui:VisualElement class="volume-control">
+                <ui:Label text="Master Volume" class="volume-label" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/BEATTECH-Line.otf?fileID=12800000&amp;guid=a3ded64774c7f0845a13201d947da5c0&amp;type=3#BEATTECH-Line&quot;);" />
+                <ui:Slider name="master-volume-slider" low-value="0.0001" high-value="1" value="1" class="volume-slider" />
+            </ui:VisualElement>
+            
+            <!-- Music Volume -->
+            <ui:VisualElement class="volume-control">
+                <ui:Label text="Music Volume" class="volume-label" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/BEATTECH-Line.otf?fileID=12800000&amp;guid=a3ded64774c7f0845a13201d947da5c0&amp;type=3#BEATTECH-Line&quot;);" />
+                <ui:Slider name="music-volume-slider" low-value="0.0001" high-value="1" value="1" class="volume-slider" />
+            </ui:VisualElement>
+            
+            <!-- SFX Volume -->
+            <ui:VisualElement class="volume-control">
+                <ui:Label text="SFX Volume" class="volume-label" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/BEATTECH-Line.otf?fileID=12800000&amp;guid=a3ded64774c7f0845a13201d947da5c0&amp;type=3#BEATTECH-Line&quot;);" />
+                <ui:Slider name="sfx-volume-slider" low-value="0.0001" high-value="1" value="1" class="volume-slider" />
+            </ui:VisualElement>
+            
+            <!-- Back Button -->
+            <ui:Button text="Back" name="back-button" style="margin-top: 30px; font-size: 32px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/BEATTECH-Line.otf?fileID=12800000&amp;guid=a3ded64774c7f0845a13201d947da5c0&amp;type=3#BEATTECH-Line&quot;); -unity-font-style: bold;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
