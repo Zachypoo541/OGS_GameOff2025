@@ -3,12 +3,6 @@ using System.Collections;
 
 public class EnergyPickup : MonoBehaviour
 {
-    [Header("Interaction Settings")]
-    [SerializeField] private float interactionRange = 3f;
-    [SerializeField] private float viewAngleThreshold = 0.7f; // Dot product threshold for "looking at"
-    [SerializeField] private KeyCode interactionKey = KeyCode.G;
-    [SerializeField] private string interactionPromptText = "Press G to Collect Energy";
-
     [Header("Energy Boost Settings")]
     [SerializeField] private float energyRegenBoostAmount = 5f; // Added to base regen rate
     [SerializeField] private float boostDuration = 10f; // How long the boost lasts
@@ -17,9 +11,6 @@ public class EnergyPickup : MonoBehaviour
     [SerializeField] private AudioClip pickupSound;
     [SerializeField] private float pickupSoundVolume = 0.8f;
     [SerializeField] private Vector2 pickupSoundPitchRange = new Vector2(0.95f, 1.05f);
-
-    [Header("UI Prefabs")]
-    [SerializeField] private GameObject interactionPromptPrefab;
 
     [Header("Hand Animation")]
     [SerializeField] private float grabAnimationDelay = 0.5f; // Delay before pickup activates after grab starts
@@ -49,14 +40,12 @@ public class EnergyPickup : MonoBehaviour
     [SerializeField] private float spawnScaleDuration = 0.8f;
     [SerializeField] private float spawnParticleRadius = 3f; // Initial spawn radius around object
     [SerializeField] private float spawnParticleFadeInDuration = 0.3f;
+    [HideInInspector] public bool wasSpawnedByEnemy = false; // Set to true when dropped by an enemy
 
     private Transform playerTransform;
     private Camera playerCamera;
     private CombatEntity playerCombatEntity;
-    private InteractionPrompt currentPrompt;
     private bool hasBeenCollected = false;
-    private bool isPlayerInRange = false;
-    private bool isPlayerLookingAt = false;
     private Vector3 initialScale;
     private HandAnimationController handAnimController;
     private bool isScalingDown = false;
@@ -128,25 +117,14 @@ public class EnergyPickup : MonoBehaviour
 
         // Always update rotation (even when collected or scaling down)
         UpdateRotation();
+    }
 
-        // Only check for interaction if not collected, fully spawned, and not scaling down
-        if (hasBeenCollected || !isFullySpawned || isScalingDown)
-            return;
-
-        CheckPlayerProximityAndGaze();
-
-        if (isPlayerInRange && isPlayerLookingAt)
+    private void OnTriggerEnter(Collider other)
+    {
+        // Check if the player has entered the trigger and pickup hasn't been collected yet
+        if (!hasBeenCollected && isFullySpawned && !isScalingDown && other.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
-            ShowPrompt();
-
-            if (Input.GetKeyDown(interactionKey))
-            {
-                StartCoroutine(PlayGrabAndCollect());
-            }
-        }
-        else
-        {
-            HidePrompt();
+            StartCoroutine(PlayGrabAndCollect());
         }
     }
 
@@ -347,60 +325,10 @@ public class EnergyPickup : MonoBehaviour
             Destroy(particleObj);
     }
 
-    private void CheckPlayerProximityAndGaze()
-    {
-        // Check distance from camera
-        float distance = Vector3.Distance(playerCamera.transform.position, transform.position);
-        isPlayerInRange = distance <= interactionRange;
-
-        if (!isPlayerInRange)
-        {
-            isPlayerLookingAt = false;
-            return;
-        }
-
-        // Check if camera is looking at object
-        Vector3 directionToObject = (transform.position - playerCamera.transform.position).normalized;
-        float dotProduct = Vector3.Dot(playerCamera.transform.forward, directionToObject);
-        isPlayerLookingAt = dotProduct >= viewAngleThreshold;
-    }
-
-    private void ShowPrompt()
-    {
-        if (currentPrompt == null)
-        {
-            Canvas canvas = FindFirstObjectByType<Canvas>();
-
-            if (canvas != null && interactionPromptPrefab != null)
-            {
-                GameObject promptObj = Instantiate(interactionPromptPrefab, canvas.transform);
-                currentPrompt = promptObj.GetComponent<InteractionPrompt>();
-
-                if (currentPrompt != null)
-                {
-                    currentPrompt.SetPromptText(interactionPromptText);
-                    currentPrompt.Show();
-                }
-            }
-        }
-    }
-
-    private void HidePrompt()
-    {
-        if (currentPrompt != null)
-        {
-            currentPrompt.Hide();
-            currentPrompt = null;
-        }
-    }
-
     private IEnumerator PlayGrabAndCollect()
     {
         // Immediately mark as collected to prevent multiple interactions
         hasBeenCollected = true;
-
-        // Hide prompt
-        HidePrompt();
 
         // Play pickup-specific grab animation if controller is assigned
         if (handAnimController != null)
@@ -449,6 +377,7 @@ public class EnergyPickup : MonoBehaviour
         // Start scale down (rotation will continue in Update)
         StartCoroutine(ScaleDownAndDestroy());
     }
+
     private void CreateParticleBurst()
     {
         if (objectRenderer == null || playerCamera == null)
@@ -606,10 +535,6 @@ public class EnergyPickup : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        // Visualize interaction range in editor
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, interactionRange);
-
         // Visualize spawn particle radius
         if (isSpawned)
         {

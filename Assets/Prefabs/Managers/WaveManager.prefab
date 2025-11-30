@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3611956607884458411}
   - component: {fileID: 6067503067420755646}
   - component: {fileID: 1805569203664128081}
+  - component: {fileID: 1555987274888202198}
   m_Layer: 0
   m_Name: WaveManager
   m_TagString: Untagged
@@ -74,3 +75,27 @@ MonoBehaviour:
   OnUnlockSpawned:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1555987274888202198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1514218520611804947}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 292741f3323f2564f8bfc24545079cb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  mainCamera: {fileID: 0}
+  arenaCompletedUIPrefab: {fileID: 382483478861820370, guid: b729b321ef9610344a688c31762583c2, type: 3}
+  overlayParticleSprite: {fileID: 0}
+  overlayParticleColor: {r: 1, g: 1, b: 1, a: 1}
+  particleSize: 3
+  particleCount: 100
+  swirlRadius: 5
+  swirlSpeed: 10
+  initialSpawnHeight: 10
+  particleDescentDuration: 1.5
+  heightVariation: 1

@@ -191,6 +191,13 @@ public abstract class EnemyAI : CombatEntity
 
     public override void TakeDamage(float damage, WaveformData sourceWaveform, CombatEntity attacker = null)
     {
+        // Check immunity
+        if (IsImmuneTo(sourceWaveform))
+        {
+            TriggerCounterEffect(sourceWaveform);
+            return;
+        }
+
         // Ignore damage if already dead
         if (isDead)
         {
@@ -258,7 +265,14 @@ public abstract class EnemyAI : CombatEntity
                 ? pickupSpawnPoint.rotation
                 : Quaternion.identity;
 
-            Instantiate(energyPickupPrefab, spawnPosition, spawnRotation);
+            GameObject spawnedPickup = Instantiate(energyPickupPrefab, spawnPosition, spawnRotation);
+
+            // Mark this pickup as spawned by an enemy
+            EnergyPickup pickup = spawnedPickup.GetComponent<EnergyPickup>();
+            if (pickup != null)
+            {
+                pickup.wasSpawnedByEnemy = true;
+            }
         }
 
         OnEnemyDeath();

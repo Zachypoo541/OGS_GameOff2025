@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: RuinedGreenhouse
   m_EditorClassIdentifier: 
   arenaNumber: 2
-  arenaName: RuinedGreenhouse
+  arenaName: Ruined Greenhouse
   arenaDescription: 
   waves:
   - {fileID: 11400000, guid: 1312624b411fe5746b6b36317c07e3b5, type: 2}

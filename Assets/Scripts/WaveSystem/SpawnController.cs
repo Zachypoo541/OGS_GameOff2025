@@ -58,6 +58,39 @@ public class SpawnController : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        // Debug: Test arena completion with Num0 key
+        if (Input.GetKeyDown(KeyCode.Alpha0) || Input.GetKeyDown(KeyCode.Keypad0))
+        {
+            Debug.Log("SpawnController: Testing arena completion (triggered by Num0)");
+            TestArenaCompletion();
+        }
+    }
+
+    /// <summary>
+    /// Test method to trigger arena completion (for debugging)
+    /// </summary>
+    private void TestArenaCompletion()
+    {
+        if (currentArena == null)
+        {
+            Debug.LogError("SpawnController: Cannot test arena completion, no arena assigned!");
+            return;
+        }
+
+        // Clear all enemies
+        ClearAllEnemies();
+
+        // Stop any ongoing spawning
+        StopAllCoroutines();
+        isSpawning = false;
+        waveCompleting = false;
+
+        // Trigger arena completion
+        OnArenaComplete();
+    }
+
     /// <summary>
     /// Find and cache all spawn points in the scene by their ID
     /// </summary>
@@ -350,17 +383,16 @@ public class SpawnController : MonoBehaviour
     {
         Debug.Log($"Arena {currentArena.arenaNumber} complete!");
 
-        // TODO: Integrate with your progression system when ready
-        // For now, just log completion
-        if (currentArena.nextArena != null)
+        // Trigger the transition
+        ArenaTransitionManager transitionManager = FindFirstObjectByType<ArenaTransitionManager>();
+        if (transitionManager != null)
         {
-            Debug.Log($"Next arena unlocked: {currentArena.nextArena.arenaName}");
+            transitionManager.TriggerArenaCompletion(currentArena);
         }
         else
         {
-            Debug.Log("Final arena completed!");
+            Debug.LogWarning("SpawnController: No ArenaTransitionManager found in scene!");
         }
-
     }
 
     /// <summary>
