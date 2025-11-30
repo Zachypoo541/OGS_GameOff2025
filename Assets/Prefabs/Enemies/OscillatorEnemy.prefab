@@ -85,8 +85,8 @@ MonoBehaviour:
   projectileSpawnPoint: {fileID: 3576081988137954073}
   immuneToWaveforms:
   - {fileID: 11400000, guid: 493d8bdd963f48a489fe1e7a4a5e33b6, type: 2}
-  attackRange: 70
-  detectionRange: 80
+  attackRange: 115
+  detectionRange: 130
   aimHeightOffset: 1
   energyPickupPrefab: {fileID: 0}
   dropChance: 0

@@ -138,6 +138,9 @@ public class GameStateManager : MonoBehaviour
     {
         Debug.Log($"GameStateManager: Restarting wave {currentWaveConfig.waveNumber}");
 
+        // Clean up all enemy-spawned pickups
+        CleanupEnemySpawnedPickups();
+
         // Reset player state
         ResetPlayer();
 
@@ -196,11 +199,34 @@ public class GameStateManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Removes all energy pickups that were spawned by enemies, leaving level-placed pickups intact
+    /// </summary>
+    private void CleanupEnemySpawnedPickups()
+    {
+        EnergyPickup[] allPickups = FindObjectsByType<EnergyPickup>(FindObjectsSortMode.None);
+        int cleanedCount = 0;
+
+        foreach (EnergyPickup pickup in allPickups)
+        {
+            if (pickup.wasSpawnedByEnemy)
+            {
+                Destroy(pickup.gameObject);
+                cleanedCount++;
+            }
+        }
+
+        Debug.Log($"GameStateManager: Cleaned up {cleanedCount} enemy-spawned energy pickups");
+    }
+
+    /// <summary>
     /// Restarts the entire level by reloading the current scene
     /// </summary>
     public void RestartLevel()
     {
         Debug.Log("GameStateManager: Restarting level");
+
+        // Clean up enemy-spawned pickups before reloading
+        CleanupEnemySpawnedPickups();
 
         // Reset death state
         isPlayerDead = false;

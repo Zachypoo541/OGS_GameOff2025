@@ -1,0 +1,89 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdd5ad11e1c1eb14a96de2570d8b4728, type: 3}
+  m_Name: Factory_Wave7
+  m_EditorClassIdentifier: 
+  waveNumber: 7
+  waveDescription: 
+  playerWaveStartID: PlayerStartWave7
+  spawnGroups:
+  - delayBeforeSpawn: 0
+    spawnEntries:
+    - enemyPrefab: {fileID: 3417624422039667496, guid: 61ff65c41de9e9646899eba2b73a3213, type: 3}
+      count: 1
+      spawnPointID: SP_41
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+      overrideDropPrefab: {fileID: 1457257405789544094, guid: 9e55aceab035e0b439f6ee3fa4b76738, type: 3}
+      overrideDropChance: 0
+      useDropOverride: 1
+    - enemyPrefab: {fileID: 3417624422039667496, guid: 61ff65c41de9e9646899eba2b73a3213, type: 3}
+      count: 1
+      spawnPointID: SP_42
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+      overrideDropPrefab: {fileID: 1457257405789544094, guid: 9e55aceab035e0b439f6ee3fa4b76738, type: 3}
+      overrideDropChance: 0
+      useDropOverride: 1
+    - enemyPrefab: {fileID: 4399424611681413908, guid: 6b5fb19d297f4fb4eb34edfe8e4f16ff, type: 3}
+      count: 1
+      spawnPointID: SP_43
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+      overrideDropPrefab: {fileID: 1457257405789544094, guid: 9e55aceab035e0b439f6ee3fa4b76738, type: 3}
+      overrideDropChance: 1
+      useDropOverride: 1
+    - enemyPrefab: {fileID: 4399424611681413908, guid: 6b5fb19d297f4fb4eb34edfe8e4f16ff, type: 3}
+      count: 1
+      spawnPointID: SP_14
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+      overrideDropPrefab: {fileID: 1457257405789544094, guid: 9e55aceab035e0b439f6ee3fa4b76738, type: 3}
+      overrideDropChance: 1
+      useDropOverride: 1
+    - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
+      count: 1
+      spawnPointID: SP_44
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+      overrideDropPrefab: {fileID: 1457257405789544094, guid: 9e55aceab035e0b439f6ee3fa4b76738, type: 3}
+      overrideDropChance: 0
+      useDropOverride: 1
+    - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
+      count: 1
+      spawnPointID: SP_45
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+      overrideDropPrefab: {fileID: 1457257405789544094, guid: 9e55aceab035e0b439f6ee3fa4b76738, type: 3}
+      overrideDropChance: 0
+      useDropOverride: 1
+    - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
+      count: 1
+      spawnPointID: SP_13
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+      overrideDropPrefab: {fileID: 1457257405789544094, guid: 9e55aceab035e0b439f6ee3fa4b76738, type: 3}
+      overrideDropChance: 0
+      useDropOverride: 1
+    groupName: 
+    spawnSound: {fileID: 0}
+  autoStartNextWave: 1
+  delayBeforeNextWave: 1.5
+  waveMusic: {fileID: 0}
+  waveAnnouncementSound: {fileID: 0}

@@ -15,7 +15,15 @@ MonoBehaviour:
   arenaNumber: 3
   arenaName: Factory
   arenaDescription: 
-  waves: []
+  waves:
+  - {fileID: 11400000, guid: b579c9204b913644e87033e8d1b53bda, type: 2}
+  - {fileID: 11400000, guid: 60c3fff7319cb0f4cb9383e988f8f356, type: 2}
+  - {fileID: 11400000, guid: 58dd49174cc9d2445bf0684957500de0, type: 2}
+  - {fileID: 11400000, guid: f8a5f2cfd29b9a34d8446c50095e9954, type: 2}
+  - {fileID: 11400000, guid: ccc3a829353a1de428f61c90cd0eb7a9, type: 2}
+  - {fileID: 11400000, guid: bbd992a569ddde845abf760bd75bfba4, type: 2}
+  - {fileID: 11400000, guid: 35fdeda8f1bc6bf40b917b30b258acd1, type: 2}
+  - {fileID: 11400000, guid: a07cd06a08e3afe47b98d057d47617a8, type: 2}
   arenaSceneName: 
   spawnPointGroupTag: 
   nextArena: {fileID: 0}
