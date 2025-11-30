@@ -20,5 +20,5 @@ MonoBehaviour:
   shootDetailsText: High energy cost, consumes health if energy is low
   damageLevel: 2
   projectileType: 1
-  selfCastEffect: Explosive dash
-  counterEffect: Next attack deals bonus damage, reduces damage resistance
+  selfCastEffect: 'Self cast: Explosive dash'
+  counterEffect: 'Counter: Next attack deals bonus damage, reduces damage resistance'

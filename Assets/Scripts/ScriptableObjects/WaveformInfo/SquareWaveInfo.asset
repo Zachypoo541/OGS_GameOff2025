@@ -20,5 +20,5 @@ MonoBehaviour:
   shootDetailsText: Moderate energy cost, moderate damage
   damageLevel: 1
   projectileType: 0
-  selfCastEffect: Constant velocity opposite of aimed direction
-  counterEffect: Damage resistance
+  selfCastEffect: 'Self cast: Constant velocity opposite of aimed direction'
+  counterEffect: 'Counter: Damage resistance'

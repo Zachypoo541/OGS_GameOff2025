@@ -20,5 +20,5 @@ MonoBehaviour:
   shootDetailsText: Damage and energy cost increases with success attacks
   damageLevel: 3
   projectileType: 2
-  selfCastEffect: Grants a single-use double jump
-  counterEffect: Briefly increase energy regeneration rate
+  selfCastEffect: 'Self cast: Grants a single-use double jump'
+  counterEffect: 'Counter: Briefly increase energy regeneration rate'
