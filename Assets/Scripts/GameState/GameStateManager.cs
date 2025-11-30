@@ -257,6 +257,9 @@ public class GameStateManager : MonoBehaviour
         playerCharacter.currentHealth = playerCharacter.maxHealth;
         playerCharacter.currentEnergy = playerCharacter.maxEnergy;
 
+        // Force UI update by triggering the health/energy change events
+        playerCharacter.ForceUIUpdate();
+
         // Reset death flag
         isPlayerDead = false;
 
