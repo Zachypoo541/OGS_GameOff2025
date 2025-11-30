@@ -127,6 +127,13 @@ MonoBehaviour:
     highStemClip: {fileID: 8300000, guid: 9222c7873d21b814eaae4b26e8a6312c, type: 3}
     volume: 1
     loop: 1
+  - trackName: PHOTOSYNTH 7
+    fullMixClip: {fileID: 8300000, guid: 60bc15e2791e413459f4d244830b2f06, type: 3}
+    bassStemClip: {fileID: 8300000, guid: 541e4aa4286885345aa1b967e98e7441, type: 3}
+    midStemClip: {fileID: 8300000, guid: 60bc15e2791e413459f4d244830b2f06, type: 3}
+    highStemClip: {fileID: 8300000, guid: 60bc15e2791e413459f4d244830b2f06, type: 3}
+    volume: 1
+    loop: 1
   musicMixerGroup: {fileID: -941768749352520230, guid: 96a0d62f98c16cc4eb787a0e9048f805, type: 2}
   mutedAnalysisMixerGroup: {fileID: 24300002, guid: 3101c4b588cce00458dd98d8cefdddaf, type: 2}
   currentTrackIndex: -1
@@ -149,12 +156,15 @@ MonoBehaviour:
   - sceneName: MainMenu
     trackIndex: 0
     trackName: PHOTOSYNTH4
-  - sceneName: Arena 1_DarkOpen
+  - sceneName: Forest
     trackIndex: -1
     trackName: PHOTOSYNTH 3
-  - sceneName: 
-    trackIndex: 0
-    trackName: 
+  - sceneName: Ruined Greenhouse
+    trackIndex: -1
+    trackName: PHOTOSYNTH 7
+  - sceneName: Factory
+    trackIndex: -1
+    trackName: PHOTOSYNTH 4
   useCrossfade: 1
   crossfadeDuration: 2
 --- !u!1 &3386034028350916585

@@ -554,4 +554,14 @@ public class CombatEntity : MonoBehaviour
 
         return finalDamage;
     }
+
+    public void ForceUIUpdate()
+    {
+        // Trigger the OnHealthChanged event
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+
+        // Trigger the OnEnergyChanged event
+        OnEnergyChanged?.Invoke(currentEnergy, maxEnergy);
+    }
+
 }

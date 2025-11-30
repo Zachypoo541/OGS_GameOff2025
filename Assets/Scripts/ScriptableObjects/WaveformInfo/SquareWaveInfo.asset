@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: SquareWaveInfo
   m_EditorClassIdentifier: 
   waveformToUnlock: {fileID: 11400000, guid: 15a84da28a63faa4f8c4d8ad11630f2c, type: 2}
+  waveToStart: 1
   waveformName: Square
   waveformColor: {r: 0, g: 0, b: 1, a: 1}
   flavorText: Measured force, Rigid, Reliable
-  shootDetailsText: Moderate energy cost, strong knockback
+  shootDetailsText: Moderate energy cost, moderate damage
   damageLevel: 1
   projectileType: 0
   selfCastEffect: Constant velocity opposite of aimed direction

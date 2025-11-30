@@ -62,6 +62,9 @@ public class WaveformInfoPanel : MonoBehaviour
 
     private void DisablePlayerControl()
     {
+        // Pause the game
+        Time.timeScale = 0f;
+
         // Show and unlock cursor
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -78,6 +81,9 @@ public class WaveformInfoPanel : MonoBehaviour
 
     private void EnablePlayerControl()
     {
+        // Resume the game
+        Time.timeScale = 1f;
+
         // Hide and lock cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -159,14 +165,14 @@ public class WaveformInfoPanel : MonoBehaviour
 
     private IEnumerator FadeInSequence()
     {
-        // Initial delay
-        yield return new WaitForSeconds(initialDelay);
+        // Initial delay (unscaled)
+        yield return new WaitForSecondsRealtime(initialDelay);
 
-        // Fade in
+        // Fade in (unscaled)
         float elapsed = 0f;
         while (elapsed < fadeInDuration)
         {
-            elapsed += Time.deltaTime;
+            elapsed += Time.unscaledDeltaTime;
             canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsed / fadeInDuration);
             yield return null;
         }
@@ -314,7 +320,7 @@ public class WaveformInfoPanel : MonoBehaviour
         float elapsed = 0f;
         while (elapsed < fadeOutDuration)
         {
-            elapsed += Time.deltaTime;
+            elapsed += Time.unscaledDeltaTime;
             canvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsed / fadeOutDuration);
             yield return null;
         }

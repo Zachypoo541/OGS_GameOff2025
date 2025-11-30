@@ -19,7 +19,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1312624b411fe5746b6b36317c07e3b5, type: 2}
   - {fileID: 11400000, guid: d873ed1fb038a5145929106f59c4caee, type: 2}
   - {fileID: 11400000, guid: 451d611e8722fcf4e94d67b4772142f4, type: 2}
+  - {fileID: 11400000, guid: 8ea68ec228188be4ca35bcb3706005a7, type: 2}
+  - {fileID: 11400000, guid: a2032a63b74beb24995a116685314a96, type: 2}
+  - {fileID: 11400000, guid: 4954c5c89ea9eae489c09eb472db082c, type: 2}
+  - {fileID: 11400000, guid: b6ea5b6210b1bb14da0f6e284d93af68, type: 2}
+  - {fileID: 11400000, guid: 36455bbb627bea74c856580246789148, type: 2}
+  - {fileID: 11400000, guid: bc3e740dae09cc649a022346c419ad7b, type: 2}
   arenaSceneName: 
   spawnPointGroupTag: 
-  nextArena: {fileID: 0}
+  nextArena: {fileID: 11400000, guid: a1bf336553f1e4545907902f6e891428, type: 2}
   completionRewards: []
