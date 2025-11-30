@@ -18,7 +18,7 @@ MonoBehaviour:
   isHitscan: 0
   hitscanRange: 100
   baseDamage: 10
-  energyCost: 15
+  energyCost: 12
   projectileSpeed: 90
   projectilePrefab: {fileID: 8115411382015281130, guid: ecbb56278298ef843a561305a9da9e31, type: 3}
   knockbackForce: 0
@@ -33,7 +33,7 @@ MonoBehaviour:
   gravityMultiplier: 1
   accelerationMultiplier: 1
   selfCastType: 4
-  selfCastEnergyCost: 20
+  selfCastEnergyCost: 15
   selfCastCooldown: 2
   usesDash: 0
   dashForce: 20

@@ -123,12 +123,12 @@ MonoBehaviour:
   attackIndicatorSprite: {fileID: 0}
   attackIndicatorColor: {r: 1, g: 0, b: 0, a: 1}
   indicatorOffset: {x: 0, y: 2, z: 0}
-  normalSpeed: 10
-  rushSpeed: 15
-  rushDistance: 15
+  normalSpeed: 8
+  rushSpeed: 14
+  rushDistance: 14
   rushCooldown: 2
   flyHeight: 4
-  heightAdjustSpeed: 5
+  heightAdjustSpeed: 3
   lungeDamage: 30
   lungeRange: 4
   lungeCooldown: 1.5

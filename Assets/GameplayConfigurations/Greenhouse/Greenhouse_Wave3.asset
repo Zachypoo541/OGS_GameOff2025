@@ -14,24 +14,67 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   waveNumber: 3
   waveDescription: 
+  playerWaveStartID: PlayerStartWave1
   spawnGroups:
   - delayBeforeSpawn: 1
     spawnEntries:
-    - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
+    - enemyPrefab: {fileID: 319902718531050667, guid: 48c1a59783abcb547a9423b3d37e11b6, type: 3}
       count: 1
-      spawnPointID: SP_2
+      spawnPointID: SP_8
       useRandomSpread: 0
       spreadRadius: 0
       spawnInterval: 0
-    - enemyPrefab: {fileID: 7327358941035645116, guid: 7d35aa2b643d6f24b8ef3b1f966fa911, type: 3}
+      overrideDropPrefab: {fileID: 0}
+      overrideDropChance: 0.5
+      useDropOverride: 0
+    - enemyPrefab: {fileID: 319902718531050667, guid: 48c1a59783abcb547a9423b3d37e11b6, type: 3}
       count: 1
-      spawnPointID: SP_3
+      spawnPointID: SP_9
       useRandomSpread: 0
       spreadRadius: 0
       spawnInterval: 0
+      overrideDropPrefab: {fileID: 0}
+      overrideDropChance: 0.5
+      useDropOverride: 0
+    - enemyPrefab: {fileID: 319902718531050667, guid: 48c1a59783abcb547a9423b3d37e11b6, type: 3}
+      count: 1
+      spawnPointID: SP_10
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+      overrideDropPrefab: {fileID: 0}
+      overrideDropChance: 0.5
+      useDropOverride: 0
+    - enemyPrefab: {fileID: 319902718531050667, guid: 48c1a59783abcb547a9423b3d37e11b6, type: 3}
+      count: 1
+      spawnPointID: SP_11
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+      overrideDropPrefab: {fileID: 0}
+      overrideDropChance: 0.5
+      useDropOverride: 0
+    - enemyPrefab: {fileID: 319902718531050667, guid: 48c1a59783abcb547a9423b3d37e11b6, type: 3}
+      count: 1
+      spawnPointID: SP_12
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+      overrideDropPrefab: {fileID: 0}
+      overrideDropChance: 0.5
+      useDropOverride: 0
+    - enemyPrefab: {fileID: 319902718531050667, guid: 48c1a59783abcb547a9423b3d37e11b6, type: 3}
+      count: 1
+      spawnPointID: SP_13
+      useRandomSpread: 0
+      spreadRadius: 0
+      spawnInterval: 0
+      overrideDropPrefab: {fileID: 0}
+      overrideDropChance: 0.5
+      useDropOverride: 0
     groupName: 
     spawnSound: {fileID: 0}
-  autoStartNextWave: 0
+  autoStartNextWave: 1
   delayBeforeNextWave: 2
   waveMusic: {fileID: 0}
   waveAnnouncementSound: {fileID: 0}
