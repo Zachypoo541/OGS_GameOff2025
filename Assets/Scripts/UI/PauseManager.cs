@@ -2,12 +2,26 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
+using UnityEngine.Audio;
 using Cursor = UnityEngine.Cursor;
 
 public class PauseManager : MonoBehaviour
 {
     [Header("UI References")]
     [SerializeField] private UIDocument uiDocument;
+    
+    [Header("Audio Mixer")]
+    [SerializeField] private AudioMixer mainMixer;
+    
+    [Header("Mixer Parameter Names")]
+    [Tooltip("The exposed parameter name in your Audio Mixer for master volume")]
+    [SerializeField] private string masterVolumeParameter = "MasterVolume";
+    
+    [Tooltip("The exposed parameter name in your Audio Mixer for music volume")]
+    [SerializeField] private string musicVolumeParameter = "MusicVolume";
+    
+    [Tooltip("The exposed parameter name in your Audio Mixer for SFX volume")]
+    [SerializeField] private string sfxVolumeParameter = "SFXVolume";
     
     [Header("Input")]
     private PlayerInputActions inputActions;
@@ -26,6 +40,11 @@ public class PauseManager : MonoBehaviour
     private Button backButton;
     private VisualElement mainPausePanel;
     private VisualElement settingsPanel;
+    
+    // Volume sliders
+    private Slider masterVolumeSlider;
+    private Slider musicVolumeSlider;
+    private Slider sfxVolumeSlider;
 
     private void Awake()
     {
@@ -33,12 +52,21 @@ public class PauseManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    private void Start()
+    {
+        // Initialize UI elements
+        InitializeUI();
+    }
+
     private void OnEnable()
     {
         // Enable input
         inputActions.Enable();
         inputActions.Gameplay.Pause.performed += OnPauseInput;
-        
+    }
+
+    private void InitializeUI()
+    {
         // Get the root visual element
         if (uiDocument != null)
         {
@@ -52,21 +80,41 @@ public class PauseManager : MonoBehaviour
             mainPausePanel = root.Q<VisualElement>("MainPausePanel");
             settingsPanel = root.Q<VisualElement>("SettingsPanel");
             
+            // Query volume sliders
+            masterVolumeSlider = root.Q<Slider>("master-volume-slider");
+            musicVolumeSlider = root.Q<Slider>("music-volume-slider");
+            sfxVolumeSlider = root.Q<Slider>("sfx-volume-slider");
+            
             // Register button click events
             if (resumeButton != null)
                 resumeButton.RegisterCallback<ClickEvent>(evt => Resume());
+            else
+                Debug.LogWarning("PauseManager: ResumeButton not found!");
             
             if (settingsButton != null)
                 settingsButton.RegisterCallback<ClickEvent>(evt => OpenSettings());
+            else
+                Debug.LogWarning("PauseManager: SettingsButton not found!");
             
             if (mainMenuButton != null)
                 mainMenuButton.RegisterCallback<ClickEvent>(evt => LoadMainMenu());
+            else
+                Debug.LogWarning("PauseManager: MainMenuButton not found!");
             
             if (backButton != null)
                 backButton.RegisterCallback<ClickEvent>(evt => CloseSettings());
+            else
+                Debug.LogWarning("PauseManager: BackButton not found!");
+            
+            // Setup volume sliders
+            SetupVolumeSliders();
             
             // Hide the pause menu initially
             HidePauseMenu();
+        }
+        else
+        {
+            Debug.LogError("PauseManager: UIDocument is not assigned!");
         }
     }
 
@@ -74,19 +122,85 @@ public class PauseManager : MonoBehaviour
     {
         inputActions.Gameplay.Pause.performed -= OnPauseInput;
         inputActions.Disable();
+    }
+
+    private void SetupVolumeSliders()
+    {
+        // Load saved volumes and setup sliders
+        if (masterVolumeSlider != null)
+        {
+            float masterVolume = PlayerPrefs.GetFloat("MasterVolume", 1f);
+            masterVolumeSlider.SetValueWithoutNotify(masterVolume);
+            masterVolumeSlider.RegisterValueChangedCallback(OnMasterVolumeChanged);
+            SetMixerVolume(masterVolumeParameter, masterVolume);
+        }
+        else
+        {
+            Debug.LogWarning("PauseManager: 'master-volume-slider' not found in UIDocument");
+        }
         
-        // Unregister callbacks
-        if (resumeButton != null)
-            resumeButton.UnregisterCallback<ClickEvent>(evt => Resume());
+        if (musicVolumeSlider != null)
+        {
+            float musicVolume = PlayerPrefs.GetFloat("MusicVolume", 1f);
+            musicVolumeSlider.SetValueWithoutNotify(musicVolume);
+            musicVolumeSlider.RegisterValueChangedCallback(OnMusicVolumeChanged);
+            SetMixerVolume(musicVolumeParameter, musicVolume);
+        }
+        else
+        {
+            Debug.LogWarning("PauseManager: 'music-volume-slider' not found in UIDocument");
+        }
         
-        if (settingsButton != null)
-            settingsButton.UnregisterCallback<ClickEvent>(evt => OpenSettings());
+        if (sfxVolumeSlider != null)
+        {
+            float sfxVolume = PlayerPrefs.GetFloat("SFXVolume", 1f);
+            sfxVolumeSlider.SetValueWithoutNotify(sfxVolume);
+            sfxVolumeSlider.RegisterValueChangedCallback(OnSFXVolumeChanged);
+            SetMixerVolume(sfxVolumeParameter, sfxVolume);
+        }
+        else
+        {
+            Debug.LogWarning("PauseManager: 'sfx-volume-slider' not found in UIDocument");
+        }
+    }
+
+    private void OnMasterVolumeChanged(ChangeEvent<float> evt)
+    {
+        SetMixerVolume(masterVolumeParameter, evt.newValue);
+        PlayerPrefs.SetFloat("MasterVolume", evt.newValue);
+        PlayerPrefs.Save();
+    }
+
+    private void OnMusicVolumeChanged(ChangeEvent<float> evt)
+    {
+        SetMixerVolume(musicVolumeParameter, evt.newValue);
+        PlayerPrefs.SetFloat("MusicVolume", evt.newValue);
+        PlayerPrefs.Save();
+    }
+
+    private void OnSFXVolumeChanged(ChangeEvent<float> evt)
+    {
+        SetMixerVolume(sfxVolumeParameter, evt.newValue);
+        PlayerPrefs.SetFloat("SFXVolume", evt.newValue);
+        PlayerPrefs.Save();
+    }
+
+    /// <summary>
+    /// Convert linear slider value (0-1) to decibel value for Audio Mixer
+    /// </summary>
+    private void SetMixerVolume(string parameterName, float sliderValue)
+    {
+        if (mainMixer == null)
+        {
+            Debug.LogError("PauseManager: No Audio Mixer assigned!");
+            return;
+        }
+
+        // Convert from linear (0-1) to decibels (-80 to 0)
+        // Using logarithmic scale for proper volume perception
+        float volume = sliderValue > 0.0001f ? Mathf.Log10(sliderValue) * 20f : -80f;
         
-        if (mainMenuButton != null)
-            mainMenuButton.UnregisterCallback<ClickEvent>(evt => LoadMainMenu());
-        
-        if (backButton != null)
-            backButton.UnregisterCallback<ClickEvent>(evt => CloseSettings());
+        mainMixer.SetFloat(parameterName, volume);
     }
 
     private void OnPauseInput(InputAction.CallbackContext context)
