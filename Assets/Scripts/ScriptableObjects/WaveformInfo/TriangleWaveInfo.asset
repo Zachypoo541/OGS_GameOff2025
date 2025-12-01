@@ -17,7 +17,7 @@ MonoBehaviour:
   waveformName: Triangle
   waveformColor: {r: 1, g: 1, b: 0, a: 1}
   flavorText: Adaptive, Moderate, Mediating
-  shootDetailsText: Damage and energy cost increases with success attacks
+  shootDetailsText: 'Shoot: Damage increases with success attacks'
   damageLevel: 3
   projectileType: 2
   selfCastEffect: 'Self cast: Grants a single-use double jump'

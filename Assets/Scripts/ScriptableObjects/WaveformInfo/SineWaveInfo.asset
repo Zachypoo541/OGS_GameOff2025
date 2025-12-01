@@ -16,8 +16,8 @@ MonoBehaviour:
   waveToStart: 0
   waveformName: Sine
   waveformColor: {r: 0, g: 1, b: 0, a: 1}
-  flavorText: Organic, Steady, Sustainable, Soothing
-  shootDetailsText: Low damage and low energy cost
+  flavorText: Steady, Sustainable, Soothing
+  shootDetailsText: 'Shoot: Low damage and low energy cost'
   damageLevel: 0
   projectileType: 0
   selfCastEffect: 'Self cast: Reduces gravity'
