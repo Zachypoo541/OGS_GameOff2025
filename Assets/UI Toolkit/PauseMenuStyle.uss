@@ -15,3 +15,20 @@ Button:hover {
     color: white;
     scale: 1.05;
 }
+/* Make all sliders the same width */
+Slider {
+    width: 300px;
+    margin: 10px 0;
+}
+
+#master-volume-slider {
+    width: 300px;
+}
+
+#music-volume-slider {
+    width: 300px;
+}
+
+#sfx-volume-slider {
+    width: 300px;
+}

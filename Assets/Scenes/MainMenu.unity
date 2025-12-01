@@ -599,7 +599,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75ce882fcdc17104d8b578a56a00d1bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainMixer: {fileID: 0}
+  mainMixer: {fileID: 24100000, guid: 96a0d62f98c16cc4eb787a0e9048f805, type: 2}
 --- !u!114 &1854405064
 MonoBehaviour:
   m_ObjectHideFlags: 0
