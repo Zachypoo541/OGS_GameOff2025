@@ -158,12 +158,15 @@ public class WaveformInfoPanel : MonoBehaviour
         if (counterEffectText != null)
             counterEffectText.text = data.counterEffect;
 
-        // Set border color with transparency
-        if (borderImage != null)
+        // Set vertex color of waveform name text and flavor text
+        if (waveformNameText != null)
         {
-            Color borderColor = data.waveformColor;
-            borderColor.a = 0.3f;
-            borderImage.color = borderColor;
+            waveformNameText.color = data.waveformColor;
+        }
+
+        if (flavorText != null)
+        {
+            flavorText.color = data.waveformColor;
         }
 
         // Disable player control and show cursor
