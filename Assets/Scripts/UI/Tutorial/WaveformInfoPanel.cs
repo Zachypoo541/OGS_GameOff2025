@@ -31,6 +31,8 @@ public class WaveformInfoPanel : MonoBehaviour
 
     private WaveformInfoData currentInfoData;
 
+    private static bool tutorialTakingOver = false;
+
     private void Awake()
     {
         if (canvasGroup == null)
@@ -56,8 +58,16 @@ public class WaveformInfoPanel : MonoBehaviour
         if (continueButton != null)
             continueButton.onClick.RemoveListener(OnContinueButtonClicked);
 
-        // Re-enable player control if panel is destroyed without clicking continue
-        EnablePlayerControl();
+        // Only re-enable player control if NOT Square waveform AND tutorial hasn't taken over
+        bool isSquareWaveform = currentInfoData != null && currentInfoData.waveformName == "Square";
+        if (!isSquareWaveform && !tutorialTakingOver)
+        {
+            EnablePlayerControl();
+        }
+        else if (isSquareWaveform)
+        {
+            Debug.Log("WaveformInfoPanel: OnDestroy for Square - tutorial is taking over control");
+        }
     }
 
     private void DisablePlayerControl()
@@ -187,11 +197,53 @@ public class WaveformInfoPanel : MonoBehaviour
         // Unlock the waveform
         UnlockWaveform();
 
-        // Re-enable player control
-        EnablePlayerControl();
+        // Check if this is the Square waveform
+        bool isSquareWaveform = currentInfoData != null && currentInfoData.waveformName == "Square";
 
         OnContinueClicked?.Invoke();
-        StartCoroutine(FadeOutAndDestroy());
+
+        if (!isSquareWaveform)
+        {
+            EnablePlayerControl();
+            StartCoroutine(FadeOutAndDestroy());
+        }
+        else
+        {
+            // Set flag so OnDestroy doesn't interfere
+            tutorialTakingOver = true;
+
+            // For Square, spawn tutorial BEFORE fading out
+            TutorialSpawner spawner = FindFirstObjectByType<TutorialSpawner>();
+            if (spawner != null)
+            {
+                Debug.Log("WaveformInfoPanel: Spawning waveform switching tutorial");
+                spawner.SpawnWaveformSwitchingTutorial();
+            }
+
+            // Now fade out (game stays paused, tutorial handles it)
+            StartCoroutine(FadeOutAndDestroyForTutorial());
+        }
+    }
+
+    private IEnumerator FadeOutAndDestroyForTutorial()
+    {
+        // Disable button to prevent multiple clicks
+        if (continueButton != null)
+            continueButton.interactable = false;
+
+        float elapsed = 0f;
+        while (elapsed < fadeOutDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            canvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsed / fadeOutDuration);
+            yield return null;
+        }
+
+        canvasGroup.alpha = 0f;
+
+        // Don't call EnablePlayerControl - tutorial will handle it
+        Debug.Log("WaveformInfoPanel: Destroyed, tutorial now in control");
+        Destroy(gameObject);
     }
 
     private void UnlockWaveform()

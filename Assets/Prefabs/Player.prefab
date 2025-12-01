@@ -41,6 +41,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8360626590970285069}
   - component: {fileID: 5573791303163878413}
+  - component: {fileID: 3061614364581788204}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -84,6 +85,28 @@ MonoBehaviour:
   reticle: {fileID: 0}
   counterSystem: {fileID: 102822914455170260}
   debugInput: 0
+--- !u!114 &3061614364581788204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2769063453141011474}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50247f6556745544e82f870c624a5ef5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tutorialPanelPrefab: {fileID: 5450573203595976400, guid: f18d02c99c11a71438895af2fea7bca7, type: 3}
+  playerCanvas: {fileID: 5702316055207206069}
+  movementTasks:
+  - {fileID: 11400000, guid: 06bcaa1ae6cb49840bd9616fc31067a8, type: 2}
+  - {fileID: 11400000, guid: 81a0935959ef5474c8c02388330b876d, type: 2}
+  - {fileID: 11400000, guid: 3f3a1e90e00f41d4a96dc8511f3bb261, type: 2}
+  - {fileID: 11400000, guid: 4e6aa9286248adf4e9979845c2bd6808, type: 2}
+  combatTasks:
+  - {fileID: 11400000, guid: f2566c28470284049b08bec9fdf35169, type: 2}
+  - {fileID: 11400000, guid: 288f54b4b9100244cb011446ca28f153, type: 2}
 --- !u!1 &3648927763264482542
 GameObject:
   m_ObjectHideFlags: 0
@@ -958,6 +981,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c3756b3e8c41a584f8e49a5fff1c7cbe, type: 3}
+--- !u!223 &5702316055207206069 stripped
+Canvas:
+  m_CorrespondingSourceObject: {fileID: 3845114790367623404, guid: c3756b3e8c41a584f8e49a5fff1c7cbe, type: 3}
+  m_PrefabInstance: {fileID: 8826533804309455961}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &7710825128209563514 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1260021785529785123, guid: c3756b3e8c41a584f8e49a5fff1c7cbe, type: 3}

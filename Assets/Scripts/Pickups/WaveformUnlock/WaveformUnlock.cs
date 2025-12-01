@@ -477,6 +477,15 @@ public class WaveformUnlock : MonoBehaviour
             );
         }
 
+        if (infoData != null && infoData.waveformName == "Sine")
+        {
+            TutorialSpawner spawner = FindFirstObjectByType<TutorialSpawner>();
+            if (spawner != null)
+            {
+                spawner.OnWaveformUnlockInteraction();
+            }
+        }
+
         // Create and play particle burst
         CreateParticleBurst();
 
