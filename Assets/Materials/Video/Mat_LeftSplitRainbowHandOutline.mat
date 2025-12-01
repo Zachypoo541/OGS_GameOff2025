@@ -120,15 +120,15 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _LineSharpness: 3.3800104
+    - _LineSharpness: 2.4825406
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _OutlineThickness: 0.005
     - _Parallax: 0.005
     - _QueueOffset: 0
-    - _RainbowIntensity: 5.6800275
+    - _RainbowIntensity: 3.2867749
     - _RainbowSamples: 7
-    - _RainbowSpread: 5.617038
+    - _RainbowSpread: 4.782535
     - _ReceiveShadows: 1
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
