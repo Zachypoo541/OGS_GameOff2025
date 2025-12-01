@@ -34,9 +34,9 @@ MonoBehaviour:
   accelerationMultiplier: 1
   selfCastType: 3
   selfCastEnergyCost: 15
-  selfCastCooldown: 3
+  selfCastCooldown: 1
   usesDash: 1
-  dashForce: 20
+  dashForce: 25
   dashDecayRate: 0.9
   reducedGravityMultiplier: 0.3
   reducedGravityDuration: 3

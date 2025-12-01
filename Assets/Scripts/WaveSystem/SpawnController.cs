@@ -29,6 +29,8 @@ public class SpawnController : MonoBehaviour
     [Tooltip("Called when all enemies in a wave are defeated")]
     public UnityEngine.Events.UnityEvent<int> OnWaveCompleted;
 
+    public Killbox killbox;
+
     // Private state
     private int currentWaveIndex = 0;
     private List<GameObject> activeEnemies = new List<GameObject>();
@@ -382,6 +384,9 @@ public class SpawnController : MonoBehaviour
     private void OnArenaComplete()
     {
         Debug.Log($"Arena {currentArena.arenaNumber} complete!");
+
+        if (killbox != null)
+            killbox.gameObject.SetActive(false);
 
         // Trigger the transition
         ArenaTransitionManager transitionManager = FindFirstObjectByType<ArenaTransitionManager>();
