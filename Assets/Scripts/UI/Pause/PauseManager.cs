@@ -124,6 +124,7 @@ public class PauseManager : MonoBehaviour
         // Show cursor
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
+        AudioListener.pause = false;
     }
 
     private void Resume()
@@ -142,6 +143,8 @@ public class PauseManager : MonoBehaviour
         // Restore cursor state
         Cursor.visible = wasCursorVisible;
         Cursor.lockState = previousLockState;
+
+        AudioListener.pause = false;
     }
 
     private void OpenSettings()

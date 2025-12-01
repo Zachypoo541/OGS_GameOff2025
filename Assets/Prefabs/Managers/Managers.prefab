@@ -80,8 +80,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1afc814967d54d4eb2a522514ebda0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pauseMenuPrefab: {fileID: 992702917034079695, guid: ac04df9948308f94086b2c07a700b418, type: 3}
-  scriptsToDisable: []
+  uiDocument: {fileID: 0}
 --- !u!1001 &1660310043928584307
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -267,6 +266,74 @@ PrefabInstance:
       propertyPath: currentTrackIndex
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 5598775634969956387, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
+      propertyPath: musicTracks.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5598775634969956387, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
+      propertyPath: musicTracks.Array.data[3].loop
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5598775634969956387, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
+      propertyPath: musicTracks.Array.data[3].volume
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5598775634969956387, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
+      propertyPath: musicTracks.Array.data[2].trackName
+      value: PHOTOSYNTH 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5598775634969956387, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
+      propertyPath: musicTracks.Array.data[3].trackName
+      value: PHOTOSYNTH 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5598775634969956387, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
+      propertyPath: musicTracks.Array.data[1].fullMixClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 0ab21284023a95a4c830066395726617, type: 3}
+    - target: {fileID: 5598775634969956387, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
+      propertyPath: musicTracks.Array.data[1].midStemClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 0ab21284023a95a4c830066395726617, type: 3}
+    - target: {fileID: 5598775634969956387, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
+      propertyPath: musicTracks.Array.data[2].fullMixClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 7659238dc448d8e4d8b1c6c45cde4a95, type: 3}
+    - target: {fileID: 5598775634969956387, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
+      propertyPath: musicTracks.Array.data[2].midStemClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 7659238dc448d8e4d8b1c6c45cde4a95, type: 3}
+    - target: {fileID: 5598775634969956387, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
+      propertyPath: musicTracks.Array.data[3].fullMixClip
+      value: 
+      objectReference: {fileID: 8300000, guid: ce2a764047b3013418d166162e901e80, type: 3}
+    - target: {fileID: 5598775634969956387, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
+      propertyPath: musicTracks.Array.data[3].midStemClip
+      value: 
+      objectReference: {fileID: 8300000, guid: ce2a764047b3013418d166162e901e80, type: 3}
+    - target: {fileID: 5598775634969956387, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
+      propertyPath: musicTracks.Array.data[1].bassStemClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 22c1c432da899394b95a878cca34e044, type: 3}
+    - target: {fileID: 5598775634969956387, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
+      propertyPath: musicTracks.Array.data[1].highStemClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 0ab21284023a95a4c830066395726617, type: 3}
+    - target: {fileID: 5598775634969956387, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
+      propertyPath: musicTracks.Array.data[2].bassStemClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 39268d7250898bb4d9b42e42d08675dd, type: 3}
+    - target: {fileID: 5598775634969956387, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
+      propertyPath: musicTracks.Array.data[2].highStemClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 7659238dc448d8e4d8b1c6c45cde4a95, type: 3}
+    - target: {fileID: 5598775634969956387, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
+      propertyPath: musicTracks.Array.data[3].bassStemClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 8f2b22efa1f91f0469ab75905fee3f74, type: 3}
+    - target: {fileID: 5598775634969956387, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
+      propertyPath: musicTracks.Array.data[3].highStemClip
+      value: 
+      objectReference: {fileID: 8300000, guid: ce2a764047b3013418d166162e901e80, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

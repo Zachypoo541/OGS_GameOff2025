@@ -47,19 +47,23 @@ public class SettingsMenuUI : MonoBehaviour
 
     public void SetMasterVolume(float volume)
     {
-        mainMixer.SetFloat("MasterVolume", Mathf.Log10(volume) * 20);
+        float dbValue = volume > 0.0001f ? Mathf.Log10(volume) * 20 : -80f;
+        bool success = mainMixer.SetFloat("MasterVolume", dbValue);
+        Debug.Log($"Setting MasterVolume: {dbValue}dB (success: {success})");
         PlayerPrefs.SetFloat("MasterVolume", volume);
     }
 
     public void SetMusicVolume(float volume)
     {
-        mainMixer.SetFloat("MusicVolume", Mathf.Log10(volume) * 20);
+        float dbValue = volume > 0.0001f ? Mathf.Log10(volume) * 20 : -80f;
+        mainMixer.SetFloat("MusicVolume", dbValue);
         PlayerPrefs.SetFloat("MusicVolume", volume);
     }
 
     public void SetSFXVolume(float volume)
     {
-        mainMixer.SetFloat("SFXVolume", Mathf.Log10(volume) * 20);
+        float dbValue = volume > 0.0001f ? Mathf.Log10(volume) * 20 : -80f;
+        mainMixer.SetFloat("SFXVolume", dbValue);
         PlayerPrefs.SetFloat("SFXVolume", volume);
     }
 

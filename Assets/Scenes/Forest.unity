@@ -7703,6 +7703,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 3061614364581788204, guid: f627d112fabccf44494a533df15e7655, type: 3}
+      propertyPath: advancedTutorialPanelPrefab
+      value: 
+      objectReference: {fileID: 2741192409720747025, guid: e11c1bb7e8baa574bb21f08497fea5ac, type: 3}
+    - target: {fileID: 3061614364581788204, guid: f627d112fabccf44494a533df15e7655, type: 3}
+      propertyPath: waveformSwitchingTasks.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3061614364581788204, guid: f627d112fabccf44494a533df15e7655, type: 3}
+      propertyPath: 'waveformSwitchingTasks.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 369177bb68f623b408c7e6e2df9e22c0, type: 2}
+    - target: {fileID: 3061614364581788204, guid: f627d112fabccf44494a533df15e7655, type: 3}
+      propertyPath: 'waveformSwitchingTasks.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 44c37c20ef710d140922aa54ab241c0d, type: 2}
     - target: {fileID: 3243523268985774179, guid: f627d112fabccf44494a533df15e7655, type: 3}
       propertyPath: m_LocalPosition.x
       value: -80.74
