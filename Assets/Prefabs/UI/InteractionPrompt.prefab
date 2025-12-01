@@ -67,8 +67,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Press G To Synthesize Waveform
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 676d0936d59e16b47a15eda1714da8fa, type: 2}
+  m_sharedMaterial: {fileID: 7435226438225818996, guid: 676d0936d59e16b47a15eda1714da8fa, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

@@ -31,6 +31,10 @@ public class PlayerCharacter : CombatEntity, ICharacterController
     [Header("Self-Cast System")]
     private SelfCastController _selfCastController;
 
+    // Energy regen boost tracking
+    private Coroutine _energyRegenBoostCoroutine;
+    private float _originalEnergyRegenRate;
+
     // Component references
     private PlayerInput _playerInput;
     private PlayerCombat _playerCombat;
@@ -96,6 +100,9 @@ public class PlayerCharacter : CombatEntity, ICharacterController
         // Initialize combat system
         currentHealth = maxHealth;
         currentEnergy = maxEnergy;
+
+        // Store original energy regen rate
+        _originalEnergyRegenRate = baseEnergyRegenRate;
     }
 
     protected override void Update()
@@ -289,25 +296,49 @@ public class PlayerCharacter : CombatEntity, ICharacterController
     /// </summary>
     public void ApplyEnergyRegenBoost(float boostAmount, float duration)
     {
-        StartCoroutine(EnergyRegenBoostCoroutine(boostAmount, duration));
+        // Stop any existing boost coroutine
+        if (_energyRegenBoostCoroutine != null)
+        {
+            StopCoroutine(_energyRegenBoostCoroutine);
+        }
+
+        _energyRegenBoostCoroutine = StartCoroutine(EnergyRegenBoostCoroutine(boostAmount, duration));
     }
 
     private System.Collections.IEnumerator EnergyRegenBoostCoroutine(float boostAmount, float duration)
     {
-        // Store original regen rate
-        float originalRegenRate = baseEnergyRegenRate;
+        // Reset to original first (in case there was a previous boost)
+        baseEnergyRegenRate = _originalEnergyRegenRate;
 
         // Apply boost
         baseEnergyRegenRate += boostAmount;
 
-        Debug.Log($"Energy regen boosted! {originalRegenRate} -> {baseEnergyRegenRate} for {duration} seconds");
+        Debug.Log($"Energy regen boosted! {_originalEnergyRegenRate} -> {baseEnergyRegenRate} for {duration} seconds");
 
         // Wait for duration
         yield return new WaitForSeconds(duration);
 
         // Restore original regen rate
-        baseEnergyRegenRate = originalRegenRate;
-        Debug.Log($"Energy regen boost expired. Restored to {originalRegenRate}");
+        baseEnergyRegenRate = _originalEnergyRegenRate;
+        _energyRegenBoostCoroutine = null;
+        Debug.Log($"Energy regen boost expired. Restored to {_originalEnergyRegenRate}");
+    }
+
+    /// <summary>
+    /// Clear any active energy regen boost and restore base regen rate
+    /// </summary>
+    public void ClearEnergyRegenBoost()
+    {
+        // Stop the coroutine if it's running
+        if (_energyRegenBoostCoroutine != null)
+        {
+            StopCoroutine(_energyRegenBoostCoroutine);
+            _energyRegenBoostCoroutine = null;
+        }
+
+        // Restore original regen rate
+        baseEnergyRegenRate = _originalEnergyRegenRate;
+        Debug.Log($"Energy regen boost cleared. Restored to {_originalEnergyRegenRate}");
     }
 
     protected override float GetEnergyRegenRate()
@@ -329,6 +360,9 @@ public class PlayerCharacter : CombatEntity, ICharacterController
 
     protected override void Die()
     {
+        // Clear any active energy regen boost before dying
+        ClearEnergyRegenBoost();
+
         base.Die();
         Debug.Log("Player died!");
 

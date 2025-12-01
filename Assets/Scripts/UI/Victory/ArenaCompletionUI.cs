@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // Remove if not using TextMeshPro
+using TMPro;
 
 /// <summary>
 /// Handles the Arena Completion UI screen with fade-in animation

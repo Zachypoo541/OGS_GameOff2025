@@ -6,6 +6,7 @@ public class EnergyPickup : MonoBehaviour
     [Header("Energy Boost Settings")]
     [SerializeField] private float energyRegenBoostAmount = 5f; // Added to base regen rate
     [SerializeField] private float boostDuration = 10f; // How long the boost lasts
+    [SerializeField] private float healAmount = 50f; // Amount to heal player
 
     [Header("Audio")]
     [SerializeField] private AudioClip pickupSound;
@@ -339,13 +340,21 @@ public class EnergyPickup : MonoBehaviour
         // Wait for grab animation delay
         yield return new WaitForSeconds(grabAnimationDelay);
 
-        // Now perform collection
-        CollectPickup();
+        // Check if player is still alive before collecting
+        if (playerCombatEntity != null && playerCombatEntity.currentHealth > 0)
+        {
+            CollectPickup();
+        }
+        else
+        {
+            // Player died during grab animation, just destroy the pickup
+            Destroy(gameObject);
+        }
     }
 
     private void CollectPickup()
     {
-        // Apply energy regen boost to player
+        // Apply energy regen boost and healing to player
         if (playerCombatEntity != null)
         {
             PlayerCharacter player = playerCombatEntity as PlayerCharacter;
@@ -353,8 +362,8 @@ public class EnergyPickup : MonoBehaviour
             {
                 player.ApplyEnergyRegenBoost(energyRegenBoostAmount, boostDuration);
 
-                // Heal the player for 50 health
-                player.Heal(50f);
+                // Heal the player
+                player.Heal(healAmount);
             }
             else
             {
