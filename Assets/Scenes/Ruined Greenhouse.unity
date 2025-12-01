@@ -27192,38 +27192,6 @@ PrefabInstance:
       propertyPath: uiDocument
       value: 
       objectReference: {fileID: 1714639871}
-    - target: {fileID: 7416890995134351165, guid: 7812aa76633a39742a422c7a6db5b671, type: 3}
-      propertyPath: musicTracks.Array.size
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 7416890995134351165, guid: 7812aa76633a39742a422c7a6db5b671, type: 3}
-      propertyPath: musicTracks.Array.data[2].loop
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7416890995134351165, guid: 7812aa76633a39742a422c7a6db5b671, type: 3}
-      propertyPath: musicTracks.Array.data[2].volume
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7416890995134351165, guid: 7812aa76633a39742a422c7a6db5b671, type: 3}
-      propertyPath: musicTracks.Array.data[2].trackName
-      value: PHOTOSYNTH 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 7416890995134351165, guid: 7812aa76633a39742a422c7a6db5b671, type: 3}
-      propertyPath: musicTracks.Array.data[2].fullMixClip
-      value: 
-      objectReference: {fileID: 8300000, guid: 60bc15e2791e413459f4d244830b2f06, type: 3}
-    - target: {fileID: 7416890995134351165, guid: 7812aa76633a39742a422c7a6db5b671, type: 3}
-      propertyPath: musicTracks.Array.data[2].midStemClip
-      value: 
-      objectReference: {fileID: 8300000, guid: 60bc15e2791e413459f4d244830b2f06, type: 3}
-    - target: {fileID: 7416890995134351165, guid: 7812aa76633a39742a422c7a6db5b671, type: 3}
-      propertyPath: musicTracks.Array.data[2].bassStemClip
-      value: 
-      objectReference: {fileID: 8300000, guid: 541e4aa4286885345aa1b967e98e7441, type: 3}
-    - target: {fileID: 7416890995134351165, guid: 7812aa76633a39742a422c7a6db5b671, type: 3}
-      propertyPath: musicTracks.Array.data[2].highStemClip
-      value: 
-      objectReference: {fileID: 8300000, guid: 60bc15e2791e413459f4d244830b2f06, type: 3}
     - target: {fileID: 7595577252096980956, guid: 7812aa76633a39742a422c7a6db5b671, type: 3}
       propertyPath: m_LocalPosition.x
       value: -10.920085
