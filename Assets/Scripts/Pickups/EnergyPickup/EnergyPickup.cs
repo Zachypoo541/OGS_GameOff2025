@@ -352,6 +352,9 @@ public class EnergyPickup : MonoBehaviour
             if (player != null)
             {
                 player.ApplyEnergyRegenBoost(energyRegenBoostAmount, boostDuration);
+
+                // Heal the player for 50 health
+                player.Heal(50f);
             }
             else
             {

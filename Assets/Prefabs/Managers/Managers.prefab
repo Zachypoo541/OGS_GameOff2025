@@ -171,12 +171,20 @@ PrefabInstance:
     m_TransformParent: {fileID: 7595577252096980956}
     m_Modifications:
     - target: {fileID: 1046577022544043494, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
+      propertyPath: sceneMappings.Array.data[0].trackName
+      value: PHOTOSYNTH 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1046577022544043494, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
       propertyPath: sceneMappings.Array.data[2].sceneName
       value: Ruined Greenhouse
       objectReference: {fileID: 0}
     - target: {fileID: 1046577022544043494, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
       propertyPath: sceneMappings.Array.data[2].trackName
-      value: PHOTOSYNTH 4
+      value: PHOTOSYNTH 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1046577022544043494, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
+      propertyPath: sceneMappings.Array.data[0].trackIndex
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 1046577022544043494, guid: 642f82ab21256f945b8ed88d909cdda1, type: 3}
       propertyPath: sceneMappings.Array.data[2].trackIndex
